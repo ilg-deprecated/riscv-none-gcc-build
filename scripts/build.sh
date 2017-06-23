@@ -1035,7 +1035,7 @@ then
 
   elif [ "${target_name}" == "debian" ]
   then
-    CFLAGS="-m${target_bits} -pipe" \
+    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     PKG_CONFIG="${git_folder_path}/gnu-mcu-eclipse/scripts/pkg-config-dbg" \
     PKG_CONFIG_LIBDIR="${install_folder}/lib/pkgconfig" \
     \
@@ -1045,7 +1045,7 @@ then
 
   elif [ "${target_name}" == "osx" ]
   then
-    CFLAGS="-Wno-shift-negative-value -m${target_bits} -pipe" \
+    CFLAGS="-Wno-shift-negative-value -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     PKG_CONFIG="${git_folder_path}/gnu-mcu-eclipse/scripts/pkg-config-dbg" \
     PKG_CONFIG_LIBDIR="${install_folder}/lib/pkgconfig" \
     \
@@ -1063,7 +1063,7 @@ then
 
     sed -e 's/PREFIX =/#PREFIX =/' -e 's/STRIP = .*/STRIP = file /' -e 's/SHARED_MODE=0/SHARED_MODE=1/' win32/Makefile.gcc >win32/Makefile.gcc2
 
-    CFLAGS="-m${target_bits} -pipe" \
+    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     LDFLAGS="-v" \
     PREFIX="${cross_compile_prefix}-" \
     INCLUDE_PATH="${install_folder}/include" \
@@ -1102,7 +1102,7 @@ then
   if [ "${target_name}" == "win" ]
   then
 
-    CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -m${target_bits} -pipe" \
+    CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1118,7 +1118,7 @@ then
   elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
   then
 
-    CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -m${target_bits} -pipe" \
+    CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1161,7 +1161,7 @@ then
   if [ "${target_name}" == "win" ]
   then
 
-    CFLAGS="-m${target_bits} -pipe" \
+    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1178,7 +1178,7 @@ then
   elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
   then
 
-    CFLAGS="-m${target_bits} -pipe" \
+    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1222,7 +1222,7 @@ then
   if [ "${target_name}" == "win" ]
   then
 
-    CFLAGS="-m${target_bits} -pipe" \
+    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1238,7 +1238,7 @@ then
   elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
   then
 
-    CFLAGS="-m${target_bits} -pipe" \
+    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1281,7 +1281,7 @@ then
   if [ "${target_name}" == "win" ]
   then
 
-    CFLAGS="-Wno-dangling-else -m${target_bits} -pipe" \
+    CFLAGS="-Wno-dangling-else -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1297,7 +1297,7 @@ then
   elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
   then
 
-    CFLAGS="-Wno-dangling-else -m${target_bits} -pipe" \
+    CFLAGS="-Wno-dangling-else -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1342,10 +1342,10 @@ then
   if [ "${target_name}" == "win" ]
   then
     
-    CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe" \
-    CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe" \
+    CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+    CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
-    LDFLAGS="-L${install_folder}/lib" \
+    LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
     \
     bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
       --prefix="${app_prefix}" \
@@ -1360,6 +1360,11 @@ then
       \
       --with-pkgversion="${branding}" \
       \
+      --with-mpc="${install_folder}" \
+      --with-mpfr="${install_folder}" \
+      --with-gmp="${install_folder}" \
+      --with-isl="${install_folder}" \
+      \
       --disable-werror \
       --disable-build-warnings \
       --disable-gdb-build-warnings \
@@ -1369,13 +1374,15 @@ then
       --with-sysroot="${app_prefix}" \
     | tee "configure-output.txt"
 
-  elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+  elif [ "${target_name}" == "osx" ]
   then
 
     # --with-system-zlib assume libz is available on osx & debian
 
-    CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe" \
-    CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe" \
+    CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+    CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+    CPPFLAGS="-I${install_folder}/include" \
+    LDFLAGS="-L${install_folder}/lib" \
     \
     bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
       --prefix="${app_prefix}" \
@@ -1387,6 +1394,46 @@ then
       --target="${gcc_target}" \
       \
       --with-pkgversion="${branding}" \
+      \
+      --with-mpc="${install_folder}" \
+      --with-mpfr="${install_folder}" \
+      --with-gmp="${install_folder}" \
+      --with-isl="${install_folder}" \
+      \
+      --disable-werror \
+      --disable-build-warnings \
+      --disable-gdb-build-warnings \
+      --disable-nls \
+      --enable-plugins \
+      --with-system-zlib \
+      --with-sysroot="${app_prefix}" \
+    | tee "configure-output.txt"
+
+  elif [ "${target_name}" == "debian" ]
+  then
+
+    # --with-system-zlib assume libz is available on osx & debian
+
+    CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+    CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+    CPPFLAGS="-I${install_folder}/include" \
+    LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+    \
+    bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
+      --prefix="${app_prefix}" \
+      --infodir="${app_prefix_doc}/info" \
+      --mandir="${app_prefix_doc}/man" \
+      --htmldir="${app_prefix_doc}/html" \
+      --pdfdir="${app_prefix_doc}/pdf" \
+      \
+      --target="${gcc_target}" \
+      \
+      --with-pkgversion="${branding}" \
+      \
+      --with-mpc="${install_folder}" \
+      --with-mpfr="${install_folder}" \
+      --with-gmp="${install_folder}" \
+      --with-isl="${install_folder}" \
       \
       --disable-werror \
       --disable-build-warnings \
@@ -1462,10 +1509,10 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe" \
-      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -m${target_bits} -pipe" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -1517,8 +1564,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe" \
-      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
       LDFLAGS="-L${install_folder}/lib" \
       \
@@ -1605,8 +1652,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-m${target_bits} -pipe" \
-      CXXFLAGS="-m${target_bits} -pipe" \
+      CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       \
       bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -1634,8 +1681,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-m${target_bits} -pipe" \
-      CXXFLAGS="-m${target_bits} -pipe" \
+      CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       \
       bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -1716,8 +1763,10 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe" \
-      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -m${target_bits} -pipe" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CPPFLAGS="-I${install_folder}/include" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -1763,17 +1812,71 @@ then
         CFLAGS_FOR_TARGET="${cflags_for_target}" \
         | tee "configure-output.txt"
 
-    elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+    elif [ "${target_name}" == "osx" ]
     then
 
       # --with-system-zlib assume libz is available
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe" \
-      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
       LDFLAGS="-L${install_folder}/lib" \
+      \
+      bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix}"  \
+        --infodir="${app_prefix_doc}/info" \
+        --mandir="${app_prefix_doc}/man" \
+        --htmldir="${app_prefix_doc}/html" \
+        --pdfdir="${app_prefix_doc}/pdf" \
+        \
+        --target="${gcc_target}" \
+        \
+        --with-pkgversion="${branding}" \
+        \
+        --with-mpc="${install_folder}" \
+        --with-mpfr="${install_folder}" \
+        --with-gmp="${install_folder}" \
+        --with-isl="${install_folder}" \
+        \
+        --disable-shared \
+        --disable-threads \
+        --enable-plugins \
+        --enable-tls \
+        --enable-languages=c,c++ \
+        --disable-decimal-float \
+        --disable-libffi \
+        --disable-libgomp \
+        --disable-libmudflap \
+        --disable-libquadmath \
+        --disable-libssp \
+        --disable-libstdcxx-pch \
+        --disable-nls \
+        --enable-checking=yes \
+        "${multilib_flags}" \
+        --with-system-zlib \
+        --with-newlib \
+        --with-headers="${install_folder}/${gcc_target}/include" \
+        --with-gnu-as \
+        --with-gnu-ld \
+        --with-abi="${gcc_abi}" \
+        --with-arch="${gcc_arch}" \
+        --with-sysroot="${app_prefix}" \
+        CFLAGS_FOR_TARGET="${cflags_for_target}" \
+        | tee "configure-output.txt"
+  
+    elif [ "${target_name}" == "debian" ]
+    then
+
+      # --with-system-zlib assume libz is available
+
+      # All variables below are passed on the command line before 'configure'.
+      # Be sure all these lines end in '\' to ensure lines are concatenated.
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CPPFLAGS="-I${install_folder}/include" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
