@@ -1,6 +1,13 @@
-# GNU MCU Eclipse RISC-V GCC build
+# GNU MCU Eclipse RISC-V Embedded GCC build
 
-These are the additional files required by the **GNU MCU Eclipse RISC-V GCC build** procedures.
+These are the additional files required by the [GNU MCU Eclipse RISC-V Embedded GCC](https://github.com/gnu-mcu-eclipse/riscv-gcc) build procedures.
+
+## How to build
+
+```bash
+$ git clone https://github.com/gnu-mcu-eclipse/riscv-gcc-build.git ~/Downloads/riscv-gcc-build.git
+$ bash ~/Downloads/riscv-gcc-build.git/scripts/build.sh --all
+```
 
 ## Folders
 
@@ -10,7 +17,7 @@ For consistency with other projects, all files are grouped under `gnu-mcu-eclips
 * `nsis` - files required by [NSIS (Nullsoft Scriptable Install System)](http://nsis.sourceforge.net/Main_Page);
 * `patches` - small patches to correct some problems identified in the official packages;
 * `pkgconfig` - configuration files missing in some of the official packages;
-* `scripts` - the build scripts and some other support scripts.
+* `scripts` - the build support scripts.
 
 ## Files
 
