@@ -28,7 +28,7 @@
 
 !define PUBLISHER                 "GNU MCU Eclipse"
 !define PRODUCT                   "RISC-V Embedded GCC"
-!define PRODUCTLOWERCASE          "riscv-eabi-gcc"
+!define PRODUCTLOWERCASE          "riscv-none-gcc"
 !define URL                       "http://gnuarmeclipse.github.io"
 
 ; Single instance, each new install will overwrite the values
@@ -129,30 +129,14 @@ SectionIn RO
 ${GetParent} "$INSTDIR" $Parent.INSTDIR
 
 ; Set output path to the installation directory.
-SetOutPath "$INSTDIR\bin"
-File /r "${INSTALL_FOLDER}\bin\*"
+SetOutPath "$INSTDIR\"
+; Copy everything in one command.
+File /r "${INSTALL_FOLDER}\*"
 
-SetOutPath "$INSTDIR\riscv64-unknown-elf"
-File /r "${INSTALL_FOLDER}\riscv64-unknown-elf\*"
-
-SetOutPath "$INSTDIR\share"
-File /r "${INSTALL_FOLDER}\share\*"
-
-; License files.
-SetOutPath "$INSTDIR\license"
-File /r "${INSTALL_FOLDER}\license\*"
-
-; Extra GNU MCU Eclipse files.
-SetOutPath "$INSTDIR"
-File "${INSTALL_FOLDER}\INFO.txt"
-
-SetOutPath "$INSTDIR\gnu-mcu-eclipse"
-File "${INSTALL_FOLDER}\gnu-mcu-eclipse\*"
-
-; Write the uninstaller file
+; Write the uninstaller file.
 WriteUninstaller "${UNINSTALL_EXE}"
 
-; Write the uninstaller file
+; Write the uninstaller file.
 WriteUninstaller "${UNINSTALL_EXE}"
 
 !ifdef W64
@@ -171,7 +155,7 @@ WriteRegStr HKLM "${INSTALL_KEY_FOLDER}" "${URL_KEY_NAME}" "${URL_VALUE}"
 ; 32/64 are different, will not overwrite each other.
 WriteRegStr HKLM "${PERSISTENT_KEY_FOLDER}" "${INSTALL_LOCATION_KEY_NAME}" "$Parent.INSTDIR"
 
-; Write the uninstall keys for Windows
+; Write the uninstall keys for Windows.
 WriteRegStr HKLM "${UNINSTALL_KEY_FOLDER}" "${UNINSTALL_KEY_NAME}" "${UNINSTALL_EXE}"
 WriteRegStr HKLM "${UNINSTALL_KEY_FOLDER}" "${INSTALL_LOCATION_KEY_NAME}" "$INSTDIR"
 WriteRegStr HKLM "${UNINSTALL_KEY_FOLDER}" "${DISPLAY_KEY_NAME}" "${DISPLAY_VALUE}"
@@ -183,25 +167,7 @@ WriteRegDWORD HKLM "${UNINSTALL_KEY_FOLDER}" "NoRepair" 1
 
 SectionEnd
 
-Section "Libraries" SectionDll
-
-SetOutPath "$INSTDIR\lib"
-File /r "${INSTALL_FOLDER}\lib\*"
-
-SetOutPath "$INSTDIR\include"
-File /r "${INSTALL_FOLDER}\include\*"
-
-SectionEnd
-
-Section "Documentation" SectionDoc
-
-SetOutPath "$INSTDIR\doc"
-File /nonfatal "${INSTALL_FOLDER}\doc\*.pdf"
-File /nonfatal /r "${INSTALL_FOLDER}\doc\*.html"
-
-SectionEnd
-
-; Optional section (can be disabled by the user)
+; Optional section (can be disabled by the user).
 Section "Start Menu Shortcuts" SectionMenu
 CreateDirectory "$SMPROGRAMS\${LINK_FOLDER}"
 CreateShortCut "$SMPROGRAMS\${LINK_FOLDER}\Uninstall.lnk" "${UNINSTALL_EXE}" "" "${UNINSTALL_EXE}" 0
@@ -230,7 +196,7 @@ ${endif}
 
 ReadRegStr $ix.path HKLM "${INSTALL_KEY_FOLDER}" "${INSTALL_LOCATION_KEY_NAME}"
 
-; If this refers to the last install, remove the install keys
+; If this refers to the last install, remove the install keys.
 ${if} "$ux.path" == "$ix.path"
 
   ; MessageBox MB_OK|MB_ICONSTOP "remove all install keys"
@@ -266,10 +232,10 @@ SectionEnd
 ; Descriptions (mouse-over).
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionScripts}	"TCL scripts."
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionDll}		"Runtime Libraries (DLL)."
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionDoc}		"Documentation."
-!insertmacro MUI_DESCRIPTION_TEXT ${SectionContrib}	"Contributed."
+; !insertmacro MUI_DESCRIPTION_TEXT ${SectionScripts}	"TCL scripts."
+; !insertmacro MUI_DESCRIPTION_TEXT ${SectionDll}		"Runtime Libraries (DLL)."
+; !insertmacro MUI_DESCRIPTION_TEXT ${SectionDoc}		"Documentation."
+; !insertmacro MUI_DESCRIPTION_TEXT ${SectionContrib}	"Contributed."
 !insertmacro MUI_DESCRIPTION_TEXT ${SectionMenu}	"Menu entries."
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
@@ -288,7 +254,7 @@ Function .onInit
 
   !insertmacro MUI_LANGDLL_DISPLAY
 
-  ; Check registry key for previous folder. The key is distinct for 32/64-bit.
+  ; Check registry key for previous folder. The key is distinct for 32/64-bits.
   ReadRegStr $INSTDIR HKLM "${PERSISTENT_KEY_FOLDER}" "${INSTALL_LOCATION_KEY_NAME}"
 
   ${if} $INSTDIR == ""
