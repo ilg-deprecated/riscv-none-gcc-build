@@ -9,6 +9,8 @@ $ git clone https://github.com/gnu-mcu-eclipse/riscv-gcc-build.git ~/Downloads/r
 $ bash ~/Downloads/riscv-gcc-build.git/scripts/build.sh --all
 ```
 
+Warning: with 5 separate distributions, this will take many hours, even on a fast machine.
+
 ## Folders
 
 For consistency with other projects, all files are grouped under `gnu-mcu-eclipse`.
@@ -21,4 +23,5 @@ For consistency with other projects, all files are grouped under `gnu-mcu-eclips
 
 ## Files
 
-* `VERSION` - the current build version file. Its content looks like `7.1.1-1`, where `7.1.1` is the official GCC version, and `2` is the GNU MCU Eclipse RISC-V GCC release number.
+* `VERSION` - the stable build version file. Its content looks like `7.1.1-1`, where `7.1.1` is the official GCC version, and `2` is the GNU MCU Eclipse RISC-V GCC release number.
+* `VERSION-dev` - the development build version file.
