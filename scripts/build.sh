@@ -1363,8 +1363,10 @@ then
       --disable-werror \
       --disable-build-warnings \
       --disable-gdb-build-warnings \
-      --without-system-zlib \
       --disable-nls \
+      --enable-plugins \
+      --without-system-zlib \
+      --with-sysroot="${app_prefix}" \
     | tee "configure-output.txt"
 
   elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
@@ -1389,8 +1391,10 @@ then
       --disable-werror \
       --disable-build-warnings \
       --disable-gdb-build-warnings \
-      --with-system-zlib \
       --disable-nls \
+      --enable-plugins \
+      --with-system-zlib \
+      --with-sysroot="${app_prefix}" \
     | tee "configure-output.txt"
 
   fi
@@ -1454,7 +1458,7 @@ then
     if [ "${target_name}" == "win" ]
     then
 
-      # --without-system-zlib assume libz is not available
+      # --with-system-zlib libz is available in the development environment
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
@@ -1485,25 +1489,31 @@ then
         --disable-threads \
         --disable-tls \
         --enable-languages=c \
-        --without-system-zlib \
-        --with-newlib \
-        --without-headers \
-        --disable-libmudflap \
-        --disable-libssp \
-        --disable-libquadmath \
+        --disable-decimal-float \
+        --disable-libffi \
         --disable-libgomp \
+        --disable-libmudflap \
+        --disable-libquadmath \
+        --disable-libssp \
+        --disable-libstdcxx-pch \
         --disable-nls \
         --enable-checking=no \
         "${multilib_flags}" \
+        --with-system-zlib \
+        --with-newlib \
+        --without-headers \
+        --with-gnu-as \
+        --with-gnu-ld \
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
+        --with-sysroot="${app_prefix}" \
         CFLAGS_FOR_TARGET="${cflags_for_target}" \
         | tee "configure-output.txt"
 
     elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
     then
 
-      # --with-system-zlib assume libz is available
+      # --with-system-zlib libz is available in the development environment
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
@@ -1532,18 +1542,24 @@ then
         --disable-threads \
         --disable-tls \
         --enable-languages=c \
-        --with-system-zlib \
-        --with-newlib \
-        --without-headers \
-        --disable-libmudflap \
-        --disable-libssp \
-        --disable-libquadmath \
+        --disable-decimal-float \
+        --disable-libffi \
         --disable-libgomp \
+        --disable-libmudflap \
+        --disable-libquadmath \
+        --disable-libssp \
+        --disable-libstdcxx-pch \
         --disable-nls \
         --enable-checking=no \
         "${multilib_flags}" \
+        --with-system-zlib \
+        --with-newlib \
+        --without-headers \
+        --with-gnu-as \
+        --with-gnu-ld \
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
+        --with-sysroot="${app_prefix}" \
         CFLAGS_FOR_TARGET="${cflags_for_target}" \
         | tee "configure-output.txt"
 
@@ -1558,7 +1574,7 @@ then
   cd "${build_folder_path}/${gcc_stage1_folder}"
 
   (
-    # No need to make all, gcc is enough to compile the libraries.
+    # No need to make 'all', 'all-gcc' is enough to compile the libraries.
     make "${jobs}" all-gcc
     make "${jobs}" install-gcc
   ) | tee "make-all-output.txt"
@@ -1723,20 +1739,27 @@ then
         \
         --disable-shared \
         --disable-threads \
+        --enable-plugins \
         --enable-tls \
         --enable-languages=c,c++ \
-        --without-system-zlib \
-        --with-newlib \
-        --with-headers="${install_folder}/${gcc_target}/include" \
-        --disable-libmudflap \
-        --disable-libssp \
-        --disable-libquadmath \
+        --disable-decimal-float \
+        --disable-libffi \
         --disable-libgomp \
+        --disable-libmudflap \
+        --disable-libquadmath \
+        --disable-libssp \
+        --disable-libstdcxx-pch \
         --disable-nls \
         --enable-checking=yes \
         "${multilib_flags}" \
+        --without-system-zlib \
+        --with-newlib \
+        --with-headers="${install_folder}/${gcc_target}/include" \
+        --with-gnu-as \
+        --with-gnu-ld \
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
+        --with-sysroot="${app_prefix}" \
         CFLAGS_FOR_TARGET="${cflags_for_target}" \
         | tee "configure-output.txt"
 
@@ -1770,20 +1793,27 @@ then
         \
         --disable-shared \
         --disable-threads \
+        --enable-plugins \
         --enable-tls \
         --enable-languages=c,c++ \
-        --with-system-zlib \
-        --with-newlib \
-        --with-headers="${install_folder}/${gcc_target}/include" \
-        --disable-libmudflap \
-        --disable-libssp \
-        --disable-libquadmath \
+        --disable-decimal-float \
+        --disable-libffi \
         --disable-libgomp \
+        --disable-libmudflap \
+        --disable-libquadmath \
+        --disable-libssp \
+        --disable-libstdcxx-pch \
         --disable-nls \
         --enable-checking=yes \
         "${multilib_flags}" \
+        --with-system-zlib \
+        --with-newlib \
+        --with-headers="${install_folder}/${gcc_target}/include" \
+        --with-gnu-as \
+        --with-gnu-ld \
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
+        --with-sysroot="${app_prefix}" \
         CFLAGS_FOR_TARGET="${cflags_for_target}" \
         | tee "configure-output.txt"
   
