@@ -1652,8 +1652,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-      CXXFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-m${target_bits} -pipe" \
+      CXXFLAGS="-m${target_bits} -pipe" \
       \
       bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -1673,7 +1673,8 @@ then
         --enable-newlib-retargetable-locking \
         --disable-newlib-supplied-syscalls \
         --disable-nls \
-        CFLAGS_FOR_TARGET="-Os -mcmodel=medlow" \
+        CFLAGS_FOR_TARGET="-Os -mcmodel=medlow -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="-Os -mcmodel=medlow -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
 
     elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
@@ -1681,8 +1682,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-      CXXFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-m${target_bits} -pipe" \
+      CXXFLAGS="-m${target_bits} -pipe" \
       \
       bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -1700,7 +1701,8 @@ then
         --enable-newlib-retargetable-locking \
         --disable-newlib-supplied-syscalls \
         --disable-nls \
-        CFLAGS_FOR_TARGET="-Os -mcmodel=medlow" \
+        CFLAGS_FOR_TARGET="-Os -mcmodel=medlow -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="-Os -mcmodel=medlow -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
 
     fi
