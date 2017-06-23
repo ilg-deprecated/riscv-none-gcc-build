@@ -850,6 +850,7 @@ export CONFIG_SHELL="/bin/sh"
 script_name="$(basename "$0")"
 args="$@"
 docker_container_name=""
+extra_path=""
 
 while [ $# -gt 0 ]
 do
