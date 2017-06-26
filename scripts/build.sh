@@ -171,12 +171,12 @@ do
       shift 2
       ;;
 
-    --no-strip)
+    --disable-strip)
       do_no_strip="y"
       shift
       ;;
 
-    --no-pdf)
+    --without-pdf)
       do_no_pdf="y"
       shift
       ;;
