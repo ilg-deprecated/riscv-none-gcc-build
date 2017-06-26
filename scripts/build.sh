@@ -52,9 +52,21 @@ IFS=$'\n\t'
 #
 # As a consequence, the Windows build is always done after the
 # Debian build.
+#
+# The script also builds a size optimised version of the system libraries,
+# similar to ARM **nano** version.
+# In practical terms, this means a separate build of the compiler
+# internal libraries, using `-Os -mcmodel=medlow` instead of 
+# `-O2 -mcmodel=medany` as for the regular libraries. It also means
+# the `newlib` build with special configuration options to use 
+# simpler `printf()` and memory management functions.
 # 
 # To resume a crashed build with the same timestamp, set
 # DISTRIBUTION_FILE_DATE='yyyymmdd-HHMM' in the environment.
+#
+# To make the resulting install folder relocatable (i.e. do not depend on
+# an absolute location), the `--with-sysroot` must point to a sub-folder
+# below `--prefix`.
 #
 
 # Mandatory definition.
@@ -112,7 +124,7 @@ DO_BUILD_DEB64=""
 DO_BUILD_OSX=""
 helper_script_path=""
 do_no_strip=""
-multilib_flags="" # by default multili is enabled
+multilib_flags="" # by default multilib is enabled
 do_no_pdf=""
 
 while [ $# -gt 0 ]
@@ -820,10 +832,12 @@ gcc_arch="${gcc_arch}"
 gcc_abi="${gcc_abi}"
 
 multilib_flags="${multilib_flags}"
-cflags_for_target="-Os -mcmodel=medlow"
 jobs="${jobs}"
 
 branding="${branding}"
+
+cflags_optimizations_for_target="-O2 -mcmodel=medany"
+cflags_optimizations_nano_for_target="-Os -mcmodel=medlow"
 
 EOF
 # The above marker must start in the first column.
@@ -923,6 +937,9 @@ distribution_file_version=$(cat "${git_folder_path}/gnu-mcu-eclipse/VERSION")-${
 
 app_prefix="${install_folder}/${APP_LC_NAME}"
 app_prefix_doc="${app_prefix}/share/doc"
+
+app_prefix_nano="${app_prefix}-nano"
+app_prefix_nano_doc="${app_prefix_nano}/share/doc"
 
 echo
 uname -a
@@ -1320,6 +1337,10 @@ then
   touch "${isl_stamp_file}"
 fi
 
+# -------------------------------------------------------------
+
+mkdir -p "${app_prefix}"
+mkdir -p "${app_prefix_nano}"
 
 # ----- Build BINUTILS. -----
 
@@ -1329,7 +1350,6 @@ binutils_stamp_file="${build_folder_path}/${binutils_folder}/stamp-install-compl
 if [ ! -f "${binutils_stamp_file}" ]
 then
 
-  rm -rfv "${build_folder_path}/${binutils_folder}"
   mkdir -p "${build_folder_path}/${binutils_folder}"
 
   echo
@@ -1337,139 +1357,139 @@ then
 
   cd "${build_folder_path}/${binutils_folder}"
 
-  mkdir -p "${app_prefix}"
-
-  if [ "${target_name}" == "win" ]
-  then
-    
-    CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-    CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-    CPPFLAGS="-I${install_folder}/include" \
-    LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
-    \
-    bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
-      --prefix="${app_prefix}" \
-      --infodir="${app_prefix_doc}/info" \
-      --mandir="${app_prefix_doc}/man" \
-      --htmldir="${app_prefix_doc}/html" \
-      --pdfdir="${app_prefix_doc}/pdf" \
-      \
-      --build="$(uname -m)-linux-gnu" \
-      --host="${cross_compile_prefix}" \
-      --target="${gcc_target}" \
-      \
-      --with-pkgversion="${branding}" \
-      \
-      --with-mpc="${install_folder}" \
-      --with-mpfr="${install_folder}" \
-      --with-gmp="${install_folder}" \
-      --with-isl="${install_folder}" \
-      \
-      --disable-werror \
-      --disable-build-warnings \
-      --disable-gdb-build-warnings \
-      --disable-nls \
-      --enable-plugins \
-      --without-system-zlib \
-      --with-sysroot="${app_prefix}" \
-    | tee "configure-output.txt"
-
-  elif [ "${target_name}" == "osx" ]
+  if [ ! -f "config.status" ]
   then
 
-    # --with-system-zlib assume libz is available on osx & debian
+    if [ "${target_name}" == "win" ]
+    then
+      
+      CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CPPFLAGS="-I${install_folder}/include" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      \
+      bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix}" \
+        --infodir="${app_prefix_doc}/info" \
+        --mandir="${app_prefix_doc}/man" \
+        --htmldir="${app_prefix_doc}/html" \
+        --pdfdir="${app_prefix_doc}/pdf" \
+        \
+        --build="$(uname -m)-linux-gnu" \
+        --host="${cross_compile_prefix}" \
+        --target="${gcc_target}" \
+        \
+        --with-pkgversion="${branding}" \
+        \
+        --with-mpc="${install_folder}" \
+        --with-mpfr="${install_folder}" \
+        --with-gmp="${install_folder}" \
+        --with-isl="${install_folder}" \
+        \
+        --disable-werror \
+        --disable-build-warnings \
+        --disable-gdb-build-warnings \
+        --disable-nls \
+        --enable-plugins \
+        --without-system-zlib \
+        --with-sysroot="${app_prefix}/${gcc_target}" \
+      | tee "configure-output.txt"
 
-    CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-    CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-    CPPFLAGS="-I${install_folder}/include" \
-    LDFLAGS="-L${install_folder}/lib" \
-    \
-    bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
-      --prefix="${app_prefix}" \
-      --infodir="${app_prefix_doc}/info" \
-      --mandir="${app_prefix_doc}/man" \
-      --htmldir="${app_prefix_doc}/html" \
-      --pdfdir="${app_prefix_doc}/pdf" \
-      \
-      --target="${gcc_target}" \
-      \
-      --with-pkgversion="${branding}" \
-      \
-      --with-mpc="${install_folder}" \
-      --with-mpfr="${install_folder}" \
-      --with-gmp="${install_folder}" \
-      --with-isl="${install_folder}" \
-      \
-      --disable-werror \
-      --disable-build-warnings \
-      --disable-gdb-build-warnings \
-      --disable-nls \
-      --enable-plugins \
-      --with-system-zlib \
-      --with-sysroot="${app_prefix}" \
-    | tee "configure-output.txt"
+    elif [ "${target_name}" == "osx" ]
+    then
 
-  elif [ "${target_name}" == "debian" ]
-  then
+      # --with-system-zlib assume libz is available on osx & debian
 
-    # --with-system-zlib assume libz is available on osx & debian
+      CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CPPFLAGS="-I${install_folder}/include" \
+      LDFLAGS="-L${install_folder}/lib" \
+      \
+      bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix}" \
+        --infodir="${app_prefix_doc}/info" \
+        --mandir="${app_prefix_doc}/man" \
+        --htmldir="${app_prefix_doc}/html" \
+        --pdfdir="${app_prefix_doc}/pdf" \
+        \
+        --target="${gcc_target}" \
+        \
+        --with-pkgversion="${branding}" \
+        \
+        --with-mpc="${install_folder}" \
+        --with-mpfr="${install_folder}" \
+        --with-gmp="${install_folder}" \
+        --with-isl="${install_folder}" \
+        \
+        --disable-werror \
+        --disable-build-warnings \
+        --disable-gdb-build-warnings \
+        --disable-nls \
+        --enable-plugins \
+        --with-system-zlib \
+        --with-sysroot="${app_prefix}/${gcc_target}" \
+      | tee "configure-output.txt"
 
-    CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-    CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-    CPPFLAGS="-I${install_folder}/include" \
-    LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
-    \
-    bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
-      --prefix="${app_prefix}" \
-      --infodir="${app_prefix_doc}/info" \
-      --mandir="${app_prefix_doc}/man" \
-      --htmldir="${app_prefix_doc}/html" \
-      --pdfdir="${app_prefix_doc}/pdf" \
-      \
-      --target="${gcc_target}" \
-      \
-      --with-pkgversion="${branding}" \
-      \
-      --with-mpc="${install_folder}" \
-      --with-mpfr="${install_folder}" \
-      --with-gmp="${install_folder}" \
-      --with-isl="${install_folder}" \
-      \
-      --disable-werror \
-      --disable-build-warnings \
-      --disable-gdb-build-warnings \
-      --disable-nls \
-      --enable-plugins \
-      --with-system-zlib \
-      --with-sysroot="${app_prefix}" \
-    | tee "configure-output.txt"
+    elif [ "${target_name}" == "debian" ]
+    then
 
+      # --with-system-zlib assume libz is available on osx & debian
+
+      CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CPPFLAGS="-I${install_folder}/include" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      \
+      bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix}" \
+        --infodir="${app_prefix_doc}/info" \
+        --mandir="${app_prefix_doc}/man" \
+        --htmldir="${app_prefix_doc}/html" \
+        --pdfdir="${app_prefix_doc}/pdf" \
+        \
+        --target="${gcc_target}" \
+        \
+        --with-pkgversion="${branding}" \
+        \
+        --with-mpc="${install_folder}" \
+        --with-mpfr="${install_folder}" \
+        --with-gmp="${install_folder}" \
+        --with-isl="${install_folder}" \
+        \
+        --disable-werror \
+        --disable-build-warnings \
+        --disable-gdb-build-warnings \
+        --disable-nls \
+        --enable-plugins \
+        --with-system-zlib \
+        --with-sysroot="${app_prefix}/${gcc_target}" \
+      | tee "configure-output.txt"
+
+    fi
   fi
- 
+
   echo
   echo "Running binutils make..."
   
   (
     # make clean
-    make "${jobs}" all
+    make "${jobs}" 
     make "${jobs}" install
     if [ -z "${do_no_pdf}" ]
     then
-      make "${jobs}" pdf
-      make "${jobs}" install-pdf
+      make "${jobs}" html pdf
+      make "${jobs}" install-html install-pdf
     fi
+
+    # Without this copy, the build for the nano version of the GCC second 
+    # step fails with unexpected errors, like "cannot compute suffix of 
+    # object files: cannot compile".
+    do_copy_dir "${app_prefix}" "${app_prefix_nano}"
   ) | tee "make-newlib-all-output.txt"
 
   # The binutils were successfuly created.
   touch "${binutils_stamp_file}"
-
 fi
-
-
-# ----- Save PATH and set it to include the new binaries -----
-
-saved_path=${PATH}
-PATH="${app_prefix}/bin":${PATH}
 
 # ----- Build GCC, first stage. -----
 
@@ -1545,7 +1565,7 @@ then
         --disable-libstdcxx-pch \
         --disable-nls \
         --enable-checking=no \
-        "${multilib_flags}" \
+        ${multilib_flags} \
         --with-system-zlib \
         --with-newlib \
         --without-headers \
@@ -1553,8 +1573,9 @@ then
         --with-gnu-ld \
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
-        --with-sysroot="${app_prefix}" \
-        CFLAGS_FOR_TARGET="${cflags_for_target}" \
+        --with-sysroot="${app_prefix}/${gcc_target}" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target}" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target}" \
         | tee "configure-output.txt"
 
     elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
@@ -1598,7 +1619,7 @@ then
         --disable-libstdcxx-pch \
         --disable-nls \
         --enable-checking=no \
-        "${multilib_flags}" \
+        ${multilib_flags} \
         --with-system-zlib \
         --with-newlib \
         --without-headers \
@@ -1606,12 +1627,12 @@ then
         --with-gnu-ld \
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
-        --with-sysroot="${app_prefix}" \
-        CFLAGS_FOR_TARGET="${cflags_for_target}" \
+        --with-sysroot="${app_prefix}/${gcc_target}" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target}" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target}" \
         | tee "configure-output.txt"
 
     fi
-
   fi
 
   # ----- Partial build, without documentation. -----
@@ -1625,9 +1646,14 @@ then
     make "${jobs}" all-gcc
     make "${jobs}" install-gcc
   ) | tee "make-all-output.txt"
-  touch "${gcc_stage1_stamp_file}"
 
+  touch "${gcc_stage1_stamp_file}"
 fi
+
+# ----- Save PATH and set it to include the new binaries -----
+
+saved_path=${PATH}
+PATH="${app_prefix}/bin":${PATH}
 
 # ----- Build newlib. -----
 
@@ -1673,8 +1699,8 @@ then
         --enable-newlib-retargetable-locking \
         --disable-newlib-supplied-syscalls \
         --disable-nls \
-        CFLAGS_FOR_TARGET="-Os -mcmodel=medlow -ffunction-sections -fdata-sections" \
-        CXXFLAGS_FOR_TARGET="-Os -mcmodel=medlow -ffunction-sections -fdata-sections" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
 
     elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
@@ -1701,12 +1727,11 @@ then
         --enable-newlib-retargetable-locking \
         --disable-newlib-supplied-syscalls \
         --disable-nls \
-        CFLAGS_FOR_TARGET="-Os -mcmodel=medlow -ffunction-sections -fdata-sections" \
-        CXXFLAGS_FOR_TARGET="-Os -mcmodel=medlow -ffunction-sections -fdata-sections" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
 
     fi
-  
   fi
 
   echo
@@ -1714,7 +1739,7 @@ then
   cd "${build_folder_path}/${newlib_folder}"
   (
     # make clean
-    make "${jobs}" all 
+    make "${jobs}"  
     make "${jobs}" install 
 
     if [ -z "${do_no_pdf}" ]
@@ -1741,7 +1766,121 @@ then
   touch "${newlib_stamp_file}"
 fi
 
-gcc_stage2_folder="gcc-second"
+# ----- Build newlib-nano. -----
+
+newlib_nano_folder="newlib-nano"
+newlib_nano_stamp_file="${build_folder_path}/${newlib_nano_folder}/stamp-install-completed"
+# mkdir -p "${build_folder_path}/${newlib_nano_folder}"
+
+if [ ! -f "${newlib_nano_stamp_file}" ]
+then
+
+  mkdir -p "${build_folder_path}/${newlib_nano_folder}"
+  cd "${build_folder_path}/${newlib_nano_folder}"
+
+  if [ ! -f "config.status" ]
+  then 
+
+    echo
+    echo "Running newlib-nano configure..."
+
+    if [ "${target_name}" == "win" ]
+    then
+
+      # All variables below are passed on the command line before 'configure'.
+      # Be sure all these lines end in '\' to ensure lines are concatenated.
+      CFLAGS="-Wno-implicit-function-declaration -m${target_bits} -pipe" \
+      CXXFLAGS="-m${target_bits} -pipe" \
+      \
+      bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix_nano}"  \
+        --infodir="${app_prefix_nano_doc}/info" \
+        --mandir="${app_prefix_nano_doc}/man" \
+        --htmldir="${app_prefix_nano_doc}/html" \
+        --pdfdir="${app_prefix_nano_doc}/pdf" \
+        \
+        --build="$(uname -m)-linux-gnu" \
+        --host="${cross_compile_prefix}" \
+        --target="${gcc_target}" \
+        \
+        --disable-newlib-supplied-syscalls \
+        --disable-newlib-fvwrite-in-streamio \
+        --disable-newlib-fseek-optimization \
+        --disable-newlib-wide-orient \
+        --disable-newlib-unbuf-stream-opt \
+        --disable-nls \
+        --enable-newlib-io-long-double \
+        --enable-newlib-io-long-long \
+        --enable-newlib-io-c99-formats \
+        --enable-newlib-register-fini \
+        --enable-newlib-retargetable-locking \
+        --enable-newlib-nano-malloc \
+        --enable-lite-exit \
+        --enable-newlib-global-atexit \
+        --enable-newlib-nano-formatted-io \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
+        | tee "configure-output.txt"
+
+    elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+    then
+
+      # All variables below are passed on the command line before 'configure'.
+      # Be sure all these lines end in '\' to ensure lines are concatenated.
+      CFLAGS="-m${target_bits} -pipe" \
+      CXXFLAGS="-m${target_bits} -pipe" \
+      \
+      bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix_nano}"  \
+        --infodir="${app_prefix_nano_doc}/info" \
+        --mandir="${app_prefix_nano_doc}/man" \
+        --htmldir="${app_prefix_nano_doc}/html" \
+        --pdfdir="${app_prefix_nano_doc}/pdf" \
+        \
+        --target="${gcc_target}" \
+        \
+        --disable-newlib-supplied-syscalls \
+        --disable-newlib-fvwrite-in-streamio \
+        --disable-newlib-fseek-optimization \
+        --disable-newlib-wide-orient \
+        --disable-newlib-unbuf-stream-opt \
+        --disable-nls \
+        --enable-newlib-io-long-double \
+        --enable-newlib-io-long-long \
+        --enable-newlib-io-c99-formats \
+        --enable-newlib-register-fini \
+        --enable-newlib-retargetable-locking \
+        --enable-newlib-nano-malloc \
+        --enable-lite-exit \
+        --enable-newlib-global-atexit \
+        --enable-newlib-nano-formatted-io \
+        CFLAGS_FOR_TARGET="-Wno-implicit-function-declaration -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-logical-op-parentheses ${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
+        | tee "configure-output.txt"
+
+    fi
+  fi
+
+  echo
+  echo "Running newlib-nano make..."
+  cd "${build_folder_path}/${newlib_nano_folder}"
+  (
+    # make clean
+    make "${jobs}"  
+    make "${jobs}" install 
+  ) | tee "make-newlib-all-output.txt"
+
+  touch "${newlib_nano_stamp_file}"
+fi
+
+# -------------------------------------------------------------
+
+# Restore PATH
+PATH="${saved_path}"
+
+# -------------------------------------------------------------
+
+gcc_stage2_folder="gcc-final"
 gcc_stage2_stamp_file="${build_folder_path}/${gcc_stage2_folder}/stamp-install-completed"
 # mkdir -p "${build_folder_path}/${gcc_stage2_folder}"
 
@@ -1765,7 +1904,7 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
       LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
@@ -1788,11 +1927,12 @@ then
         --with-gmp="${install_folder}" \
         --with-isl="${install_folder}" \
         \
-        --disable-shared \
-        --disable-threads \
+        --enable-languages=c,c++ \
         --enable-plugins \
         --enable-tls \
-        --enable-languages=c,c++ \
+        --enable-checking=yes \
+        --disable-shared \
+        --disable-threads \
         --disable-decimal-float \
         --disable-libffi \
         --disable-libgomp \
@@ -1801,28 +1941,31 @@ then
         --disable-libssp \
         --disable-libstdcxx-pch \
         --disable-nls \
-        --enable-checking=yes \
-        "${multilib_flags}" \
-        --without-system-zlib \
+        ${multilib_flags} \
         --with-newlib \
-        --with-headers="${install_folder}/${gcc_target}/include" \
+        --with-headers="yes" \
         --with-gnu-as \
         --with-gnu-ld \
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
-        --with-sysroot="${app_prefix}" \
-        CFLAGS_FOR_TARGET="${cflags_for_target}" \
+        --with-sysroot="${app_prefix}/${gcc_target}" \
+        --without-system-zlib \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
+        LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections" \
         | tee "configure-output.txt"
 
     elif [ "${target_name}" == "osx" ]
     then
 
       # --with-system-zlib assume libz is available
+      # no -ffunction-sections -fdata-sections / -Wl,--gc-sections for 
+      # Apple default gcc (clang based)
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-char-subscripts -Wno-format-security -m${target_bits} -pipe" \
+      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe" \
       CPPFLAGS="-I${install_folder}/include" \
       LDFLAGS="-L${install_folder}/lib" \
       \
@@ -1842,11 +1985,12 @@ then
         --with-gmp="${install_folder}" \
         --with-isl="${install_folder}" \
         \
-        --disable-shared \
-        --disable-threads \
+        --enable-languages=c,c++ \
         --enable-plugins \
         --enable-tls \
-        --enable-languages=c,c++ \
+        --enable-checking=yes \
+        --disable-shared \
+        --disable-threads \
         --disable-decimal-float \
         --disable-libffi \
         --disable-libgomp \
@@ -1855,17 +1999,18 @@ then
         --disable-libssp \
         --disable-libstdcxx-pch \
         --disable-nls \
-        --enable-checking=yes \
-        "${multilib_flags}" \
+        ${multilib_flags} \
         --with-system-zlib \
         --with-newlib \
-        --with-headers="${install_folder}/${gcc_target}/include" \
+        --with-headers="yes" \
         --with-gnu-as \
         --with-gnu-ld \
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
-        --with-sysroot="${app_prefix}" \
-        CFLAGS_FOR_TARGET="${cflags_for_target}" \
+        --with-sysroot="${app_prefix}/${gcc_target}" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
+        LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections" \
         | tee "configure-output.txt"
   
     elif [ "${target_name}" == "debian" ]
@@ -1875,7 +2020,7 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
       LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
@@ -1896,11 +2041,12 @@ then
         --with-gmp="${install_folder}" \
         --with-isl="${install_folder}" \
         \
-        --disable-shared \
-        --disable-threads \
+        --enable-languages=c,c++ \
         --enable-plugins \
         --enable-tls \
-        --enable-languages=c,c++ \
+        --enable-checking=yes \
+        --disable-shared \
+        --disable-threads \
         --disable-decimal-float \
         --disable-libffi \
         --disable-libgomp \
@@ -1909,21 +2055,21 @@ then
         --disable-libssp \
         --disable-libstdcxx-pch \
         --disable-nls \
-        --enable-checking=yes \
-        "${multilib_flags}" \
+        ${multilib_flags} \
         --with-system-zlib \
         --with-newlib \
-        --with-headers="${install_folder}/${gcc_target}/include" \
+        --with-headers="yes" \
         --with-gnu-as \
         --with-gnu-ld \
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
-        --with-sysroot="${app_prefix}" \
-        CFLAGS_FOR_TARGET="${cflags_for_target}" \
+        --with-sysroot="${app_prefix}/${gcc_target}" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
+        LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections" \
         | tee "configure-output.txt"
   
     fi
-
   fi
 
   # ----- Full build, with documentation. -----
@@ -1933,15 +2079,11 @@ then
   cd "${build_folder_path}/${gcc_stage2_folder}"
 
   (
-    make "${jobs}" all
+    make "${jobs}" 
     make "${jobs}" install
     if [ -z "${do_no_pdf}" ]
     then
-
-      # set +e
       make "${jobs}" install-pdf install-html
-      # set -e
-
     fi
   ) | tee "make-all-output.txt"
 
@@ -1950,8 +2092,282 @@ fi
 
 # -------------------------------------------------------------
 
-# Restore PATH
-PATH="${saved_path}"
+gcc_stage2_nano_folder="gcc-final-nano"
+gcc_stage2_nano_stamp_file="${build_folder_path}/${gcc_stage2_nano_folder}/stamp-install-completed"
+# mkdir -p "${build_folder_path}/${gcc_stage2_folder}"
+
+if [ ! -f "${gcc_stage2_nano_stamp_file}" ]
+then
+
+  mkdir -p "${build_folder_path}/${gcc_stage2_nano_folder}"
+  cd "${build_folder_path}/${gcc_stage2_nano_folder}"
+
+  if [ ! -f "config.status" ]
+  then
+
+    # https://gcc.gnu.org/install/configure.html
+    echo
+    echo "Running second stage configure RISC-V GCC ..."
+
+    if [ "${target_name}" == "win" ]
+    then
+
+      # --without-system-zlib assume libz is not available
+
+      # All variables below are passed on the command line before 'configure'.
+      # Be sure all these lines end in '\' to ensure lines are concatenated.
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CPPFLAGS="-I${install_folder}/include" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      \
+      bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix_nano}"  \
+        --infodir="${app_prefix_nano_doc}/info" \
+        --mandir="${app_prefix_nano_doc}/man" \
+        --htmldir="${app_prefix_nano_doc}/html" \
+        --pdfdir="${app_prefix_nano_doc}/pdf" \
+        \
+        --build="$(uname -m)-linux-gnu" \
+        --host="${cross_compile_prefix}" \
+        --target="${gcc_target}" \
+        \
+        --with-pkgversion="${branding}" \
+        \
+        --with-mpc="${install_folder}" \
+        --with-mpfr="${install_folder}" \
+        --with-gmp="${install_folder}" \
+        --with-isl="${install_folder}" \
+        \
+        --enable-languages=c,c++ \
+        --enable-plugins \
+        --enable-tls \
+        --enable-checking=yes \
+        --disable-shared \
+        --disable-threads \
+        --disable-decimal-float \
+        --disable-libffi \
+        --disable-libgomp \
+        --disable-libmudflap \
+        --disable-libquadmath \
+        --disable-libssp \
+        --disable-libstdcxx-pch \
+        --disable-libstdcxx-verbose \
+        --disable-nls \
+        ${multilib_flags} \
+        --with-newlib \
+        --without-system-zlib \
+        --with-headers="yes" \
+        --with-gnu-as \
+        --with-gnu-ld \
+        --with-abi="${gcc_abi}" \
+        --with-arch="${gcc_arch}" \
+        --with-sysroot="${app_prefix_nano}/${gcc_target}" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
+        LDFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -Wl,--gc-sections" \
+        | tee "configure-output.txt"
+
+    elif [ "${target_name}" == "osx" ]
+    then
+
+      # --with-system-zlib assume libz is available
+      # No -ffunction-sections -fdata-sections / -Wl,--gc-sections since  
+      # for Apple the default gcc is clang based.
+      # --disable-libstdcxx-verbose \
+
+      # All variables below are passed on the command line before 'configure'.
+      # Be sure all these lines end in '\' to ensure lines are concatenated.
+
+if true
+then
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-char-subscripts -Wno-format-security -m${target_bits} -pipe" \
+      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof  -Wno-mismatched-tags -Wno-ignored-attributes -m${target_bits} -pipe" \
+      CPPFLAGS="-I${install_folder}/include" \
+      LDFLAGS="-L${install_folder}/lib" \
+      \
+      bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix_nano}"  \
+        --infodir="${app_prefix_nano_doc}/info" \
+        --mandir="${app_prefix_nano_doc}/man" \
+        --htmldir="${app_prefix_nano_doc}/html" \
+        --pdfdir="${app_prefix_nano_doc}/pdf" \
+        \
+        --target="${gcc_target}" \
+        \
+        --with-pkgversion="${branding}" \
+        \
+        --with-mpc="${install_folder}" \
+        --with-mpfr="${install_folder}" \
+        --with-gmp="${install_folder}" \
+        --with-isl="${install_folder}" \
+        \
+        --enable-languages=c,c++ \
+        --enable-plugins \
+        --enable-tls \
+        --enable-checking=yes \
+        --disable-shared \
+        --disable-threads \
+        --disable-decimal-float \
+        --disable-libffi \
+        --disable-libgomp \
+        --disable-libmudflap \
+        --disable-libquadmath \
+        --disable-libssp \
+        --disable-libstdcxx-pch \
+        --disable-libstdcxx-verbose \
+        --disable-nls \
+        ${multilib_flags} \
+        --with-system-zlib \
+        --with-newlib \
+        --with-headers="yes" \
+        --with-gnu-as \
+        --with-gnu-ld \
+        --with-abi="${gcc_abi}" \
+        --with-arch="${gcc_arch}" \
+        --with-sysroot="${app_prefix_nano}/${gcc_target}" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
+        LDFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -Wl,--gc-sections" \
+        | tee "configure-output.txt"
+else
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-char-subscripts -Wno-format-security -m${target_bits} -pipe" \
+      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe" \
+      CPPFLAGS="-I${install_folder}/include" \
+      LDFLAGS="-L${install_folder}/lib" \
+      \
+      bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix_nano}"  \
+        --infodir="${app_prefix_nano_doc}/info" \
+        --mandir="${app_prefix_nano_doc}/man" \
+        --htmldir="${app_prefix_nano_doc}/html" \
+        --pdfdir="${app_prefix_nano_doc}/pdf" \
+        \
+        --target="${gcc_target}" \
+        \
+        --with-pkgversion="${branding}" \
+        \
+        --with-mpc="${install_folder}" \
+        --with-mpfr="${install_folder}" \
+        --with-gmp="${install_folder}" \
+        --with-isl="${install_folder}" \
+        \
+        --enable-languages=c,c++ \
+        --enable-plugins \
+        --enable-tls \
+        --enable-checking=yes \
+        --disable-shared \
+        --disable-threads \
+        --disable-decimal-float \
+        --disable-libffi \
+        --disable-libgomp \
+        --disable-libmudflap \
+        --disable-libquadmath \
+        --disable-libssp \
+        --disable-libstdcxx-pch \
+        --disable-nls \
+        ${multilib_flags} \
+        --with-system-zlib \
+        --with-newlib \
+        --with-headers="yes" \
+        --with-gnu-as \
+        --with-gnu-ld \
+        --with-abi="${gcc_abi}" \
+        --with-arch="${gcc_arch}" \
+        --with-sysroot="${app_prefix_nano}/${gcc_target}" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
+        LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections" \
+        | tee "configure-output.txt"
+
+fi
+    elif [ "${target_name}" == "debian" ]
+    then
+
+      # --with-system-zlib assume libz is available
+
+      # All variables below are passed on the command line before 'configure'.
+      # Be sure all these lines end in '\' to ensure lines are concatenated.
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof  -Wno-format-security -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CPPFLAGS="-I${install_folder}/include" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      \
+      bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
+        --prefix="${app_prefix_nano}"  \
+        --infodir="${app_prefix_nano_doc}/info" \
+        --mandir="${app_prefix_nano_doc}/man" \
+        --htmldir="${app_prefix_nano_doc}/html" \
+        --pdfdir="${app_prefix_nano_doc}/pdf" \
+        \
+        --target="${gcc_target}" \
+        \
+        --with-pkgversion="${branding}" \
+        \
+        --with-mpc="${install_folder}" \
+        --with-mpfr="${install_folder}" \
+        --with-gmp="${install_folder}" \
+        --with-isl="${install_folder}" \
+        \
+        --enable-languages=c,c++ \
+        --enable-plugins \
+        --enable-tls \
+        --enable-checking=yes \
+        --disable-shared \
+        --disable-threads \
+        --disable-decimal-float \
+        --disable-libffi \
+        --disable-libgomp \
+        --disable-libmudflap \
+        --disable-libquadmath \
+        --disable-libssp \
+        --disable-libstdcxx-pch \
+        --disable-libstdcxx-verbose \
+        --disable-nls \
+        ${multilib_flags} \
+        --with-system-zlib \
+        --with-newlib \
+        --with-headers="yes" \
+        --with-gnu-as \
+        --with-gnu-ld \
+        --with-abi="${gcc_abi}" \
+        --with-arch="${gcc_arch}" \
+        --with-sysroot="${app_prefix_nano}/${gcc_target}" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
+        CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
+        LDFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -Wl,--gc-sections" \
+        | tee "configure-output.txt"
+  
+    fi
+  fi
+
+  # ----- Partial build -----
+  echo
+  echo "Running second stage nano make..."
+
+  cd "${build_folder_path}/${gcc_stage2_nano_folder}"
+
+  (
+    make "${jobs}"
+    make "${jobs}" install
+
+    # Copy the libraries after appending the `_nano` suffix.
+    # Iterate through all multilib names.
+    do_copy_multi_libs \
+      "${app_prefix_nano}/${gcc_target}/lib" \
+      "${app_prefix}/${gcc_target}/lib" \
+      "${app_prefix_nano}/bin/${gcc_target}-gcc"
+
+    # Copy the nano configured newlib.h file into the location that nano.specs
+    # expects it to be.
+    mkdir -p "${app_prefix}/${gcc_target}/include/newlib-nano"
+    cp -v -f "${app_prefix_nano}/${gcc_target}/include/newlib.h" \
+      "${app_prefix}/${gcc_target}/include/newlib-nano/newlib.h"
+
+  ) | tee "make-all-output.txt"
+
+  touch "${gcc_stage2_nano_stamp_file}"
+fi
 
 # ----- Copy dynamic libraries to the install bin folder. -----
 
@@ -1968,8 +2384,24 @@ then
       echo
       echo "Striping executables..."
 
-      ${cross_compile_prefix}-strip \
-        "${app_prefix}/bin"/*.exe
+      to_strip=$(find "${app_prefix}/bin" -type f -name '*.exe')
+      for f in ${to_strip}
+      do
+        ${cross_compile_prefix}-strip ${f}
+      done
+
+      to_strip=$(find "${app_prefix}/libexec/gcc/${gcc_target}" -type f -name '*.exe')
+      for f in ${to_strip}
+      do
+        ${cross_compile_prefix}-strip ${f}
+      done
+
+      to_strip=$(find "${app_prefix}/${gcc_target}/bin" -type f -name '*.exe')
+      for f in ${to_strip}
+      do
+        ${cross_compile_prefix}-strip ${f}
+      done
+      
     fi
 
     echo
