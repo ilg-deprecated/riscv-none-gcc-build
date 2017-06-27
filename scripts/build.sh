@@ -311,13 +311,13 @@ GMP_URL="https://gmplib.org/download/gmp/${GMP_ARCHIVE}"
 
 
 # http://www.mpfr.org
-# http://www.mpfr.org/mpfr-current/mpfr-3.1.4.tar.bz2
+# http://www.mpfr.org/mpfr-3.1.5/mpfr-3.1.5.tar.bz2
 
 MPFR_VERSION="3.1.4"
 
 MPFR_FOLDER="mpfr-${MPFR_VERSION}"
 MPFR_ARCHIVE="${MPFR_FOLDER}.tar.bz2"
-MPFR_URL="http://www.mpfr.org/mpfr-current/${MPFR_ARCHIVE}"
+MPFR_URL="http://www.mpfr.org/${MPFR_FOLDER}/${MPFR_ARCHIVE}"
 
 
 # http://www.multiprecision.org/index.php?prog=mpc
