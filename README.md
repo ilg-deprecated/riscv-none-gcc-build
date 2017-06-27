@@ -6,7 +6,7 @@ This toolchain closely follows the official RISC-V distribution.
 
 ## newlib-nano
 
-The only notable addition is support for newlib-nano, using the `--specs=nano.specs` linker option.
+The only notable addition is support for **newlib-nano**, using the `--specs=nano.specs` linker option.
 
 ## How to build
 
