@@ -2331,7 +2331,7 @@ then
     do_copy_multi_libs \
       "${app_prefix_nano}/${gcc_target}/lib" \
       "${app_prefix}/${gcc_target}/lib" \
-      "${app_prefix_nano}/bin/${gcc_target}-gcc"
+      "${gcc_target}-gcc"
 
     # Copy the nano configured newlib.h file into the location that nano.specs
     # expects it to be.
