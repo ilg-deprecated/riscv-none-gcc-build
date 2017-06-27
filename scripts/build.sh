@@ -186,6 +186,11 @@ do
       shift
       ;;
 
+    --jobs)
+      jobs="--jobs=$2"
+      shift 2
+      ;;
+
     --help)
       echo "Build the GNU MCU Eclipse ${APP_NAME} distributions."
       echo "Usage:"
