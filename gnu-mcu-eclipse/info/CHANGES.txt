@@ -1,4 +1,6 @@
 
 The changes applied to the original projects, in reverse chronological order:
 
-- none
+[2017-06-27]
+
+- support `--specs=nano.specs`

@@ -2,6 +2,12 @@
 
 These are the additional files required by the [GNU MCU Eclipse RISC-V Embedded GCC](https://github.com/gnu-mcu-eclipse/riscv-gcc) build procedures.
 
+This toolchain closely follows the official RISC-V distribution.
+
+## newlib-nano
+
+The only notable addition is support for newlib-nano, using the `--specs=nano.specs` linker option.
+
 ## How to build
 
 ```bash

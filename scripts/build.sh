@@ -1670,6 +1670,15 @@ then
   if [ ! -f "config.status" ]
   then 
 
+    # --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf
+    # --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf
+    # --enable-newlib-io-c99-formats   enable C99 support in IO functions like printf/scanf
+    # --enable-newlib-register-fini   enable finalization function registration using atexit
+    # --disable-newlib-supplied-syscalls disable newlib from supplying syscalls
+    # --disable-nls do not use Native Language Support
+
+    # --enable-newlib-retargetable-locking ???
+ 
     echo
     echo "Running newlib configure..."
 
@@ -1696,7 +1705,6 @@ then
         --enable-newlib-io-long-long \
         --enable-newlib-io-c99-formats \
         --enable-newlib-register-fini \
-        --enable-newlib-retargetable-locking \
         --disable-newlib-supplied-syscalls \
         --disable-nls \
         CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
@@ -1724,7 +1732,6 @@ then
         --enable-newlib-io-long-long \
         --enable-newlib-io-c99-formats \
         --enable-newlib-register-fini \
-        --enable-newlib-retargetable-locking \
         --disable-newlib-supplied-syscalls \
         --disable-nls \
         CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
@@ -1781,6 +1788,23 @@ then
   if [ ! -f "config.status" ]
   then 
 
+    # --disable-newlib-supplied-syscalls disable newlib from supplying syscalls (__NO_SYSCALLS__)
+    # --disable-newlib-fvwrite-in-streamio    disable iov in streamio
+    # --disable-newlib-fseek-optimization    disable fseek optimization
+    # --disable-newlib-wide-orient    Turn off wide orientation in streamio
+    # --disable-newlib-unbuf-stream-opt    disable unbuffered stream optimization in streamio
+    # --disable-nls do not use Native Language Support
+    # --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf
+    # --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf
+    # --enable-newlib-io-c99-formats   enable C99 support in IO functions like printf/scanf
+    # --enable-newlib-register-fini   enable finalization function registration using atexit
+    # --enable-newlib-nano-malloc    use small-footprint nano-malloc implementation
+    # --enable-lite-exit	enable light weight exit
+    # --enable-newlib-global-atexit	enable atexit data structure as global
+    # --enable-newlib-nano-formatted-io    Use nano version formatted IO
+
+    # --enable-newlib-retargetable-locking ???
+
     echo
     echo "Running newlib-nano configure..."
 
@@ -1813,7 +1837,6 @@ then
         --enable-newlib-io-long-long \
         --enable-newlib-io-c99-formats \
         --enable-newlib-register-fini \
-        --enable-newlib-retargetable-locking \
         --enable-newlib-nano-malloc \
         --enable-lite-exit \
         --enable-newlib-global-atexit \
@@ -1849,7 +1872,6 @@ then
         --enable-newlib-io-long-long \
         --enable-newlib-io-c99-formats \
         --enable-newlib-register-fini \
-        --enable-newlib-retargetable-locking \
         --enable-newlib-nano-malloc \
         --enable-lite-exit \
         --enable-newlib-global-atexit \
@@ -1942,6 +1964,7 @@ then
         --disable-libstdcxx-pch \
         --disable-nls \
         ${multilib_flags} \
+        --without-system-zlib \
         --with-newlib \
         --with-headers="yes" \
         --with-gnu-as \
@@ -1949,7 +1972,6 @@ then
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
         --with-sysroot="${app_prefix}/${gcc_target}" \
-        --without-system-zlib \
         CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
         LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections" \
@@ -2179,8 +2201,6 @@ then
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
 
-if true
-then
       CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-char-subscripts -Wno-format-security -m${target_bits} -pipe" \
       CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof  -Wno-mismatched-tags -Wno-ignored-attributes -m${target_bits} -pipe" \
       CPPFLAGS="-I${install_folder}/include" \
@@ -2230,57 +2250,7 @@ then
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
         LDFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -Wl,--gc-sections" \
         | tee "configure-output.txt"
-else
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-char-subscripts -Wno-format-security -m${target_bits} -pipe" \
-      CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe" \
-      CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib" \
-      \
-      bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
-        --prefix="${app_prefix_nano}"  \
-        --infodir="${app_prefix_nano_doc}/info" \
-        --mandir="${app_prefix_nano_doc}/man" \
-        --htmldir="${app_prefix_nano_doc}/html" \
-        --pdfdir="${app_prefix_nano_doc}/pdf" \
-        \
-        --target="${gcc_target}" \
-        \
-        --with-pkgversion="${branding}" \
-        \
-        --with-mpc="${install_folder}" \
-        --with-mpfr="${install_folder}" \
-        --with-gmp="${install_folder}" \
-        --with-isl="${install_folder}" \
-        \
-        --enable-languages=c,c++ \
-        --enable-plugins \
-        --enable-tls \
-        --enable-checking=yes \
-        --disable-shared \
-        --disable-threads \
-        --disable-decimal-float \
-        --disable-libffi \
-        --disable-libgomp \
-        --disable-libmudflap \
-        --disable-libquadmath \
-        --disable-libssp \
-        --disable-libstdcxx-pch \
-        --disable-nls \
-        ${multilib_flags} \
-        --with-system-zlib \
-        --with-newlib \
-        --with-headers="yes" \
-        --with-gnu-as \
-        --with-gnu-ld \
-        --with-abi="${gcc_abi}" \
-        --with-arch="${gcc_arch}" \
-        --with-sysroot="${app_prefix_nano}/${gcc_target}" \
-        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
-        CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
-        LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections" \
-        | tee "configure-output.txt"
 
-fi
     elif [ "${target_name}" == "debian" ]
     then
 
@@ -2383,25 +2353,14 @@ then
     then
       echo
       echo "Striping executables..."
-
-      to_strip=$(find "${app_prefix}/bin" -type f -name '*.exe')
-      for f in ${to_strip}
-      do
-        ${cross_compile_prefix}-strip ${f}
-      done
-
-      to_strip=$(find "${app_prefix}/libexec/gcc/${gcc_target}" -type f -name '*.exe')
-      for f in ${to_strip}
-      do
-        ${cross_compile_prefix}-strip ${f}
-      done
-
-      to_strip=$(find "${app_prefix}/${gcc_target}/bin" -type f -name '*.exe')
-      for f in ${to_strip}
-      do
-        ${cross_compile_prefix}-strip ${f}
-      done
       
+      (
+        cd "${app_prefix}"
+        find "bin" "libexec/gcc/${gcc_target}" "${gcc_target}/bin" \
+          -type f -executable -name '*.exe' \
+          -exec ${cross_compile_prefix}-strip "{}" \;
+      )
+
     fi
 
     echo
@@ -2451,7 +2410,13 @@ then
       echo
       echo "Striping executables..."
 
-      strip "${app_prefix}/bin"/*
+      (
+        cd "${app_prefix}"
+        find "bin" "libexec/gcc/${gcc_target}" "${gcc_target}/bin" \
+          -type f -executable \
+          -exec strip "{}" \;
+      )
+
     fi
 
     # Generally this is a very important detail: 'patchelf' sets "runpath"
@@ -2476,24 +2441,6 @@ then
     find "${app_prefix}/bin" -type f -executable \
         -exec patchelf --debug --set-rpath '$ORIGIN' "{}" \;
 
-    if false # ?????
-    then
-
-      echo
-      echo "Copying shared libs..."
-
-      if [ "${target_bits}" == "64" ]
-      then
-        distro_machine="x86_64"
-      elif [ "${target_bits}" == "32" ]
-      then
-        distro_machine="i386"
-      fi
-
-      do_container_linux_copy_librt_so
-
-    fi
-
     (
       cd "${app_prefix}/bin"
       for f in *
@@ -2514,6 +2461,14 @@ then
       echo "Striping executables..."
 
       strip "${app_prefix}/bin"/*
+
+      strip "${app_prefix}/libexec/gcc/${gcc_target}"/*/cc1
+      strip "${app_prefix}/libexec/gcc/${gcc_target}"/*/cc1plus
+      strip "${app_prefix}/libexec/gcc/${gcc_target}"/*/collect2
+      strip "${app_prefix}/libexec/gcc/${gcc_target}"/*/lto-wrapper
+      strip "${app_prefix}/libexec/gcc/${gcc_target}"/*/lto1
+
+      strip "${app_prefix}/${gcc_target}/bin"/*
     fi
 
     (
