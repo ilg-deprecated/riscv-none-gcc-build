@@ -2326,12 +2326,19 @@ then
     make "${jobs}"
     make "${jobs}" install
 
+    if [ "${target_name}" == "win" ]
+    then
+      host_gcc="${gcc_target}-gcc"
+    else
+      host_gcc="${app_prefix_nano}/bin/${gcc_target}-gcc"
+    fi
+
     # Copy the libraries after appending the `_nano` suffix.
     # Iterate through all multilib names.
     do_copy_multi_libs \
       "${app_prefix_nano}/${gcc_target}/lib" \
       "${app_prefix}/${gcc_target}/lib" \
-      "${gcc_target}-gcc"
+      "${host_gcc}"
 
     # Copy the nano configured newlib.h file into the location that nano.specs
     # expects it to be.
