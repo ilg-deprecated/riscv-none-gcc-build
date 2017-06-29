@@ -73,7 +73,7 @@ IFS=$'\n\t'
 APP_NAME="RISC-V Embedded GCC"
 
 # Used as part of file/folder paths.
-APP_UC_NAME="GNU RISC-V Embedded GCC"
+APP_UC_NAME="RISC-V Embedded GCC"
 APP_LC_NAME="riscv-none-gcc"
 
 branding="GNU MCU Eclipse RISC-V Embedded GCC"
@@ -101,7 +101,7 @@ else
   WORK_FOLDER_PATH=${WORK_FOLDER_PATH:-"${HOME}/Work/${APP_LC_NAME}"}
 fi
 
-BUILD_FOLDER="${WORK_FOLDER_PATH}/build"
+BUILD_FOLDER_PATH="${WORK_FOLDER_PATH}/build"
 
 PROJECT_GIT_FOLDER_NAME="riscv-gcc-build.git"
 PROJECT_GIT_FOLDER_PATH="${WORK_FOLDER_PATH}/${PROJECT_GIT_FOLDER_NAME}"
@@ -293,11 +293,11 @@ NEWLIB_GIT_COMMIT="ccd8a0a4ffbbc00400892334eaf64a1616302b35"
 # http://zlib.net
 # https://sourceforge.net/projects/libpng/files/zlib/
 
-LIBZ_VERSION="1.2.11" # 2017-01-16
+# LIBZ_VERSION="1.2.11" # 2017-01-16
 
-LIBZ_FOLDER="zlib-${LIBZ_VERSION}"
-LIBZ_ARCHIVE="${LIBZ_FOLDER}.tar.gz"
-LIBZ_URL="https://sourceforge.net/projects/libpng/files/zlib/${LIBZ_VERSION}/${LIBZ_ARCHIVE}"
+# LIBZ_FOLDER="zlib-${LIBZ_VERSION}"
+# LIBZ_ARCHIVE="${LIBZ_FOLDER}.tar.gz"
+# LIBZ_URL="https://sourceforge.net/projects/libpng/files/zlib/${LIBZ_VERSION}/${LIBZ_ARCHIVE}"
 
 
 # https://gmplib.org
@@ -357,11 +357,10 @@ then
     echo "Remove most of the build folders (except output)..."
   fi
 
-  rm -rf "${BUILD_FOLDER}"
+  rm -rf "${BUILD_FOLDER_PATH}"
   rm -rf "${WORK_FOLDER_PATH}/install"
   rm -rf "${WORK_FOLDER_PATH}/scripts"
 
-  rm -rf "${WORK_FOLDER_PATH}/${LIBZ_FOLDER}"
   rm -rf "${WORK_FOLDER_PATH}/${GMP_FOLDER}"
   rm -rf "${WORK_FOLDER_PATH}/${MPFR_FOLDER}"
   rm -rf "${WORK_FOLDER_PATH}/${MPC_FOLDER}"
@@ -484,18 +483,13 @@ fi
 
 # ----- Check some more prerequisites. -----
 
-if false
-then
+# echo
+# echo "Checking host automake..."
+# automake --version 2>/dev/null | grep automake
 
-echo
-echo "Checking host automake..."
-automake --version 2>/dev/null | grep automake
-
-echo
-echo "Checking host patch..."
-patch --version | grep patch
-
-fi
+# echo
+# echo "Checking host patch..."
+# patch --version | grep patch
 
 echo
 echo "Checking host tar..."
@@ -583,7 +577,7 @@ do_repo_action() {
 
     do_host_bootstrap
 
-    rm -rf "${BUILD_FOLDER}/${APP_LC_NAME}"
+    rm -rf "${BUILD_FOLDER_PATH}/${APP_LC_NAME}"
 
     echo
     if [ "${ACTION}" == "pull" ]
@@ -660,30 +654,6 @@ then
   git checkout -qf "${NEWLIB_GIT_COMMIT}"
 fi
 
-# ----- Get LIBZ. -----
-
-# Download the Z library.
-if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${LIBZ_ARCHIVE}" ]
-then
-  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
-
-  cd "${DOWNLOAD_FOLDER_PATH}"
-  echo "Downloading \"${LIBZ_ARCHIVE}\"..."
-  curl -L "${LIBZ_URL}" --output "${LIBZ_ARCHIVE}"
-fi
-
-# Unpacked in the build folder.
-if false
-then
-
-# Unpack LIBZ.
-if [ ! -d "${WORK_FOLDER_PATH}/${LIBZ_FOLDER}" ]
-then
-  cd "${WORK_FOLDER_PATH}"
-  tar -xzvf "${DOWNLOAD_FOLDER_PATH}/${LIBZ_ARCHIVE}"
-fi
-
-fi
 
 # ----- Get GMP. -----
 
@@ -813,9 +783,6 @@ PROJECT_GIT_FOLDER_NAME="${PROJECT_GIT_FOLDER_NAME}"
 BINUTILS_FOLDER_NAME="${BINUTILS_FOLDER_NAME}"
 GCC_FOLDER_NAME="${GCC_FOLDER_NAME}"
 NEWLIB_FOLDER_NAME="${NEWLIB_FOLDER_NAME}"
-
-LIBZ_FOLDER="${LIBZ_FOLDER}"
-LIBZ_ARCHIVE="${LIBZ_ARCHIVE}"
 
 GMP_FOLDER="${GMP_FOLDER}"
 GMP_ARCHIVE="${GMP_ARCHIVE}"
@@ -1028,81 +995,6 @@ fi
 
 echo "Checking shasum..."
 shasum --version
-
-# ----- Build and install the ZLIB library. -----
-
-libz_stamp_file="${build_folder_path}/${LIBZ_FOLDER}/stamp-install-completed"
-
-# if [ ! -f "${install_folder}/lib/libz.a" ]
-if [ ! -f "${libz_stamp_file}" ]
-then
-
-  rm -rf "${build_folder_path}/${LIBZ_FOLDER}"
-  mkdir -p "${build_folder_path}/${LIBZ_FOLDER}"
-
-  mkdir -p "${install_folder}"
-
-  echo
-  echo "Running zlib configure..."
-
-  cd "${build_folder_path}"
-  tar -xzvf "${download_folder_path}/${LIBZ_ARCHIVE}"
-
-  cd "${build_folder_path}/${LIBZ_FOLDER}"
-
-  if [ "${target_name}" == "win" ]
-  then
-
-    true # No configure on windows
-
-  elif [ "${target_name}" == "debian" ]
-  then
-    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-    PKG_CONFIG="${git_folder_path}/gnu-mcu-eclipse/scripts/pkg-config-dbg" \
-    PKG_CONFIG_LIBDIR="${install_folder}/lib/pkgconfig" \
-    \
-    bash "configure" \
-      --prefix="${install_folder}" \
-      --static
-
-  elif [ "${target_name}" == "osx" ]
-  then
-    CFLAGS="-Wno-shift-negative-value -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-    PKG_CONFIG="${git_folder_path}/gnu-mcu-eclipse/scripts/pkg-config-dbg" \
-    PKG_CONFIG_LIBDIR="${install_folder}/lib/pkgconfig" \
-    \
-    bash "configure" \
-      --prefix="${install_folder}" \
-      --static
-
-  fi
-
-  echo
-  echo "Running zlib make install..."
-
-  if [ "${target_name}" == "win" ]
-  then
-
-    sed -e 's/PREFIX =/#PREFIX =/' -e 's/STRIP = .*/STRIP = file /' -e 's/SHARED_MODE=0/SHARED_MODE=1/' win32/Makefile.gcc >win32/Makefile.gcc2
-
-    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-    LDFLAGS="-v" \
-    PREFIX="${cross_compile_prefix}-" \
-    INCLUDE_PATH="${install_folder}/include" \
-    LIBRARY_PATH="${install_folder}/lib" \
-    BINARY_PATH="${install_folder}/bin" \
-    make "${jobs}" -f win32/Makefile.gcc2 install
-
-  else # osx & debian
-
-    # Build.
-    # make clean
-    make "${jobs}"
-    make "${jobs}" install
-  fi
-
-  touch "${libz_stamp_file}"
-fi
 
 # ----- Build and install the GMP library. -----
 
@@ -1571,7 +1463,7 @@ then
         --disable-nls \
         --enable-checking=no \
         ${multilib_flags} \
-        --with-system-zlib \
+        --without-system-zlib \
         --with-newlib \
         --without-headers \
         --with-gnu-as \
@@ -2516,8 +2408,6 @@ then
   do_container_copy_license \
     "${work_folder_path}/${NEWLIB_FOLDER_NAME}" "${newlib_folder}"
 
-  do_container_copy_license \
-    "${work_folder_path}/${LIBZ_FOLDER}" "${LIBZ_FOLDER}"
   do_container_copy_license \
     "${work_folder_path}/${GMP_FOLDER}" "${GMP_FOLDER}"
   do_container_copy_license \
