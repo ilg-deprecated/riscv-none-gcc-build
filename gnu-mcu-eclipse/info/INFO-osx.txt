@@ -8,7 +8,7 @@ procedure to generate the setup/install packages (`CHANGES.txt`).
 
 For more info and support, please read the GNU MCU Eclipe project pages from:
 
-  http://gnuarmeclipse.github.io
+  http://gnu-mcu-eclipse.github.io
 
 
 Thank you for using GNU MCU Eclipse,

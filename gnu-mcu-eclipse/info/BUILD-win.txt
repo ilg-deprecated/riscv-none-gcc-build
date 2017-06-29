@@ -29,7 +29,7 @@ first to avoid duplicated packages.
 
 Up-to-date build information is available in the GNU MCU Eclipse project web:
 
-  http://gnuarmeclipse.github.io/
+  http://gnu-mcu-eclipse.github.io/
 
 
 Liviu Ionescu

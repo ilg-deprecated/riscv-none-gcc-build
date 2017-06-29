@@ -29,7 +29,7 @@
 !define PUBLISHER                 "GNU MCU Eclipse"
 !define PRODUCT                   "RISC-V Embedded GCC"
 !define PRODUCTLOWERCASE          "riscv-none-gcc"
-!define URL                       "http://gnuarmeclipse.github.io"
+!define URL                       "http://gnu-mcu-eclipse.github.io"
 
 ; Single instance, each new install will overwrite the values
 !define INSTALL_KEY_FOLDER "SOFTWARE\${PUBLISHER}\${PRODUCT}"
