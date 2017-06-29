@@ -2,7 +2,15 @@
 
 These are the additional files required by the [GNU MCU Eclipse RISC-V Embedded GCC](https://github.com/gnu-mcu-eclipse/riscv-gcc) build procedures.
 
-This toolchain closely follows the official RISC-V distribution.
+## Compliance
+
+This toolchain closely follows the official [RISC-V distribution](https://github.com/riscv/riscv-gcc) maintained by [SiFive](https://www.sifive.com).
+
+The current version is based on project riscv/riscv-gnu-toolchain, tag v20170612 (commit [f5fae1c](https://github.com/riscv/riscv-gnu-toolchain/tree/f5fae1c27b2365da773816ddcd92f533867f28ec)) from June 12th:
+
+- the riscv/riscv-gcc project, commit 16210e6 from from May 15th, 2017
+- the riscv/riscv-binutils-gdb project, commit 3f21b5c from May 5th, 2017
+- the riscv/riscv-newlib project, commit ccd8a0a from May 2nd, 2017
 
 ## newlib-nano
 
@@ -21,11 +29,9 @@ Warning: with 5 separate distributions, this will take many hours, even on a fas
 
 For consistency with other projects, all files are grouped under `gnu-mcu-eclipse`.
 
-* `info` - informative files copied to the distributed `info` folder;
-* `nsis` - files required by [NSIS (Nullsoft Scriptable Install System)](http://nsis.sourceforge.net/Main_Page);
-* `patches` - small patches to correct some problems identified in the official packages;
-* `pkgconfig` - configuration files missing in some of the official packages;
-* `scripts` - the build support scripts.
+* `gnu-mcu-eclipse/info` - informative files copied to the distributed `info` folder;
+* `gnu-mcu-eclipse/nsis` - files required by [NSIS (Nullsoft Scriptable Install System)](http://nsis.sourceforge.net/Main_Page);
+* `scripts/build.sh` - the build script.
 
 ## Files
 

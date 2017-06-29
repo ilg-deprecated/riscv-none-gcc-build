@@ -1,6 +1,8 @@
 
 The changes applied to the original projects, in reverse chronological order:
 
+
 [2017-06-27]
 
-- support `--specs=nano.specs`
+- add support for `--specs=nano.specs`; this translates into a separate build for `newlib` with specific configuration options and a separate build of the C++ standard libraries with `-Os`.
+

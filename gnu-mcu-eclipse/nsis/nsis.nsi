@@ -98,7 +98,7 @@ Var Parent.INSTDIR
 ; Pages.
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${INSTALL_FOLDER}\COPYING"
+!insertmacro MUI_PAGE_LICENSE "${INSTALL_FOLDER}\licenses\LICENSE"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
