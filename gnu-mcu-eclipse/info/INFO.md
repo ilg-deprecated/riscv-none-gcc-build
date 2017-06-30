@@ -21,12 +21,12 @@ required by the packing procedure used to generate the binary packages
 
 ## newlib-nano
 
-The only notable addition is support for newlib-nano, using the 
+The only notable addition is support for **newlib-nano**, using the 
 `--specs=nano.specs` linker option.
 
 ## More info
 
-For more info and support, please read the GNU MCU Eclipe project pages from:
+For more info and support, please see the GNU MCU Eclipe project pages from:
 
   http://gnu-mcu-eclipse.github.io
 

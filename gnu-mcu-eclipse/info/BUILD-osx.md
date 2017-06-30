@@ -17,6 +17,7 @@ To run it, first be sure that the packages required in the Prerequisites
 section are installed, then download the script and execute it with bash:
 
 ```bash
+$ caffeinate bash
 $ bash ~/Downloads/riscv-gcc-build.git/scripts/build.sh --osx
 ```
 
