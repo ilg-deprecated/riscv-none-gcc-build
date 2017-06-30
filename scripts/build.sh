@@ -925,10 +925,10 @@ if [ "${target_name}" == "win" ]
 then
 
   # For Windows targets, decide which cross toolchain to use.
-  if [ ${target_bits} == "32" ]
+  if [ "${target_bits}" == "32" ]
   then
     cross_compile_prefix="i686-w64-mingw32"
-  elif [ ${target_bits} == "64" ]
+  elif [ "${target_bits}" == "64" ]
   then
     cross_compile_prefix="x86_64-w64-mingw32"
   fi
@@ -1013,12 +1013,16 @@ then
 
   cd "${build_folder_path}/${GMP_FOLDER}"
 
+  # ABI is mandatory, otherwise configure fails on 32-bits.
+  # (see https://gmplib.org/manual/ABI-and-ISA.html)
+
   if [ "${target_name}" == "win" ]
   then
 
-    CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+    CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
+    ABI="${target_bits}" \
     \
     bash "${work_folder_path}/${GMP_FOLDER}/configure" \
       --prefix="${install_folder}" \
@@ -1035,6 +1039,7 @@ then
     CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
+    ABI="${target_bits}" \
     \
     bash "${work_folder_path}/${GMP_FOLDER}/configure" \
       --prefix="${install_folder}" \
@@ -1075,7 +1080,7 @@ then
   if [ "${target_name}" == "win" ]
   then
 
-    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+    CFLAGS="-pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1136,7 +1141,7 @@ then
   if [ "${target_name}" == "win" ]
   then
 
-    CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+    CFLAGS="-pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1195,7 +1200,7 @@ then
   if [ "${target_name}" == "win" ]
   then
 
-    CFLAGS="-Wno-dangling-else -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+    CFLAGS="-Wno-dangling-else -pipe -ffunction-sections -fdata-sections" \
     CPPFLAGS="-I${install_folder}/include" \
     LDFLAGS="-L${install_folder}/lib" \
     \
@@ -1260,8 +1265,8 @@ then
     if [ "${target_name}" == "win" ]
     then
       
-      CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-      CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
       LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
       \
@@ -1391,7 +1396,9 @@ fi
 # ----- Build GCC, first stage. -----
 
 # The first stage creates a compiler without libraries, that is required
-# to compile newlib.
+# to compile newlib. 
+# For the Windows target this step is more or less useless, since 
+# the build uses the Debian binaries (possible future optimisation).
 
 gcc_folder="gcc"
 gcc_stage1_folder="gcc-first"
@@ -1426,8 +1433,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
       LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
       \
@@ -1540,7 +1547,8 @@ then
 
   (
     # No need to make 'all', 'all-gcc' is enough to compile the libraries.
-    make "${jobs}" all-gcc
+    # Parallel build fails for win32.
+    make all-gcc
     make "${jobs}" install-gcc
   ) | tee "make-all-output.txt"
 
@@ -1584,8 +1592,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-m${target_bits} -pipe" \
-      CXXFLAGS="-m${target_bits} -pipe" \
+      CFLAGS="-pipe" \
+      CXXFLAGS="-pipe" \
       \
       bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -1649,8 +1657,8 @@ then
     if [ -z "${do_no_pdf}" ]
     then
 
-      # Apparently parallel build not reliable on Debian.
-      make "${jobs}" pdf
+      # Do not use parallel build here, it fails on Debian 32-bits.
+      make pdf
 
       /usr/bin/install -v -c -m 644 \
         "${gcc_target}/libgloss/doc/porting.pdf" "${app_prefix_doc}/pdf"
@@ -1710,8 +1718,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-implicit-function-declaration -m${target_bits} -pipe" \
-      CXXFLAGS="-m${target_bits} -pipe" \
+      CFLAGS="-Wno-implicit-function-declaration -pipe" \
+      CXXFLAGS="-pipe" \
       \
       bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
         --prefix="${app_prefix_nano}"  \
@@ -1823,8 +1831,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
       LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
       \
@@ -2035,8 +2043,8 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
-      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -pipe -ffunction-sections -fdata-sections" \
+      CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
       LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
       \
@@ -2472,7 +2480,6 @@ EOF
 # The above marker must start in the first column.
 # ^===========================================================================^
 
-
 # ----- Build the OS X distribution. -----
 
 if [ "${HOST_UNAME}" == "Darwin" ]
@@ -2525,9 +2532,10 @@ fi
 
 # ----- Build the Windows 32-bits distribution. -----
 
+# Since the actual container is a 64-bits, use the debian64 binaries.
 if [ "${DO_BUILD_WIN32}" == "y" ]
 then
-  if [ ! -f "${WORK_FOLDER_PATH}/install/debian32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+  if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
   then
     do_host_build_target "Creating Debian 32-bits archive..." \
       --target-name debian \
@@ -2538,7 +2546,8 @@ then
   do_host_build_target "Creating Windows 32-bits setup..." \
     --target-name win \
     --target-bits 32 \
-    --docker-image "ilegeul/debian:8-gnuarm-mingw-v2"
+    --docker-image "ilegeul/debian:8-gnuarm-mingw-v2" \
+    --build-binaries-path "install/debian64/${APP_LC_NAME}/bin"
 fi
 
 do_host_show_sha
