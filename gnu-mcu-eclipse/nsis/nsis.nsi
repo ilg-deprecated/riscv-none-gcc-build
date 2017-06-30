@@ -42,7 +42,7 @@
 !define UNINSTALL_KEY_FOLDER "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PUBLISHER} ${PRODUCT} ${BITS} ${VERSION}"
 
 !define UNINSTALL_KEY_NAME "UninstallString"
-!define UNINSTALL_EXE "$INSTDIR\${PRODUCTLOWERCASE}-uninstall.exe"
+!define UNINSTALL_EXE "$INSTDIR\uninstall.exe"
 
 !define INSTALL_LOCATION_KEY_NAME "InstallLocation"
 
@@ -132,9 +132,6 @@ ${GetParent} "$INSTDIR" $Parent.INSTDIR
 SetOutPath "$INSTDIR\"
 ; Copy everything in one command.
 File /r "${INSTALL_FOLDER}\*"
-
-; Write the uninstaller file.
-WriteUninstaller "${UNINSTALL_EXE}"
 
 ; Write the uninstaller file.
 WriteUninstaller "${UNINSTALL_EXE}"
