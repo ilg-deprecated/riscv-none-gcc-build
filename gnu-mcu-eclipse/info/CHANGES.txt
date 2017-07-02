@@ -1,6 +1,9 @@
 
 The changes applied to the original projects, in reverse chronological order:
 
+[2017-07-02]
+
+- v7.1.1-1-20170702-* released
 
 [2017-06-27]
 
