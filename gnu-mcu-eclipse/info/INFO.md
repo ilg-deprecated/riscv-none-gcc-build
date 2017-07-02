@@ -5,9 +5,13 @@ This is the **GNU MCU Eclipse** (formerly GNU ARM Eclipse) version of the
 
 ## Compliance
 
-This toolchain closely follows the official [RISC-V distribution](https://github.com/riscv/riscv-gcc) maintained by [SiFive](https://www.sifive.com).
+This toolchain closely follows the official 
+[RISC-V distribution](https://github.com/riscv/riscv-gcc) 
+maintained by [SiFive](https://www.sifive.com).
 
-The current version is based on project riscv/riscv-gnu-toolchain, tag v20170612 (commit [f5fae1c](https://github.com/riscv/riscv-gnu-toolchain/tree/f5fae1c27b2365da773816ddcd92f533867f28ec)) from June 12th, which depends on the following:
+The current version is based on project riscv/riscv-gnu-toolchain, tag v20170612 
+(commit [f5fae1c](https://github.com/riscv/riscv-gnu-toolchain/tree/f5fae1c27b2365da773816ddcd92f533867f28ec)) 
+from June 12th, which depends on the following:
 
 - the riscv/riscv-gcc project, commit 16210e6 from from May 15th, 2017
 - the riscv/riscv-binutils-gdb project, commit 3f21b5c from May 5th, 2017
@@ -22,7 +26,8 @@ required by the packing procedure used to generate the binary packages
 ## newlib-nano
 
 The only notable addition is support for **newlib-nano**, using the 
-`--specs=nano.specs` linker option.
+`--specs=nano.specs` option. For better results, it must be added to 
+both compile and link.
 
 ## More info
 
