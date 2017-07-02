@@ -82,7 +82,7 @@ gcc_target="riscv64-unknown-elf"
 gcc_arch="rv64imafdc"
 gcc_abi="lp64d"
 
-jobs="--jobs=8"
+jobs="--jobs=1"
 
 # On Parallels virtual machines, prefer host Work folder.
 # Second choice are Work folders on secondary disks.
@@ -1300,8 +1300,6 @@ then
     elif [ "${target_name}" == "osx" ]
     then
 
-      # --with-system-zlib assume libz is available on osx & debian
-
       CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
@@ -1328,14 +1326,12 @@ then
         --disable-gdb-build-warnings \
         --disable-nls \
         --enable-plugins \
-        --with-system-zlib \
+        --without-system-zlib \
         --with-sysroot="${app_prefix}/${gcc_target}" \
       | tee "configure-output.txt"
 
     elif [ "${target_name}" == "debian" ]
     then
-
-      # --with-system-zlib assume libz is available on osx & debian
 
       CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
@@ -1363,7 +1359,7 @@ then
         --disable-gdb-build-warnings \
         --disable-nls \
         --enable-plugins \
-        --with-system-zlib \
+        --without-system-zlib \
         --with-sysroot="${app_prefix}/${gcc_target}" \
       | tee "configure-output.txt"
 
@@ -1415,7 +1411,7 @@ then
   then 
 
     echo
-    echo "Running first stage configure..."
+    echo "Running gcc first stage configure..."
 
     # https://gcc.gnu.org/install/configure.html
     # --enable-shared[=package[,…]] build shared versions of libraries
@@ -1428,8 +1424,6 @@ then
     
     if [ "${target_name}" == "win" ]
     then
-
-      # --with-system-zlib libz is available in the development environment
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
@@ -1485,8 +1479,6 @@ then
     elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
     then
 
-      # --with-system-zlib libz is available in the development environment
-
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
       CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
@@ -1524,7 +1516,7 @@ then
         --disable-nls \
         --enable-checking=no \
         ${multilib_flags} \
-        --with-system-zlib \
+        --without-system-zlib \
         --with-newlib \
         --without-headers \
         --with-gnu-as \
@@ -1541,7 +1533,7 @@ then
 
   # ----- Partial build, without documentation. -----
   echo
-  echo "Running first stage make..."
+  echo "Running gcc first stage make..."
 
   cd "${build_folder_path}/${gcc_stage1_folder}"
 
@@ -1822,7 +1814,7 @@ then
 
     # https://gcc.gnu.org/install/configure.html
     echo
-    echo "Running second stage configure RISC-V GCC ..."
+    echo "Running gcc final stage configure..."
 
     if [ "${target_name}" == "win" ]
     then
@@ -1885,7 +1877,6 @@ then
     elif [ "${target_name}" == "osx" ]
     then
 
-      # --with-system-zlib assume libz is available
       # no -ffunction-sections -fdata-sections / -Wl,--gc-sections for 
       # Apple default gcc (clang based)
 
@@ -1927,7 +1918,7 @@ then
         --disable-libstdcxx-pch \
         --disable-nls \
         ${multilib_flags} \
-        --with-system-zlib \
+        --without-system-zlib \
         --with-newlib \
         --with-headers="yes" \
         --with-gnu-as \
@@ -1942,8 +1933,6 @@ then
   
     elif [ "${target_name}" == "debian" ]
     then
-
-      # --with-system-zlib assume libz is available
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
@@ -1983,7 +1972,7 @@ then
         --disable-libstdcxx-pch \
         --disable-nls \
         ${multilib_flags} \
-        --with-system-zlib \
+        --without-system-zlib \
         --with-newlib \
         --with-headers="yes" \
         --with-gnu-as \
@@ -2001,7 +1990,7 @@ then
 
   # ----- Full build, with documentation. -----
   echo
-  echo "Running second stage make..."
+  echo "Running gcc final stage make..."
 
   cd "${build_folder_path}/${gcc_stage2_folder}"
 
@@ -2034,7 +2023,7 @@ then
 
     # https://gcc.gnu.org/install/configure.html
     echo
-    echo "Running second stage configure RISC-V GCC ..."
+    echo "Running gcc final stage nano configure..."
 
     if [ "${target_name}" == "win" ]
     then
@@ -2098,7 +2087,6 @@ then
     elif [ "${target_name}" == "osx" ]
     then
 
-      # --with-system-zlib assume libz is available
       # No -ffunction-sections -fdata-sections / -Wl,--gc-sections since  
       # for Apple the default gcc is clang based.
       # --disable-libstdcxx-verbose \
@@ -2143,7 +2131,7 @@ then
         --disable-libstdcxx-verbose \
         --disable-nls \
         ${multilib_flags} \
-        --with-system-zlib \
+        --without-system-zlib \
         --with-newlib \
         --with-headers="yes" \
         --with-gnu-as \
@@ -2158,8 +2146,6 @@ then
 
     elif [ "${target_name}" == "debian" ]
     then
-
-      # --with-system-zlib assume libz is available
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
@@ -2200,7 +2186,7 @@ then
         --disable-libstdcxx-verbose \
         --disable-nls \
         ${multilib_flags} \
-        --with-system-zlib \
+        --without-system-zlib \
         --with-newlib \
         --with-headers="yes" \
         --with-gnu-as \
@@ -2218,7 +2204,7 @@ then
 
   # ----- Partial build -----
   echo
-  echo "Running second stage nano make..."
+  echo "Running gcc final stage nano make..."
 
   cd "${build_folder_path}/${gcc_stage2_nano_folder}"
 
