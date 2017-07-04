@@ -671,7 +671,7 @@ fi
 if [ ! -d "${WORK_FOLDER_PATH}/${GMP_FOLDER}" ]
 then
   cd "${WORK_FOLDER_PATH}"
-  tar -xzvf "${DOWNLOAD_FOLDER_PATH}/${GMP_ARCHIVE}"
+  tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${GMP_ARCHIVE}"
 fi
 
 
@@ -691,7 +691,7 @@ fi
 if [ ! -d "${WORK_FOLDER_PATH}/${MPFR_FOLDER}" ]
 then
   cd "${WORK_FOLDER_PATH}"
-  tar -xzvf "${DOWNLOAD_FOLDER_PATH}/${MPFR_ARCHIVE}"
+  tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${MPFR_ARCHIVE}"
 fi
 
 
@@ -731,14 +731,14 @@ fi
 if [ ! -d "${WORK_FOLDER_PATH}/${ISL_FOLDER}" ]
 then
   cd "${WORK_FOLDER_PATH}"
-  tar -xzvf "${DOWNLOAD_FOLDER_PATH}/${ISL_ARCHIVE}"
+  tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${ISL_ARCHIVE}"
 fi
 
 
 # v===========================================================================v
 # Create the build script (needs to be separate for Docker).
 
-script_name="build.sh"
+script_name="inner-build.sh"
 script_file_path="${WORK_FOLDER_PATH}/scripts/${script_name}"
 
 rm -f "${script_file_path}"
