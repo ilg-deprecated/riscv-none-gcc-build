@@ -626,6 +626,7 @@ do_host_get_current_date
 if [ ! -d "${WORK_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}" ]
 then
   cd "${WORK_FOLDER_PATH}"
+  echo
   echo "Cloning '${BINUTILS_GIT_URL}'..."
   git clone --branch "${BINUTILS_GIT_BRANCH}" "${BINUTILS_GIT_URL}" "${BINUTILS_FOLDER_NAME}"
   cd "${BINUTILS_FOLDER_NAME}"
@@ -637,6 +638,7 @@ fi
 if [ ! -d "${WORK_FOLDER_PATH}/${GCC_FOLDER_NAME}" ]
 then
   cd "${WORK_FOLDER_PATH}"
+  echo
   echo "Cloning '${GCC_GIT_URL}'..."
   git clone --branch "${GCC_GIT_BRANCH}" "${GCC_GIT_URL}" "${GCC_FOLDER_NAME}"
   cd "${GCC_FOLDER_NAME}"
@@ -648,6 +650,7 @@ fi
 if [ ! -d "${WORK_FOLDER_PATH}/${NEWLIB_FOLDER_NAME}" ]
 then
   cd "${WORK_FOLDER_PATH}"
+  echo
   echo "Cloning '${NEWLIB_GIT_URL}'..."
   git clone --branch "${NEWLIB_GIT_BRANCH}" "${NEWLIB_GIT_URL}" "${NEWLIB_FOLDER_NAME}"
   cd "${NEWLIB_FOLDER_NAME}"
@@ -663,6 +666,7 @@ then
   mkdir -p "${DOWNLOAD_FOLDER_PATH}"
 
   cd "${DOWNLOAD_FOLDER_PATH}"
+  echo
   echo "Downloading \"${GMP_ARCHIVE}\"..."
   curl -L "${GMP_URL}" --output "${GMP_ARCHIVE}"
 fi
@@ -683,6 +687,7 @@ then
   mkdir -p "${DOWNLOAD_FOLDER_PATH}"
 
   cd "${DOWNLOAD_FOLDER_PATH}"
+  echo
   echo "Downloading \"${MPFR_ARCHIVE}\"..."
   curl -L "${MPFR_URL}" --output "${MPFR_ARCHIVE}"
 fi
@@ -703,6 +708,7 @@ then
   mkdir -p "${DOWNLOAD_FOLDER_PATH}"
 
   cd "${DOWNLOAD_FOLDER_PATH}"
+  echo
   echo "Downloading \"${MPC_ARCHIVE}\"..."
   curl -L "${MPC_URL}" --output "${MPC_ARCHIVE}"
 fi
@@ -723,6 +729,7 @@ then
   mkdir -p "${DOWNLOAD_FOLDER_PATH}"
 
   cd "${DOWNLOAD_FOLDER_PATH}"
+  echo
   echo "Downloading \"${ISL_ARCHIVE}\"..."
   curl -L "${ISL_URL}" --output "${ISL_ARCHIVE}"
 fi
