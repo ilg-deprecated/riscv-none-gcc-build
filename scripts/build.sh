@@ -483,14 +483,6 @@ fi
 
 # ----- Check some more prerequisites. -----
 
-# echo
-# echo "Checking host automake..."
-# automake --version 2>/dev/null | grep automake
-
-# echo
-# echo "Checking host patch..."
-# patch --version | grep patch
-
 echo
 echo "Checking host tar..."
 tar --version
@@ -498,25 +490,6 @@ tar --version
 echo
 echo "Checking host unzip..."
 unzip | grep UnZip
-
-echo
-echo "Checking host makeinfo..."
-makeinfo --version | grep 'GNU texinfo'
-makeinfo_ver=$(makeinfo --version | grep 'GNU texinfo' | sed -e 's/.*) //' -e 's/\..*//')
-if [ "${makeinfo_ver}" -lt "6" ]
-then
-  echo "makeinfo too old, abort."
-  exit 1
-fi
-
-if which libtoolize > /dev/null; then
-    libtoolize="libtoolize"
-elif which glibtoolize >/dev/null; then
-    libtoolize="glibtoolize"
-else
-    echo "$0: Error: libtool is required" >&2
-    exit 1
-fi
 
 # ----- Get the project git repository. -----
 
@@ -998,6 +971,25 @@ if [ "${target_name}" == "debian" ]
 then
   echo "Checking patchelf..."
   patchelf --version
+fi
+
+if [ -z "${do_no_pdf}" ]
+then
+
+  # TODO: check on new Debian 9 containers
+  if [ "${target_name}" == "osx" ]
+  then
+
+    echo "Checking makeinfo..."
+    makeinfo --version | grep 'GNU texinfo'
+    makeinfo_ver=$(makeinfo --version | grep 'GNU texinfo' | sed -e 's/.*) //' -e 's/\..*//')
+    if [ "${makeinfo_ver}" -lt "6" ]
+    then
+      echo "makeinfo too old, abort."
+      exit 1
+    fi
+
+  fi
 fi
 
 echo "Checking shasum..."
