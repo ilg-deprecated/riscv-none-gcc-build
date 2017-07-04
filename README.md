@@ -19,8 +19,8 @@ The only notable addition is support for **newlib-nano**, using the `--specs=nan
 ## How to build
 
 ```bash
-$ git clone https://github.com/gnu-mcu-eclipse/riscv-gcc-build.git ~/Downloads/riscv-gcc-build.git
-$ bash ~/Downloads/riscv-gcc-build.git/scripts/build.sh --all
+$ git clone https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build.git ~/Downloads/riscv-none-gcc-build.git
+$ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --all
 ```
 
 Warning: with 5 separate distributions, this will take many hours, even on a fast machine.

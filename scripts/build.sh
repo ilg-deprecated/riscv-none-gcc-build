@@ -103,7 +103,7 @@ fi
 
 BUILD_FOLDER_PATH="${WORK_FOLDER_PATH}/build"
 
-PROJECT_GIT_FOLDER_NAME="riscv-gcc-build.git"
+PROJECT_GIT_FOLDER_NAME="riscv-none-gcc-build.git"
 PROJECT_GIT_FOLDER_PATH="${WORK_FOLDER_PATH}/${PROJECT_GIT_FOLDER_NAME}"
 PROEJCT_GIT_URL="https://github.com/gnu-mcu-eclipse/${PROJECT_GIT_FOLDER_NAME}"
 
