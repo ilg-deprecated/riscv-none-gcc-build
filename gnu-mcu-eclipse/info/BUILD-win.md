@@ -2,7 +2,7 @@
 
 This package was build with MinGW-w64 on a Debian 8 64-bits Docker container,  
 running on an OS X machine, using the script provided in the GNU MCU Eclipse
-[riscv-gcc-build.git](https://github.com/gnu-mcu-eclipse/riscv-gcc-build) 
+[riscv-none-gcc-build.git](https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build) 
 project.
 
 ## How to build?
@@ -10,15 +10,15 @@ project.
 To build the latest version of the package please use the script from:
 
 ```bash
-$ git clone https://github.com/gnu-mcu-eclipse/riscv-gcc-build.git \
-~/Downloads/riscv-gcc-build.git
+$ git clone https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build.git \
+~/Downloads/riscv-none-gcc-build.git
 ```
 
 To run it, first be sure that the packages required in the Prerequisites 
 section are installed, then download the script and execute it with bash:
 
 ```bash
-$ bash ~/Downloads/riscv-gcc-build.git/scripts/build.sh --win32 --win64
+$ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --win32 --win64
 ```
 
 The output of the build script are two `setup.exe` files in the 

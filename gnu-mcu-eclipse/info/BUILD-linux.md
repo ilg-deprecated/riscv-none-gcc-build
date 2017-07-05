@@ -10,15 +10,15 @@ project.
 To build the latest version of the package please use the script from:
 
 ```bash
-$ git clone https://github.com/gnu-mcu-eclipse/riscv-gcc-build.git \
-~/Downloads/riscv-gcc-build.git
+$ git clone https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build.git \
+~/Downloads/riscv-none-gcc-build.git
 ```
 
 To run it, first be sure that the packages required in the Prerequisites 
 section are installed, then download the script and execute it with bash:
 
 ```bash
-$ bash ~/Downloads/riscv-gcc-build.git/scripts/build.sh --debian32 --debian64
+$ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --debian32 --debian64
 ```
 
 The output of the build script are two `.tgz` files in the 
