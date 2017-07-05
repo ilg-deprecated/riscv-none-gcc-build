@@ -413,15 +413,11 @@ then
   echo "Check/Preload Docker images..."
 
   echo
-  docker run --interactive --tty ilegeul/debian32:8-gnuarm-gcc-x11-v3 \
+  docker run --interactive --tty ilegeul/debian:9-gnu-mcu-eclipse \
   lsb_release --description --short
 
   echo
-  docker run --interactive --tty ilegeul/debian:8-gnuarm-gcc-x11-v3 \
-  lsb_release --description --short
-
-  echo
-  docker run --interactive --tty ilegeul/debian:8-gnuarm-mingw \
+  docker run --interactive --tty ilegeul/debian32:9-gnu-mcu-eclipse \
   lsb_release --description --short
 
   echo
@@ -470,14 +466,11 @@ then
   # Be sure it will not crash on errors, in case the images are already there.
   set +e
 
-  docker build --tag "ilegeul/debian32:8-gnuarm-gcc-x11-v3" \
-  https://github.com/ilg-ul/docker/raw/master/debian32/8-gnuarm-gcc-x11-v3/Dockerfile
+  docker build --tag "ilegeul/debian32:9-gnu-mcu-eclipse" \
+  https://github.com/ilg-ul/docker/raw/master/debian32/9-gnu-mcu-eclipse/Dockerfile
 
-  docker build --tag "ilegeul/debian:8-gnuarm-gcc-x11-v3" \
-  https://github.com/ilg-ul/docker/raw/master/debian/8-gnuarm-gcc-x11-v3/Dockerfile
-
-  docker build --tag "ilegeul/debian:8-gnuarm-mingw" \
-  https://github.com/ilg-ul/docker/raw/master/debian/8-gnuarm-mingw/Dockerfile
+  docker build --tag "ilegeul/debian:9-gnu-mcu-eclipse" \
+  https://github.com/ilg-ul/docker/raw/master/debian/9-gnu-mcu-eclipse/Dockerfile
 
   docker images
 
@@ -2534,7 +2527,7 @@ then
   do_host_build_target "Creating the Debian 64-bits distribution..." \
     --target-name debian \
     --target-bits 64 \
-    --docker-image "ilegeul/debian:8-gnuarm-gcc-x11-v4"
+    --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
 fi
 
 # ----- Build the Windows 64-bits distribution. -----
@@ -2546,13 +2539,13 @@ then
     do_host_build_target "Creating the Debian 64-bits distribution..." \
       --target-name debian \
       --target-bits 64 \
-      --docker-image "ilegeul/debian:8-gnuarm-gcc-x11-v4"
+      --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
   fi
 
   do_host_build_target "Creating the Windows 64-bits distribution..." \
     --target-name win \
     --target-bits 64 \
-    --docker-image "ilegeul/debian:8-gnuarm-mingw-v2" \
+    --docker-image "ilegeul/debian:9-gnu-mcu-eclipse" \
     --build-binaries-path "install/debian64/${APP_LC_NAME}/bin"
 fi
 
@@ -2563,7 +2556,7 @@ then
   do_host_build_target "Creating the Debian 32-bits distribution..." \
     --target-name debian \
     --target-bits 32 \
-    --docker-image "ilegeul/debian32:8-gnuarm-gcc-x11-v4"
+    --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
 fi
 
 # ----- Build the Windows 32-bits distribution. -----
@@ -2576,13 +2569,13 @@ then
     do_host_build_target "Creating the Debian 32-bits distribution..." \
       --target-name debian \
       --target-bits 32 \
-      --docker-image "ilegeul/debian32:8-gnuarm-gcc-x11-v4"
+      --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
   fi
 
   do_host_build_target "Creating the Windows 32-bits distribution..." \
     --target-name win \
     --target-bits 32 \
-    --docker-image "ilegeul/debian:8-gnuarm-mingw-v2" \
+    --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse" \
     --build-binaries-path "install/debian64/${APP_LC_NAME}/bin"
 fi
 
