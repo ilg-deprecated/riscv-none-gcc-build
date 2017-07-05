@@ -750,7 +750,7 @@ then
 
   cd "${DOWNLOAD_FOLDER_PATH}"
   echo
-  echo "Downloading '${ISL_ARCHIVE}'..."
+  echo "Downloading '${ISL_URL}'..."
   curl -L "${ISL_URL}" --output "${ISL_ARCHIVE}"
 fi
 
