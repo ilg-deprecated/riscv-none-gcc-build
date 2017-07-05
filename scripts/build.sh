@@ -23,6 +23,7 @@ IFS=$'\n\t'
 #
 # Developed on OS X 10.12 Sierra.
 # Also tested on:
+#   GNU/Linux Ubuntu 16.04 LTS
 #   GNU/Linux Arch (Manjaro 16.08)
 #
 # The Windows and GNU/Linux packages are build using Docker containers.
@@ -64,6 +65,10 @@ IFS=$'\n\t'
 # To resume a crashed build with the same timestamp, set
 # DISTRIBUTION_FILE_DATE='yyyymmdd-HHMM' in the environment.
 #
+# To build in a custom folder, set WORK_FOLDER_PATH='xyz' 
+# in the environment.
+#
+# Developer note:
 # To make the resulting install folder relocatable (i.e. do not depend on
 # an absolute location), the `--with-sysroot` must point to a sub-folder
 # below `--prefix`.
@@ -261,29 +266,35 @@ echo "Helper script: \"${helper_script_path}\"."
 source "${helper_script_path}"
 
 
-# ----- Input repositories -----
+# ----- Input archives -----
 
-# The custom RISC-V GCC branch is available from the dedicated Git repository
-# which is part of the GNU MCU Eclipse project hosted on GitHub.
-# Generally this branch follows the official RISC-V GCC master branch,
+# The archives are available from dedicated Git repositories,
+# part of the GNU MCU Eclipse project hosted on GitHub.
+# Generally these projects follow the official RISC-V GCC 
 # with updates after every RISC-V GCC public release.
 
-BINUTILS_FOLDER_NAME="binutils-gdb.git"
-BINUTILS_GIT_URL="https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb.git"
-#BINUTILS_GIT_BRANCH="riscv-next"
-BINUTILS_GIT_BRANCH="__archive__"
-BINUTILS_GIT_COMMIT="3f21b5c9675db61ef5462442b6a068d4a3da8aaf"
+SIFIVE_VERSION="20170612"
 
-GCC_FOLDER_NAME="gcc.git"
-GCC_GIT_URL="https://github.com/gnu-mcu-eclipse/riscv-gcc.git"
-# GCC_GIT_BRANCH="riscv-next"
-GCC_GIT_BRANCH="riscv-gcc-7"
-GCC_GIT_COMMIT="16210e6270e200cd4892a90ecef608906be3a130"
+BINUTILS_PROJECT_NAME="riscv-binutils-gdb"
+BINUTILS_VERSION="${SIFIVE_VERSION}"
+BINUTILS_TAG="v${BINUTILS_VERSION}"
+BINUTILS_ARCHIVE_URL="https://github.com/gnu-mcu-eclipse/${BINUTILS_PROJECT_NAME}/archive/${BINUTILS_TAG}.tar.gz"
+BINUTILS_FOLDER_NAME="${BINUTILS_PROJECT_NAME}-${BINUTILS_VERSION}"
+BINUTILS_ARCHIVE_NAME="${BINUTILS_FOLDER_NAME}.tar.gz"
 
-NEWLIB_FOLDER_NAME="newlib.git"
-NEWLIB_GIT_URL="https://github.com/gnu-mcu-eclipse/riscv-newlib.git"
-NEWLIB_GIT_BRANCH="riscv-newlib-2.5.0"
-NEWLIB_GIT_COMMIT="ccd8a0a4ffbbc00400892334eaf64a1616302b35"
+GCC_PROJECT_NAME="riscv-none-gcc"
+GCC_VERSION="${SIFIVE_VERSION}"
+GCC_TAG="v${GCC_VERSION}"
+GCC_ARCHIVE_URL="https://github.com/gnu-mcu-eclipse/${GCC_PROJECT_NAME}/archive/${GCC_TAG}.tar.gz"
+GCC_FOLDER_NAME="${GCC_PROJECT_NAME}-${GCC_VERSION}"
+GCC_ARCHIVE_NAME="${GCC_FOLDER_NAME}.tar.gz"
+
+NEWLIB_PROJECT_NAME="riscv-newlib"
+NEWLIB_VERSION="${SIFIVE_VERSION}"
+NEWLIB_TAG="v${NEWLIB_VERSION}"
+NEWLIB_ARCHIVE_URL="https://github.com/gnu-mcu-eclipse/${NEWLIB_PROJECT_NAME}/archive/${NEWLIB_TAG}.tar.gz"
+NEWLIB_FOLDER_NAME="${NEWLIB_PROJECT_NAME}-${NEWLIB_VERSION}"
+NEWLIB_ARCHIVE_NAME="${NEWLIB_FOLDER_NAME}.tar.gz"
 
 
 # ----- Libraries sources. -----
@@ -366,12 +377,13 @@ then
   rm -rf "${WORK_FOLDER_PATH}/${MPC_FOLDER}"
   rm -rf "${WORK_FOLDER_PATH}/${ISL_FOLDER}"
 
+  rm -rf "${WORK_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}"
+  rm -rf "${WORK_FOLDER_PATH}/${GCC_FOLDER_NAME}"
+  rm -rf "${WORK_FOLDER_PATH}/${NEWLIB_FOLDER_NAME}"
+
   if [ "${ACTION}" == "cleanall" ]
   then
-    rm -rf "${PROJECT_GIT_FOLDER_PATH}"
-    rm -rf "${WORK_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}"
-    rm -rf "${WORK_FOLDER_PATH}/${GCC_FOLDER_NAME}"
-    rm -rf "${WORK_FOLDER_PATH}/${NEWLIB_FOLDER_NAME}"
+    # rm -rf "${PROJECT_GIT_FOLDER_PATH}"
     rm -rf "${WORK_FOLDER_PATH}/${DEPLOY_FOLDER_NAME}"
   fi
 
@@ -596,40 +608,69 @@ do_host_get_current_date
 
 # ----- Get BINUTILS & GDB. -----
 
+# Download BINUTILS archive.
+if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${BINUTILS_ARCHIVE_NAME}" ]
+then
+  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+  cd "${DOWNLOAD_FOLDER_PATH}"
+  echo
+  echo "Downloading '${BINUTILS_ARCHIVE_URL}'..."
+  curl -L "${BINUTILS_ARCHIVE_URL}" --output "${BINUTILS_ARCHIVE_NAME}"
+fi
+
+# Unpack BINUTILS.
 if [ ! -d "${WORK_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}" ]
 then
   cd "${WORK_FOLDER_PATH}"
   echo
-  echo "Cloning '${BINUTILS_GIT_URL}'..."
-  git clone --branch "${BINUTILS_GIT_BRANCH}" "${BINUTILS_GIT_URL}" "${BINUTILS_FOLDER_NAME}"
-  cd "${BINUTILS_FOLDER_NAME}"
-  git checkout -qf "${BINUTILS_GIT_COMMIT}"
+  echo "Unpacking '${BINUTILS_ARCHIVE_NAME}'..."
+  tar -xf "${DOWNLOAD_FOLDER_PATH}/${BINUTILS_ARCHIVE_NAME}"
 fi
 
 # ----- Get GCC. -----
 
+# Download GCC archive.
+if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${GCC_ARCHIVE_NAME}" ]
+then
+  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+  cd "${DOWNLOAD_FOLDER_PATH}"
+  echo
+  echo "Downloading '${GCC_ARCHIVE_URL}'..."
+  curl -L "${GCC_ARCHIVE_URL}" --output "${GCC_ARCHIVE_NAME}"
+fi
+
+# Unpack GCC.
 if [ ! -d "${WORK_FOLDER_PATH}/${GCC_FOLDER_NAME}" ]
 then
   cd "${WORK_FOLDER_PATH}"
   echo
-  echo "Cloning '${GCC_GIT_URL}'..."
-  git clone --branch "${GCC_GIT_BRANCH}" "${GCC_GIT_URL}" "${GCC_FOLDER_NAME}"
-  cd "${GCC_FOLDER_NAME}"
-  git checkout -qf "${GCC_GIT_COMMIT}"
+  echo "Unpacking '${GCC_ARCHIVE_NAME}'..."
+  tar -xf "${DOWNLOAD_FOLDER_PATH}/${GCC_ARCHIVE_NAME}"
 fi
 
 # ----- Get NEWLIB. -----
 
+# Download NEWLIB archive.
+if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${NEWLIB_ARCHIVE_NAME}" ]
+then
+  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+  cd "${DOWNLOAD_FOLDER_PATH}"
+  echo
+  echo "Downloading '${NEWLIB_ARCHIVE_URL}'..."
+  curl -L "${NEWLIB_ARCHIVE_URL}" --output "${NEWLIB_ARCHIVE_NAME}"
+fi
+
+# Unpack NEWLIB.
 if [ ! -d "${WORK_FOLDER_PATH}/${NEWLIB_FOLDER_NAME}" ]
 then
   cd "${WORK_FOLDER_PATH}"
   echo
-  echo "Cloning '${NEWLIB_GIT_URL}'..."
-  git clone --branch "${NEWLIB_GIT_BRANCH}" "${NEWLIB_GIT_URL}" "${NEWLIB_FOLDER_NAME}"
-  cd "${NEWLIB_FOLDER_NAME}"
-  git checkout -qf "${NEWLIB_GIT_COMMIT}"
+  echo "Unpacking '${NEWLIB_ARCHIVE_NAME}'..."
+  tar -xf "${DOWNLOAD_FOLDER_PATH}/${NEWLIB_ARCHIVE_NAME}"
 fi
-
 
 # ----- Get GMP. -----
 
@@ -640,7 +681,7 @@ then
 
   cd "${DOWNLOAD_FOLDER_PATH}"
   echo
-  echo "Downloading \"${GMP_ARCHIVE}\"..."
+  echo "Downloading '${GMP_URL}'..."
   curl -L "${GMP_URL}" --output "${GMP_ARCHIVE}"
 fi
 
@@ -648,6 +689,8 @@ fi
 if [ ! -d "${WORK_FOLDER_PATH}/${GMP_FOLDER}" ]
 then
   cd "${WORK_FOLDER_PATH}"
+  echo
+  echo "Unpacking '${GMP_ARCHIVE}'..."
   tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${GMP_ARCHIVE}"
 fi
 
@@ -661,7 +704,7 @@ then
 
   cd "${DOWNLOAD_FOLDER_PATH}"
   echo
-  echo "Downloading \"${MPFR_ARCHIVE}\"..."
+  echo "Downloading '${MPFR_URL}'..."
   curl -L "${MPFR_URL}" --output "${MPFR_ARCHIVE}"
 fi
 
@@ -669,6 +712,8 @@ fi
 if [ ! -d "${WORK_FOLDER_PATH}/${MPFR_FOLDER}" ]
 then
   cd "${WORK_FOLDER_PATH}"
+  echo
+  echo "Unpacking '${MPFR_ARCHIVE}'..."
   tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${MPFR_ARCHIVE}"
 fi
 
@@ -682,7 +727,7 @@ then
 
   cd "${DOWNLOAD_FOLDER_PATH}"
   echo
-  echo "Downloading \"${MPC_ARCHIVE}\"..."
+  echo "Downloading '${MPC_URL}'..."
   curl -L "${MPC_URL}" --output "${MPC_ARCHIVE}"
 fi
 
@@ -690,6 +735,8 @@ fi
 if [ ! -d "${WORK_FOLDER_PATH}/${MPC_FOLDER}" ]
 then
   cd "${WORK_FOLDER_PATH}"
+  echo
+  echo "Unpacking '${MPC_ARCHIVE}'..."
   tar -xzvf "${DOWNLOAD_FOLDER_PATH}/${MPC_ARCHIVE}"
 fi
 
@@ -703,7 +750,7 @@ then
 
   cd "${DOWNLOAD_FOLDER_PATH}"
   echo
-  echo "Downloading \"${ISL_ARCHIVE}\"..."
+  echo "Downloading '${ISL_ARCHIVE}'..."
   curl -L "${ISL_URL}" --output "${ISL_ARCHIVE}"
 fi
 
@@ -711,6 +758,8 @@ fi
 if [ ! -d "${WORK_FOLDER_PATH}/${ISL_FOLDER}" ]
 then
   cd "${WORK_FOLDER_PATH}"
+  echo
+  echo "Unpacking '${ISL_ARCHIVE}'..."
   tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${ISL_ARCHIVE}"
 fi
 
