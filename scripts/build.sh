@@ -2473,7 +2473,7 @@ if [ "${HOST_UNAME}" == "Darwin" ]
 then
   if [ "${DO_BUILD_OSX}" == "y" ]
   then
-    do_host_build_target "Creating OS X package..." \
+    do_host_build_target "Creating the OS X distribution..." \
       --target-name osx
   fi
 fi
@@ -2482,7 +2482,7 @@ fi
 
 if [ "${DO_BUILD_DEB64}" == "y" ]
 then
-  do_host_build_target "Creating Debian 64-bits archive..." \
+  do_host_build_target "Creating the Debian 64-bits distribution..." \
     --target-name debian \
     --target-bits 64 \
     --docker-image "ilegeul/debian:8-gnuarm-gcc-x11-v4"
@@ -2494,13 +2494,13 @@ if [ "${DO_BUILD_WIN64}" == "y" ]
 then
   if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
   then
-    do_host_build_target "Creating Debian 64-bits archive..." \
+    do_host_build_target "Creating the Debian 64-bits distribution..." \
       --target-name debian \
       --target-bits 64 \
       --docker-image "ilegeul/debian:8-gnuarm-gcc-x11-v4"
   fi
 
-  do_host_build_target "Creating Windows 64-bits setup..." \
+  do_host_build_target "Creating the Windows 64-bits distribution..." \
     --target-name win \
     --target-bits 64 \
     --docker-image "ilegeul/debian:8-gnuarm-mingw-v2" \
@@ -2511,7 +2511,7 @@ fi
 
 if [ "${DO_BUILD_DEB32}" == "y" ]
 then
-  do_host_build_target "Creating Debian 32-bits archive..." \
+  do_host_build_target "Creating the Debian 32-bits distribution..." \
     --target-name debian \
     --target-bits 32 \
     --docker-image "ilegeul/debian32:8-gnuarm-gcc-x11-v4"
@@ -2524,13 +2524,13 @@ if [ "${DO_BUILD_WIN32}" == "y" ]
 then
   if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
   then
-    do_host_build_target "Creating Debian 32-bits archive..." \
+    do_host_build_target "Creating the Debian 32-bits distribution..." \
       --target-name debian \
       --target-bits 32 \
       --docker-image "ilegeul/debian32:8-gnuarm-gcc-x11-v4"
   fi
 
-  do_host_build_target "Creating Windows 32-bits setup..." \
+  do_host_build_target "Creating the Windows 32-bits distribution..." \
     --target-name win \
     --target-bits 32 \
     --docker-image "ilegeul/debian:8-gnuarm-mingw-v2" \
