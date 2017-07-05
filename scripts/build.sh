@@ -508,74 +508,35 @@ then
 
 fi
 
-# ----- Process "pull|checkout-dev|checkout-stable" actions. -----
+# ----- Process "pull" actions. -----
 
 do_repo_action() {
 
-  # $1 = action (pull, checkout-dev, checkout-stable)
-
-  # Update current branch and prepare autotools.
-  echo
+  # $1 = action (pull)
   if [ "${ACTION}" == "pull" ]
   then
+    echo
     echo "Running git pull..."
-  elif [ "${ACTION}" == "checkout-dev" ]
-  then
-    echo "Running git checkout gnu-mcu-eclipse-dev & pull..."
-  elif [ "${ACTION}" == "checkout-stable" ]
-  then
-    echo "Running git checkout gnu-mcu-eclipse & pull..."
-  fi
 
-  if [ -d "${PROJECT_GIT_FOLDER_PATH}" ]
-  then
-    echo
-    if [ "${USER}" == "ilg" ]
-    then
-      echo "If asked, enter ${USER} GitHub password for git pull"
-    fi
-
-    cd "${PROJECT_GIT_FOLDER_PATH}"
-
-    if [ "${ACTION}" == "checkout-dev" ]
-    then
-      git checkout gnu-mcu-eclipse-dev
-    elif [ "${ACTION}" == "checkout-stable" ]
-    then
-      git checkout gnu-mcu-eclipse
-    fi
-
-    if false
+    if [ -d "${PROJECT_GIT_FOLDER_PATH}" ]
     then
 
-    git pull --recurse-submodules
-    git submodule update --init --recursive --remote
+      echo
+      if [ "${USER}" == "ilg" ]
+      then
+        echo "If asked, enter ${USER} GitHub password for git pull"
+      fi
 
-    git branch
+      cd "${PROJECT_GIT_FOLDER_PATH}"
 
-    do_host_bootstrap
-
-    rm -rf "${BUILD_FOLDER_PATH}/${APP_LC_NAME}"
-
-    echo
-    if [ "${ACTION}" == "pull" ]
-    then
-      echo "Pull completed. Proceed with a regular build."
-    else
-      echo "Checkout completed. Proceed with a regular build."
-    fi
+      git pull --recurse-submodules
+      # git submodule update --init --recursive --remote
 
     else
 
-      echo "Not implemented."
+      echo "No git folder."
       exit 1
-
     fi
-
-    exit 0
-  else
-	echo "No git folder."
-    exit 1
   fi
 
 }
@@ -585,9 +546,13 @@ do_repo_action() {
 # git branch --set-upstream-to=origin/gnu-mcu-eclipse gnu-mcu-eclipse
 
 case "${ACTION}" in
-  pull|checkout-dev|checkout-stable)
-    do_repo_action "${ACTION}"
+  pull)
+    do_repo_action "pull"
     ;;
+    
+  checkout-dev|checkout-stable)
+    echo "Not implemented"
+    exit 1
 esac
 
 # Get the current Git branch name, to know if we are building the stable or
