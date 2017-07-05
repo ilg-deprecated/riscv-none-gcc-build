@@ -87,7 +87,7 @@ gcc_target="riscv64-unknown-elf"
 gcc_arch="rv64imafdc"
 gcc_abi="lp64d"
 
-jobs="--jobs=1"
+jobs=""
 
 # On Parallels virtual machines, prefer host Work folder.
 # Second choice are Work folders on secondary disks.
@@ -1104,8 +1104,8 @@ then
 
   # Build.
   # make clean
-  make "${jobs}"
-  make "${jobs}" install
+  make ${jobs}
+  make ${jobs} install
 
   touch "${gmp_stamp_file}"
 fi
@@ -1165,8 +1165,8 @@ then
 
   # Build.
   # make clean
-  make "${jobs}"
-  make "${jobs}" install
+  make ${jobs}
+  make ${jobs} install
 
   touch "${mpfr_stamp_file}"
 fi
@@ -1224,8 +1224,8 @@ then
 
   # Build.
   # make clean
-  make "${jobs}"
-  make "${jobs}" install
+  make ${jobs}
+  make ${jobs} install
 
   touch "${mpc_stamp_file}"
 fi
@@ -1283,8 +1283,8 @@ then
 
   # Build.
   # make clean
-  make "${jobs}"
-  make "${jobs}" install
+  make ${jobs}
+  make ${jobs} install
 
   touch "${isl_stamp_file}"
 fi
@@ -1421,12 +1421,12 @@ then
   
   (
     # make clean
-    make "${jobs}" 
-    make "${jobs}" install
+    make ${jobs} 
+    make ${jobs} install
     if [ -z "${do_no_pdf}" ]
     then
-      make "${jobs}" html pdf
-      make "${jobs}" install-html install-pdf
+      make ${jobs} html pdf
+      make ${jobs} install-html install-pdf
     fi
 
     # Without this copy, the build for the nano version of the GCC second 
@@ -1591,7 +1591,7 @@ then
     # No need to make 'all', 'all-gcc' is enough to compile the libraries.
     # Parallel build fails for win32.
     make all-gcc
-    make "${jobs}" install-gcc
+    make ${jobs} install-gcc
   ) | tee "make-all-output.txt"
 
   touch "${gcc_stage1_stamp_file}"
@@ -1693,8 +1693,8 @@ then
   cd "${build_folder_path}/${newlib_folder}"
   (
     # make clean
-    make "${jobs}"  
-    make "${jobs}" install 
+    make ${jobs}  
+    make ${jobs} install 
 
     if [ -z "${do_no_pdf}" ]
     then
@@ -1835,8 +1835,8 @@ then
   cd "${build_folder_path}/${newlib_nano_folder}"
   (
     # make clean
-    make "${jobs}"  
-    make "${jobs}" install 
+    make ${jobs}  
+    make ${jobs} install 
   ) | tee "make-newlib-all-output.txt"
 
   touch "${newlib_nano_stamp_file}"
@@ -2045,11 +2045,11 @@ then
   cd "${build_folder_path}/${gcc_stage2_folder}"
 
   (
-    make "${jobs}" 
-    make "${jobs}" install
+    make ${jobs} 
+    make ${jobs} install
     if [ -z "${do_no_pdf}" ]
     then
-      make "${jobs}" install-pdf install-html
+      make ${jobs} install-pdf install-html
     fi
   ) | tee "make-all-output.txt"
 
@@ -2259,8 +2259,8 @@ then
   cd "${build_folder_path}/${gcc_stage2_nano_folder}"
 
   (
-    make "${jobs}"
-    make "${jobs}" install
+    make ${jobs}
+    make ${jobs} install
 
     if [ "${target_name}" == "win" ]
     then
