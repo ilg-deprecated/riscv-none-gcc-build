@@ -892,6 +892,12 @@ do
   esac
 done
 
+start_stamp_file="${build_folder_path}/stamp_started"
+if [ ! -f "${start_stamp_file}" ]
+then
+  touch "${start_stamp_file}"
+fi
+
 download_folder_path=${download_folder_path:-"${work_folder_path}/download"}
 git_folder_path="${work_folder_path}/${PROJECT_GIT_FOLDER_NAME}"
 distribution_file_version=$(cat "${git_folder_path}/gnu-mcu-eclipse/VERSION")-${DISTRIBUTION_FILE_DATE}
@@ -2467,6 +2473,9 @@ do_check_application "${gcc_target}-g++" --version
 
 # Requires ${distribution_file} and ${result}
 do_container_completed
+
+stop_stamp_file="${build_folder_path}/stamp_completed"
+touch "${stop_stamp_file}"
 
 exit 0
 
