@@ -131,6 +131,7 @@ helper_script_path=""
 do_no_strip=""
 multilib_flags="" # by default multilib is enabled
 do_no_pdf=""
+do_develop=""
 
 while [ $# -gt 0 ]
 do
@@ -196,10 +197,15 @@ do
       shift 2
       ;;
 
+    --develop)
+      do_develop="y"
+      shift
+      ;;
+
     --help)
       echo "Build the GNU MCU Eclipse ${APP_NAME} distributions."
       echo "Usage:"
-      echo "    bash $0 helper_script [--win32] [--win64] [--deb32] [--deb64] [--osx] [--all] [clean|cleanall|pull|checkout-dev|checkout-stable|build-images] [--help]"
+      echo "    bash $0 helper_script [--win32] [--win64] [--deb32] [--deb64] [--osx] [--all] [clean|cleanall|pull|build-images|preload-images] [--help]"
       echo
       exit 1
       ;;
