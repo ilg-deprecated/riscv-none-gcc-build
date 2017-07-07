@@ -2535,10 +2535,10 @@ fi
 
 # ----- Build the Windows 32-bits distribution. -----
 
-# Since the actual container is a 64-bits, use the debian64 binaries.
+# Since the actual container is a 32-bits, use the debian32 binaries.
 if [ "${DO_BUILD_WIN32}" == "y" ]
 then
-  if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+  if [ ! -f "${WORK_FOLDER_PATH}/install/debian32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
   then
     do_host_build_target "Creating the Debian 32-bits distribution..." \
       --target-name debian \
@@ -2550,7 +2550,7 @@ then
     --target-name win \
     --target-bits 32 \
     --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse" \
-    --build-binaries-path "install/debian64/${APP_LC_NAME}/bin"
+    --build-binaries-path "install/debian32/${APP_LC_NAME}/bin"
 fi
 
 do_host_show_sha
