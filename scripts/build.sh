@@ -405,10 +405,6 @@ do_host_start_timer
 
 do_host_detect
 
-# ----- Prepare prerequisites. -----
-
-do_host_prepare_prerequisites
-
 # ----- Process "preload-images" action. -----
 
 if [ "${ACTION}" == "preload-images" ]
@@ -432,31 +428,6 @@ then
   do_host_stop_timer
 
   exit 0
-fi
-
-do_host_bootstrap() {
-
-  return
-
-  # Prepare autotools.
-  echo
-  echo "bootstrap..."
-
-  cd "${PROJECT_GIT_FOLDER_PATH}"
-  rm -f aclocal.m4
-  ./bootstrap
-
-}
-
-if [ \( "${ACTION}" == "bootstrap" \) ]
-then
-
-  do_host_bootstrap
-
-  do_host_stop_timer
-
-  exit 0
-
 fi
 
 # ----- Process "build-images" action. -----
@@ -484,6 +455,37 @@ then
 
   exit 0
 fi
+
+
+# ----- Prepare prerequisites. -----
+
+do_host_prepare_prerequisites
+
+do_host_bootstrap() {
+
+  return
+
+  # Prepare autotools.
+  echo
+  echo "bootstrap..."
+
+  cd "${PROJECT_GIT_FOLDER_PATH}"
+  rm -f aclocal.m4
+  ./bootstrap
+
+}
+
+if [ \( "${ACTION}" == "bootstrap" \) ]
+then
+
+  do_host_bootstrap
+
+  do_host_stop_timer
+
+  exit 0
+
+fi
+
 
 # ----- Prepare Docker, if needed. -----
 
