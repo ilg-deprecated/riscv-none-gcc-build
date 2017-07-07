@@ -892,7 +892,8 @@ do
   esac
 done
 
-start_stamp_file="${build_folder_path}/stamp_started"
+mkdir -p "${install_folder}"
+start_stamp_file="${install_folder}/stamp_started"
 if [ ! -f "${start_stamp_file}" ]
 then
   touch "${start_stamp_file}"
@@ -2474,7 +2475,7 @@ do_check_application "${gcc_target}-g++" --version
 # Requires ${distribution_file} and ${result}
 do_container_completed
 
-stop_stamp_file="${build_folder_path}/stamp_completed"
+stop_stamp_file="${install_folder}/stamp_completed"
 touch "${stop_stamp_file}"
 
 exit 0
