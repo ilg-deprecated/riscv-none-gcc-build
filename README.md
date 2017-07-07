@@ -28,8 +28,10 @@ Another addition compared to the SiFive distribution is the presence of the docu
 
 ## How to build
 
+
 ```bash
-$ git clone https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build.git ~/Downloads/riscv-none-gcc-build.git
+$ rm -rf ~/Downloads/riscv-none-gcc-build.git
+$ git clone --recurse-submodules https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build.git ~/Downloads/riscv-none-gcc-build.git
 $ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --all
 ```
 
@@ -37,7 +39,7 @@ Warning: with 5 separate distributions, this will take many hours, even on a fas
 
 ## Folders
 
-For consistency with other projects, all files are grouped under `gnu-mcu-eclipse`.
+For consistency with other projects, most files are grouped under `gnu-mcu-eclipse`.
 
 * `gnu-mcu-eclipse/info` - informative files copied to the distributed `info` folder;
 * `gnu-mcu-eclipse/nsis` - files required by [NSIS (Nullsoft Scriptable Install System)](http://nsis.sourceforge.net/Main_Page);
