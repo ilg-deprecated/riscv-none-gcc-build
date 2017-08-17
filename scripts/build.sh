@@ -1722,6 +1722,7 @@ then
     # --enable-lite-exit	enable light weight exit
     # --enable-newlib-global-atexit	enable atexit data structure as global
     # --enable-newlib-nano-formatted-io    Use nano version formatted IO
+    # --enable-newlib-reent-small
 
     # --enable-newlib-retargetable-locking ???
 
@@ -1761,6 +1762,7 @@ then
         --enable-lite-exit \
         --enable-newlib-global-atexit \
         --enable-newlib-nano-formatted-io \
+        --enable-newlib-reent-small \
         CFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
@@ -1796,6 +1798,7 @@ then
         --enable-lite-exit \
         --enable-newlib-global-atexit \
         --enable-newlib-nano-formatted-io \
+        --enable-newlib-reent-small \
         CFLAGS_FOR_TARGET="-Wno-implicit-function-declaration -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-logical-op-parentheses ${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
