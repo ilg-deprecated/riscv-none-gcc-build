@@ -4,15 +4,11 @@ These are the additional files required by the [GNU MCU Eclipse RISC-V Embedded 
 
 This release closely follows the official [RISC-V distribution](https://github.com/riscv/riscv-gcc) maintained by [SiFive](https://www.sifive.com).
 
-The current version is based on project [riscv/riscv-gnu-toolchain](https://github.com/riscv/riscv-gnu-toolchain), tag v20170612 (commit [f5fae1c](https://github.com/riscv/riscv-gnu-toolchain/tree/f5fae1c27b2365da773816ddcd92f533867f28ec)) from June 12th, which depends on the following:
-
-- the [riscv/riscv-gcc](https://github.com/riscv/riscv-gcc) project, commit [16210e6](https://github.com/riscv/riscv-gcc/commit/16210e6270e200cd4892a90ecef608906be3a130) from from May 15th, 2017
-- the [riscv/riscv-binutils-gdb](https://github.com/riscv/riscv-binutils-gdb) project, commit [3f21b5c](https://github.com/riscv/riscv-binutils-gdb/commit/3f21b5c9675db61ef5462442b6a068d4a3da8aaf) from May 5th, 2017
-- the [riscv/riscv-newlib](https://github.com/riscv/riscv-newlib) project, commit [ccd8a0a](https://github.com/riscv/riscv-newlib/commit/ccd8a0a4ffbbc00400892334eaf64a1616302b35) from May 2nd, 2017
+The current version is based on project [riscv/riscv-gnu-toolchain](https://github.com/riscv/riscv-gnu-toolchain).
 
 ## Changes
 
-Compared to the original RISC-V version, there are no functional changes; the **same architecture and API** options are supported, and the same combinations of libraries (derived from newlib) are provided.
+Compared to the original RISC-V version, there are no functional changes; the **same architecture and API options** are supported, and **the same combinations of libraries** (derived from newlib) are provided.
 
 ## newlib-nano
 
@@ -28,12 +24,7 @@ Another addition compared to the SiFive distribution is the presence of the docu
 
 ## How to build
 
-
-```bash
-$ rm -rf ~/Downloads/riscv-none-gcc-build.git
-$ git clone --recurse-submodules https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build.git ~/Downloads/riscv-none-gcc-build.git
-$ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --all
-```
+The detailed steps are defined in the [How to build the RISC-V Embedded GCC binaries?](https://gnu-mcu-eclipse.github.io/toolchain/riscv/build-procedure/) page.
 
 Warning: with 5 separate distributions, this will take many hours, even on a fast machine.
 
