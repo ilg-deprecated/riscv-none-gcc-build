@@ -805,8 +805,9 @@ jobs="${jobs}"
 
 branding="${branding}"
 
+# Cannot use medlow with 64 bits, so both must be medany.
 cflags_optimizations_for_target="-O2 -mcmodel=medany"
-cflags_optimizations_nano_for_target="-Os -mcmodel=medlow"
+cflags_optimizations_nano_for_target="-Os -mcmodel=medany"
 
 EOF
 # The above marker must start in the first column.
