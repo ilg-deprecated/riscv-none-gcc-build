@@ -110,7 +110,8 @@ BUILD_FOLDER_PATH="${WORK_FOLDER_PATH}/build"
 
 PROJECT_GIT_FOLDER_NAME="riscv-none-gcc-build.git"
 PROJECT_GIT_FOLDER_PATH="${WORK_FOLDER_PATH}/${PROJECT_GIT_FOLDER_NAME}"
-PROEJCT_GIT_URL="https://github.com/gnu-mcu-eclipse/${PROJECT_GIT_FOLDER_NAME}"
+PROJECT_GIT_DOWNLOADS_FOLDER_PATH="${HOME}/Downloads/${PROJECT_GIT_FOLDER_NAME}"
+PROJECT_GIT_URL="https://github.com/gnu-mcu-eclipse/${PROJECT_GIT_FOLDER_NAME}"
 
 # ----- Create Work folder. -----
 
@@ -389,7 +390,7 @@ then
 
   if [ "${ACTION}" == "cleanall" ]
   then
-    # rm -rf "${PROJECT_GIT_FOLDER_PATH}"
+    rm -rf "${PROJECT_GIT_FOLDER_PATH}"
     rm -rf "${WORK_FOLDER_PATH}/${DEPLOY_FOLDER_NAME}"
   fi
 
@@ -484,11 +485,20 @@ unzip | grep UnZip
 if [ ! -d "${PROJECT_GIT_FOLDER_PATH}" ]
 then
 
-  cd "${WORK_FOLDER_PATH}"
+  if [ -d "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}" ]
+  then
 
-  echo "If asked, enter ${USER} GitHub password for git clone"
-  git clone "${PROEJCT_GIT_URL}" "${PROJECT_GIT_FOLDER_PATH}"
+    # If the folder is already present in Downloads, link to it.
+    ln -s "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}" "${PROJECT_GIT_FOLDER_PATH}"
 
+  else
+
+    cd "${WORK_FOLDER_PATH}"
+
+    echo "If asked, enter ${USER} GitHub password for git clone"
+    git clone "${PROJECT_GIT_URL}" "${PROJECT_GIT_FOLDER_PATH}"
+
+  fi
 fi
 
 # ----- Process "pull" actions. -----
