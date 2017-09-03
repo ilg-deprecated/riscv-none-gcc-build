@@ -137,7 +137,7 @@ while [ $# -gt 0 ]
 do
   case "$1" in
 
-    clean|cleanall|pull|checkout-dev|checkout-stable|build-images|preload-images|bootstrap)
+    clean|cleanall|pull|checkout-dev|checkout-stable|build-images|preload-images)
       ACTION="$1"
       shift
       ;;
@@ -460,31 +460,6 @@ fi
 # ----- Prepare prerequisites. -----
 
 do_host_prepare_prerequisites
-
-do_host_bootstrap() {
-
-  return
-
-  # Prepare autotools.
-  echo
-  echo "bootstrap..."
-
-  cd "${PROJECT_GIT_FOLDER_PATH}"
-  rm -f aclocal.m4
-  ./bootstrap
-
-}
-
-if [ \( "${ACTION}" == "bootstrap" \) ]
-then
-
-  do_host_bootstrap
-
-  do_host_stop_timer
-
-  exit 0
-
-fi
 
 
 # ----- Prepare Docker, if needed. -----
