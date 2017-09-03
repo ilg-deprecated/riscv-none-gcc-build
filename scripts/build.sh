@@ -57,7 +57,7 @@ IFS=$'\n\t'
 # The script also builds a size optimised version of the system libraries,
 # similar to ARM **nano** version.
 # In practical terms, this means a separate build of the compiler
-# internal libraries, using `-Os -mcmodel=medlow` instead of 
+# internal libraries, using `-Os -mcmodel=medany` instead of 
 # `-O2 -mcmodel=medany` as for the regular libraries. It also means
 # the `newlib` build with special configuration options to use 
 # simpler `printf()` and memory management functions.
@@ -73,19 +73,31 @@ IFS=$'\n\t'
 # an absolute location), the `--with-sysroot` must point to a sub-folder
 # below `--prefix`.
 #
+# Configuration environment variables:
+#
+# - WORK_FOLDER_PATH
+# - DISTRIBUTION_FILE_DATE
+# - APP_NAME
+# - APP_UC_NAME
+# - APP_LC_NAME
+# - branding
+# - gcc_target
+# - gcc_arch
+# - gcc_abi
+#
 
 # Mandatory definition.
-APP_NAME="RISC-V Embedded GCC"
+APP_NAME=${APP_NAME:-"RISC-V Embedded GCC"}
 
 # Used as part of file/folder paths.
-APP_UC_NAME="RISC-V Embedded GCC"
-APP_LC_NAME="riscv-none-gcc"
+APP_UC_NAME=${APP_UC_NAME:-"RISC-V Embedded GCC"}
+APP_LC_NAME=${APP_LC_NAME:-"riscv-none-gcc"}
 
-branding="GNU MCU Eclipse RISC-V Embedded GCC"
+branding=${branding:-"GNU MCU Eclipse RISC-V Embedded GCC"}
 
-gcc_target="riscv64-unknown-elf"
-gcc_arch="rv64imafdc"
-gcc_abi="lp64d"
+gcc_target=${gcc_target:-"riscv64-unknown-elf"}
+gcc_arch=${gcc_arch:-"rv64imafdc"}
+gcc_abi=${gcc_abi:-"lp64d"}
 
 jobs=""
 
