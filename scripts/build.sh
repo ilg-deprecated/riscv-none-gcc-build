@@ -505,16 +505,17 @@ unzip | grep UnZip
 
 # ----- Get the project git repository. -----
 
-if [ ! -d "${PROJECT_GIT_FOLDER_PATH}" ]
+if [ -d "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}" ]
 then
 
-  if [ -d "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}" ]
+  # If the folder is already present in Downloads, copy it.
+  echo "Copying ${PROJECT_GIT_FOLDER_NAME} from Downloads..."
+  cp -r "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}" "${PROJECT_GIT_FOLDER_PATH}"
+
+else
+
+  if [ ! -d "${PROJECT_GIT_FOLDER_PATH}" ]
   then
-
-    # If the folder is already present in Downloads, link to it.
-    ln -s "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}" "${PROJECT_GIT_FOLDER_PATH}"
-
-  else
 
     cd "${WORK_FOLDER_PATH}"
 
@@ -522,6 +523,7 @@ then
     git clone "${PROJECT_GIT_URL}" "${PROJECT_GIT_FOLDER_PATH}"
 
   fi
+
 fi
 
 # ----- Process "pull" actions. -----
