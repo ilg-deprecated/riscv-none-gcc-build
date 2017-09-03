@@ -510,7 +510,9 @@ then
 
   # If the folder is already present in Downloads, copy it.
   echo "Copying ${PROJECT_GIT_FOLDER_NAME} from Downloads..."
-  cp -r "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}" "${PROJECT_GIT_FOLDER_PATH}"
+  rm -rf "${PROJECT_GIT_FOLDER_PATH}"
+  mkdir -p "${PROJECT_GIT_FOLDER_PATH}"
+  cp -R "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}"/* "${PROJECT_GIT_FOLDER_PATH}"
 
 else
 
