@@ -84,7 +84,12 @@ IFS=$'\n\t'
 # - gcc_target
 # - gcc_arch
 # - gcc_abi
+# - BUILD_FOLDER_PATH
+# - DOWNLOAD_FOLDER_PATH
+# - DEPLOY_FOLDER_NAME
 #
+
+# -----------------------------------------------------------------------------
 
 # Mandatory definition.
 APP_NAME=${APP_NAME:-"RISC-V Embedded GCC"}
@@ -118,12 +123,23 @@ else
   WORK_FOLDER_PATH=${WORK_FOLDER_PATH:-"${HOME}/Work/${APP_LC_NAME}"}
 fi
 
-BUILD_FOLDER_PATH="${WORK_FOLDER_PATH}/build"
+# ----- Define build constants. -----
+
+BUILD_FOLDER_NAME=${BUILD_FOLDER_NAME:-"build"}
+BUILD_FOLDER_PATH=${BUILD_FOLDER_PATH:-"${WORK_FOLDER_PATH}/${BUILD_FOLDER_NAME}"}
+
+DOWNLOAD_FOLDER_NAME=${DOWNLOAD_FOLDER_NAME:-"download"}
+DOWNLOAD_FOLDER_PATH=${DOWNLOAD_FOLDER_PATH:-"${WORK_FOLDER_PATH}/${DOWNLOAD_FOLDER_NAME}"}
+DEPLOY_FOLDER_NAME=${DEPLOY_FOLDER_NAME:-"deploy"}
+
+
+# ----- Define build Git constants. -----
 
 PROJECT_GIT_FOLDER_NAME="riscv-none-gcc-build.git"
 PROJECT_GIT_FOLDER_PATH="${WORK_FOLDER_PATH}/${PROJECT_GIT_FOLDER_NAME}"
 PROJECT_GIT_DOWNLOADS_FOLDER_PATH="${HOME}/Downloads/${PROJECT_GIT_FOLDER_NAME}"
 PROJECT_GIT_URL="https://github.com/gnu-mcu-eclipse/${PROJECT_GIT_FOLDER_NAME}"
+
 
 # ----- Create Work folder. -----
 
@@ -368,11 +384,6 @@ ISL_FOLDER="isl-${ISL_VERSION}"
 ISL_ARCHIVE="${ISL_FOLDER}.tar.bz2"
 ISL_URL="http://isl.gforge.inria.fr/${ISL_ARCHIVE}"
 
-
-# ----- Define build constants. -----
-
-DOWNLOAD_FOLDER_PATH="${WORK_FOLDER_PATH}/download"
-DEPLOY_FOLDER_NAME="deploy"
 
 # ----- Process actions. -----
 
