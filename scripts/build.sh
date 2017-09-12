@@ -353,7 +353,10 @@ else
   GCC_ARCHIVE_NAME=${GCC_ARCHIVE_NAME:-"${GCC_FOLDER_NAME}.tar.gz"}
 fi
 
-GCC_MULTILIB=${GCC_MULTILIB:-"rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--"}
+# The default is:
+# rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--
+# Add 'rv32imaf-ilp32f--'. 
+GCC_MULTILIB=${GCC_MULTILIB:-(rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--)}
 GCC_MULTILIB_FILE=${GCC_MULTILIB_FILE:-"t-elf-multilib"}
 
 NEWLIB_PROJECT_NAME="riscv-newlib"
@@ -906,7 +909,7 @@ gcc_target="${gcc_target}"
 gcc_arch="${gcc_arch}"
 gcc_abi="${gcc_abi}"
 
-GCC_MULTILIB="${GCC_MULTILIB}"
+GCC_MULTILIB=${GCC_MULTILIB}
 GCC_MULTILIB_FILE="${GCC_MULTILIB_FILE}"
 
 multilib_flags="${multilib_flags}"
@@ -1543,7 +1546,9 @@ then
     echo "Running the multilib generator..."
 
     cd "${work_folder_path}/${GCC_FOLDER_NAME}/gcc/config/riscv"
-    ./multilib-generator "${GCC_MULTILIB}" >"${GCC_MULTILIB_FILE}"
+    # Be sure the ${GCC_MULTILIB} has no quotes, since it defines multiple strings.
+    ./multilib-generator ${GCC_MULTILIB[@]} >"${GCC_MULTILIB_FILE}"
+    cat "${GCC_MULTILIB_FILE}"
   fi
 
   mkdir -p "${build_folder_path}/${gcc_stage1_folder}"
