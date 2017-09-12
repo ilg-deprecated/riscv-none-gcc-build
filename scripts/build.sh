@@ -323,7 +323,7 @@ then
   BINUTILS_FOLDER_NAME=${BINUTILS_FOLDER_NAME:-"${BINUTILS_PROJECT_NAME}.git"}
 
   BINUTILS_GIT_URL=${BINUTILS_GIT_URL:-"https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb.git"}
-  BINUTILS_GIT_BRANCH=${BINUTILS_GIT_BRANCH:-"gnu-mcu-eclipse-dev"}
+  BINUTILS_GIT_BRANCH=${BINUTILS_GIT_BRANCH:-"riscv-binutils-2.29"}
   # June 17, 2017
   BINUTILS_GIT_COMMIT=${BINUTILS_GIT_COMMIT:-"60cda8de81dce7bc67977b0dd1953437ed06db36"}
 else
@@ -342,8 +342,8 @@ then
   GCC_FOLDER_NAME=${GCC_FOLDER_NAME:-"${GCC_PROJECT_NAME}.git"}
 
   GCC_GIT_URL=${GCC_GIT_URL:-"https://github.com/gnu-mcu-eclipse/riscv-none-gcc.git"}
-  GCC_GIT_BRANCH=${GCC_GIT_BRANCH:-"gnu-mcu-eclipse-dev"}
-  GCC_GIT_COMMIT=${GCC_GIT_COMMIT:-"7a3a24f7bfa07fc840c43e11da0cd3f01f27d975"}
+  GCC_GIT_BRANCH=${GCC_GIT_BRANCH:-"riscv-gcc-7-no-libloss"}
+  GCC_GIT_COMMIT=${GCC_GIT_COMMIT:-"e0203ff93b1c6d6d42809400c5d37cd1448ee697"}
 else
   GCC_VERSION=${GCC_VERSION:-"${SIFIVE_VERSION}"}
   GCC_FOLDER_NAME=${GCC_FOLDER_NAME:-"${GCC_PROJECT_NAME}-${GCC_VERSION}"}
@@ -353,6 +353,9 @@ else
   GCC_ARCHIVE_NAME=${GCC_ARCHIVE_NAME:-"${GCC_FOLDER_NAME}.tar.gz"}
 fi
 
+GCC_MULTILIB=${GCC_MULTILIB:-"rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--"}
+GCC_MULTILIB_FILE=${GCC_MULTILIB_FILE:-"t-elf-multilib"}
+
 NEWLIB_PROJECT_NAME="riscv-newlib"
 
 if [ "${do_use_gits}" == "y" ]
@@ -360,7 +363,7 @@ then
   NEWLIB_FOLDER_NAME=${NEWLIB_FOLDER_NAME:-"${NEWLIB_PROJECT_NAME}.git"}
   
   NEWLIB_GIT_URL=${NEWLIB_GIT_URL:-"https://github.com/gnu-mcu-eclipse/riscv-newlib.git"}
-  NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"gnu-mcu-eclipse-dev"}
+  NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0"}
   NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"bcf3078d2203be52ac7e31c58ef2dbfe02388d58"}
 
 else
@@ -902,6 +905,9 @@ do_no_pdf="${do_no_pdf}"
 gcc_target="${gcc_target}"
 gcc_arch="${gcc_arch}"
 gcc_abi="${gcc_abi}"
+
+GCC_MULTILIB="${GCC_MULTILIB}"
+GCC_MULTILIB_FILE="${GCC_MULTILIB_FILE}"
 
 multilib_flags="${multilib_flags}"
 jobs="${jobs}"
@@ -1530,6 +1536,15 @@ gcc_stage1_stamp_file="${build_folder_path}/${gcc_stage1_folder}/stamp-install-c
 
 if [ ! -f "${gcc_stage1_stamp_file}" ]
 then
+
+  if [ -n "${GCC_MULTILIB}" ]
+  then
+    echo
+    echo "Running the multilib generator..."
+
+    cd "${work_folder_path}/${GCC_FOLDER_NAME}/gcc/config/riscv"
+    ./multilib-generator "${GCC_MULTILIB}" >"${GCC_MULTILIB_FILE}"
+  fi
 
   mkdir -p "${build_folder_path}/${gcc_stage1_folder}"
   cd "${build_folder_path}/${gcc_stage1_folder}"
