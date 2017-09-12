@@ -161,6 +161,7 @@ do_no_strip=""
 multilib_flags="" # by default multilib is enabled
 do_no_pdf=""
 do_develop=""
+do_use_gits=""
 
 while [ $# -gt 0 ]
 do
@@ -228,6 +229,11 @@ do
 
     --develop)
       do_develop="y"
+      shift
+      ;;
+
+    --use-gits)
+      do_use_gits="y"
       shift
       ;;
 
@@ -308,29 +314,63 @@ source "${helper_script_path}"
 # Generally these projects follow the official RISC-V GCC 
 # with updates after every RISC-V GCC public release.
 
-SIFIVE_VERSION="20170612"
+SIFIVE_VERSION=${SIFIVE_VERSION:-"20170612"}
 
 BINUTILS_PROJECT_NAME="riscv-binutils-gdb"
-BINUTILS_VERSION="${SIFIVE_VERSION}"
-BINUTILS_TAG="v${BINUTILS_VERSION}"
-BINUTILS_ARCHIVE_URL="https://github.com/gnu-mcu-eclipse/${BINUTILS_PROJECT_NAME}/archive/${BINUTILS_TAG}.tar.gz"
-BINUTILS_FOLDER_NAME="${BINUTILS_PROJECT_NAME}-${BINUTILS_VERSION}"
-BINUTILS_ARCHIVE_NAME="${BINUTILS_FOLDER_NAME}.tar.gz"
+
+if [ "${do_use_gits}" == "y" ]
+then
+  BINUTILS_FOLDER_NAME=${BINUTILS_FOLDER_NAME:-"${BINUTILS_PROJECT_NAME}.git"}
+
+  BINUTILS_GIT_URL=${BINUTILS_GIT_URL:-"https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb.git"}
+  BINUTILS_GIT_BRANCH=${BINUTILS_GIT_BRANCH:-"gnu-mcu-eclipse-dev"}
+  # June 17, 2017
+  BINUTILS_GIT_COMMIT=${BINUTILS_GIT_COMMIT:-"60cda8de81dce7bc67977b0dd1953437ed06db36"}
+else
+  BINUTILS_VERSION=${BINUTILS_VERSION:-"${SIFIVE_VERSION}"}
+  BINUTILS_FOLDER_NAME="${BINUTILS_PROJECT_NAME}-${BINUTILS_VERSION}"
+
+  BINUTILS_TAG=${BINUTILS_TAG:-"v${BINUTILS_VERSION}"}
+  BINUTILS_ARCHIVE_URL=${BINUTILS_ARCHIVE_URL:-"https://github.com/gnu-mcu-eclipse/${BINUTILS_PROJECT_NAME}/archive/${BINUTILS_TAG}.tar.gz"}
+  BINUTILS_ARCHIVE_NAME=${BINUTILS_ARCHIVE_NAME:-"${BINUTILS_FOLDER_NAME}.tar.gz"}
+fi
 
 GCC_PROJECT_NAME="riscv-none-gcc"
-GCC_VERSION="${SIFIVE_VERSION}"
-GCC_TAG="v${GCC_VERSION}"
-GCC_ARCHIVE_URL="https://github.com/gnu-mcu-eclipse/${GCC_PROJECT_NAME}/archive/${GCC_TAG}.tar.gz"
-GCC_FOLDER_NAME="${GCC_PROJECT_NAME}-${GCC_VERSION}"
-GCC_ARCHIVE_NAME="${GCC_FOLDER_NAME}.tar.gz"
+
+if [ "${do_use_gits}" == "y" ]
+then
+  GCC_FOLDER_NAME=${GCC_FOLDER_NAME:-"${GCC_PROJECT_NAME}.git"}
+
+  GCC_GIT_URL=${GCC_GIT_URL:-"https://github.com/gnu-mcu-eclipse/riscv-none-gcc.git"}
+  GCC_GIT_BRANCH=${GCC_GIT_BRANCH:-"gnu-mcu-eclipse-dev"}
+  GCC_GIT_COMMIT=${GCC_GIT_COMMIT:-"7a3a24f7bfa07fc840c43e11da0cd3f01f27d975"}
+else
+  GCC_VERSION=${GCC_VERSION:-"${SIFIVE_VERSION}"}
+  GCC_FOLDER_NAME=${GCC_FOLDER_NAME:-"${GCC_PROJECT_NAME}-${GCC_VERSION}"}
+
+  GCC_TAG=${GCC_TAG:-"v${GCC_VERSION}"}
+  GCC_ARCHIVE_URL=${GCC_ARCHIVE_URL:-"https://github.com/gnu-mcu-eclipse/${GCC_PROJECT_NAME}/archive/${GCC_TAG}.tar.gz"}
+  GCC_ARCHIVE_NAME=${GCC_ARCHIVE_NAME:-"${GCC_FOLDER_NAME}.tar.gz"}
+fi
 
 NEWLIB_PROJECT_NAME="riscv-newlib"
-NEWLIB_VERSION="${SIFIVE_VERSION}"
-NEWLIB_TAG="v${NEWLIB_VERSION}"
-NEWLIB_ARCHIVE_URL="https://github.com/gnu-mcu-eclipse/${NEWLIB_PROJECT_NAME}/archive/${NEWLIB_TAG}.tar.gz"
-NEWLIB_FOLDER_NAME="${NEWLIB_PROJECT_NAME}-${NEWLIB_VERSION}"
-NEWLIB_ARCHIVE_NAME="${NEWLIB_FOLDER_NAME}.tar.gz"
 
+if [ "${do_use_gits}" == "y" ]
+then
+  NEWLIB_FOLDER_NAME=${NEWLIB_FOLDER_NAME:-"${NEWLIB_PROJECT_NAME}.git"}
+  
+  NEWLIB_GIT_URL=${NEWLIB_GIT_URL:-"https://github.com/gnu-mcu-eclipse/riscv-newlib.git"}
+  NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"gnu-mcu-eclipse-dev"}
+  NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"bcf3078d2203be52ac7e31c58ef2dbfe02388d58"}
+
+else
+  NEWLIB_VERSION=${NEWLIB_VERSION:-"${SIFIVE_VERSION}"}
+  NEWLIB_FOLDER_NAME=${NEWLIB_FOLDER_NAME:-"${NEWLIB_PROJECT_NAME}-${NEWLIB_VERSION}"}
+
+  NEWLIB_TAG=${NEWLIB_TAG:-"v${NEWLIB_VERSION}"}
+  NEWLIB_ARCHIVE_URL=${NEWLIB_ARCHIVE_URL:-"https://github.com/gnu-mcu-eclipse/${NEWLIB_PROJECT_NAME}/archive/${NEWLIB_TAG}.tar.gz"}
+  NEWLIB_ARCHIVE_NAME=${NEWLIB_ARCHIVE_NAME:-"${NEWLIB_FOLDER_NAME}.tar.gz"}
+fi
 
 # ----- Libraries sources. -----
 
@@ -347,6 +387,7 @@ NEWLIB_ARCHIVE_NAME="${NEWLIB_FOLDER_NAME}.tar.gz"
 
 
 # https://gmplib.org
+# https://gmplib.org/download/gmp/
 # https://gmplib.org/download/gmp/gmp-6.1.0.tar.bz2
 
 GMP_VERSION="6.1.0"
@@ -407,12 +448,19 @@ then
   rm -rf "${WORK_FOLDER_PATH}/${MPC_FOLDER}"
   rm -rf "${WORK_FOLDER_PATH}/${ISL_FOLDER}"
 
-  rm -rf "${WORK_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}"
-  rm -rf "${WORK_FOLDER_PATH}/${GCC_FOLDER_NAME}"
-  rm -rf "${WORK_FOLDER_PATH}/${NEWLIB_FOLDER_NAME}"
+  if [ -z "${do_use_gits}" ]
+  then
+    rm -rf "${WORK_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}"
+    rm -rf "${WORK_FOLDER_PATH}/${GCC_FOLDER_NAME}"
+    rm -rf "${WORK_FOLDER_PATH}/${NEWLIB_FOLDER_NAME}"
+  fi
 
   if [ "${ACTION}" == "cleanall" ]
   then
+    rm -rf "${WORK_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}"
+    rm -rf "${WORK_FOLDER_PATH}/${GCC_FOLDER_NAME}"
+    rm -rf "${WORK_FOLDER_PATH}/${NEWLIB_FOLDER_NAME}"
+
     rm -rf "${PROJECT_GIT_FOLDER_PATH}"
     rm -rf "${WORK_FOLDER_PATH}/${DEPLOY_FOLDER_NAME}"
   fi
@@ -586,86 +634,129 @@ do_host_get_current_date
 
 # ----- Get BINUTILS & GDB. -----
 
-# Download BINUTILS archive.
-if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${BINUTILS_ARCHIVE_NAME}" ]
-then
-  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
-
-  cd "${DOWNLOAD_FOLDER_PATH}"
-  echo
-  echo "Downloading '${BINUTILS_ARCHIVE_URL}'..."
-  curl -L "${BINUTILS_ARCHIVE_URL}" --output "${BINUTILS_ARCHIVE_NAME}"
-fi
-
-# Unpack BINUTILS.
 if [ ! -d "${WORK_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}" ]
 then
-  cd "${WORK_FOLDER_PATH}"
-  echo
-  echo "Unpacking '${BINUTILS_ARCHIVE_NAME}'..."
-  tar -xf "${DOWNLOAD_FOLDER_PATH}/${BINUTILS_ARCHIVE_NAME}"
+  if [ -n "${BINUTILS_GIT_URL}" ]
+  then
+    cd "${WORK_FOLDER_PATH}"
+    echo
+    git clone --branch="${BINUTILS_GIT_BRANCH}" "${BINUTILS_GIT_URL}" \
+      "${BINUTILS_FOLDER_NAME}"
+    if [ -n "${BINUTILS_GIT_COMMIT}" ]
+    then
+      cd "${BINUTILS_FOLDER_NAME}"
+      git checkout -qf "${BINUTILS_GIT_COMMIT}"
+    fi
+  elif [ -n "${BINUTILS_ARCHIVE_URL}" ]
+  then
+    if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${BINUTILS_ARCHIVE_NAME}" ]
+    then
+      mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+      # Download BINUTILS archive.
+      cd "${DOWNLOAD_FOLDER_PATH}"
+      echo
+      echo "Downloading '${BINUTILS_ARCHIVE_URL}'..."
+      curl -L "${BINUTILS_ARCHIVE_URL}" --output "${BINUTILS_ARCHIVE_NAME}"
+    fi
+
+    # Unpack BINUTILS.
+    cd "${WORK_FOLDER_PATH}"
+    echo
+    echo "Unpacking '${BINUTILS_ARCHIVE_NAME}'..."
+    tar -xf "${DOWNLOAD_FOLDER_PATH}/${BINUTILS_ARCHIVE_NAME}"
+  fi
 fi
 
 # ----- Get GCC. -----
 
-# Download GCC archive.
-if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${GCC_ARCHIVE_NAME}" ]
-then
-  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
-
-  cd "${DOWNLOAD_FOLDER_PATH}"
-  echo
-  echo "Downloading '${GCC_ARCHIVE_URL}'..."
-  curl -L "${GCC_ARCHIVE_URL}" --output "${GCC_ARCHIVE_NAME}"
-fi
-
-# Unpack GCC.
 if [ ! -d "${WORK_FOLDER_PATH}/${GCC_FOLDER_NAME}" ]
 then
-  cd "${WORK_FOLDER_PATH}"
-  echo
-  echo "Unpacking '${GCC_ARCHIVE_NAME}'..."
-  tar -xf "${DOWNLOAD_FOLDER_PATH}/${GCC_ARCHIVE_NAME}"
+  if [ -n "${GCC_GIT_URL}" ]
+  then
+    cd "${WORK_FOLDER_PATH}"
+    echo
+    git clone --branch="${GCC_GIT_BRANCH}" "${GCC_GIT_URL}" \
+      "${GCC_FOLDER_NAME}"
+    if [ -n "${GCC_GIT_COMMIT}" ]
+    then
+      cd "${GCC_FOLDER_NAME}"
+      git checkout -qf "${GCC_GIT_COMMIT}"
+    fi
+  elif [ -n "${GCC_ARCHIVE_URL}" ]
+  then
+    if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${GCC_ARCHIVE_NAME}" ]
+    then
+      mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+      # Download GCC archive.
+      cd "${DOWNLOAD_FOLDER_PATH}"
+      echo
+      echo "Downloading '${GCC_ARCHIVE_URL}'..."
+      curl -L "${GCC_ARCHIVE_URL}" --output "${GCC_ARCHIVE_NAME}"
+    fi
+
+    # Unpack GCC.
+    cd "${WORK_FOLDER_PATH}"
+    echo
+    echo "Unpacking '${GCC_ARCHIVE_NAME}'..."
+    tar -xf "${DOWNLOAD_FOLDER_PATH}/${GCC_ARCHIVE_NAME}"
+  fi
 fi
 
 # ----- Get NEWLIB. -----
 
-# Download NEWLIB archive.
-if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${NEWLIB_ARCHIVE_NAME}" ]
-then
-  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
 
-  cd "${DOWNLOAD_FOLDER_PATH}"
-  echo
-  echo "Downloading '${NEWLIB_ARCHIVE_URL}'..."
-  curl -L "${NEWLIB_ARCHIVE_URL}" --output "${NEWLIB_ARCHIVE_NAME}"
-fi
-
-# Unpack NEWLIB.
 if [ ! -d "${WORK_FOLDER_PATH}/${NEWLIB_FOLDER_NAME}" ]
 then
-  cd "${WORK_FOLDER_PATH}"
-  echo
-  echo "Unpacking '${NEWLIB_ARCHIVE_NAME}'..."
-  tar -xf "${DOWNLOAD_FOLDER_PATH}/${NEWLIB_ARCHIVE_NAME}"
+  if [ -n "${NEWLIB_GIT_URL}" ]
+  then
+    cd "${WORK_FOLDER_PATH}"
+    echo
+    git clone --branch="${NEWLIB_GIT_BRANCH}" "${NEWLIB_GIT_URL}" \
+      "${NEWLIB_FOLDER_NAME}"
+    if [ -n "${NEWLIB_GIT_COMMIT}" ]
+    then
+      cd "${NEWLIB_FOLDER_NAME}"
+      git checkout -qf "${NEWLIB_GIT_COMMIT}"
+    fi
+  elif [ -n "${NEWLIB_ARCHIVE_URL}" ]
+  then
+    if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${NEWLIB_ARCHIVE_NAME}" ]
+    then
+      mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+      # Download NEWLIB archive.
+      cd "${DOWNLOAD_FOLDER_PATH}"
+      echo
+      echo "Downloading '${NEWLIB_ARCHIVE_URL}'..."
+      curl -L "${NEWLIB_ARCHIVE_URL}" --output "${NEWLIB_ARCHIVE_NAME}"
+    fi
+
+    # Unpack NEWLIB.
+    cd "${WORK_FOLDER_PATH}"
+    echo
+    echo "Unpacking '${NEWLIB_ARCHIVE_NAME}'..."
+    tar -xf "${DOWNLOAD_FOLDER_PATH}/${NEWLIB_ARCHIVE_NAME}"
+  fi
 fi
 
 # ----- Get GMP. -----
 
-# Download the GMP library.
-if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${GMP_ARCHIVE}" ]
-then
-  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
-
-  cd "${DOWNLOAD_FOLDER_PATH}"
-  echo
-  echo "Downloading '${GMP_URL}'..."
-  curl -L "${GMP_URL}" --output "${GMP_ARCHIVE}"
-fi
-
-# Unpack GMP.
 if [ ! -d "${WORK_FOLDER_PATH}/${GMP_FOLDER}" ]
 then
+  if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${GMP_ARCHIVE}" ]
+  then
+    mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+    # Download the GMP library.
+    cd "${DOWNLOAD_FOLDER_PATH}"
+    echo
+    echo "Downloading '${GMP_URL}'..."
+    curl -L "${GMP_URL}" --output "${GMP_ARCHIVE}"
+  fi
+
+  # Unpack GMP.
   cd "${WORK_FOLDER_PATH}"
   echo
   echo "Unpacking '${GMP_ARCHIVE}'..."
@@ -675,20 +766,20 @@ fi
 
 # ----- Get MPFR. -----
 
-# Download the MPFR library.
-if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${MPFR_ARCHIVE}" ]
-then
-  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
-
-  cd "${DOWNLOAD_FOLDER_PATH}"
-  echo
-  echo "Downloading '${MPFR_URL}'..."
-  curl -L "${MPFR_URL}" --output "${MPFR_ARCHIVE}"
-fi
-
-# Unpack MPFR.
 if [ ! -d "${WORK_FOLDER_PATH}/${MPFR_FOLDER}" ]
 then
+  if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${MPFR_ARCHIVE}" ]
+  then
+    mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+    # Download the MPFR library.
+    cd "${DOWNLOAD_FOLDER_PATH}"
+    echo
+    echo "Downloading '${MPFR_URL}'..."
+    curl -L "${MPFR_URL}" --output "${MPFR_ARCHIVE}"
+  fi
+
+  # Unpack MPFR.
   cd "${WORK_FOLDER_PATH}"
   echo
   echo "Unpacking '${MPFR_ARCHIVE}'..."
@@ -698,20 +789,20 @@ fi
 
 # ----- Get MPC. -----
 
-# Download the MPC library.
-if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${MPC_ARCHIVE}" ]
-then
-  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
-
-  cd "${DOWNLOAD_FOLDER_PATH}"
-  echo
-  echo "Downloading '${MPC_URL}'..."
-  curl -L "${MPC_URL}" --output "${MPC_ARCHIVE}"
-fi
-
-# Unpack MPC.
 if [ ! -d "${WORK_FOLDER_PATH}/${MPC_FOLDER}" ]
 then
+  if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${MPC_ARCHIVE}" ]
+  then
+    mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+    # Download the MPC library.
+    cd "${DOWNLOAD_FOLDER_PATH}"
+    echo
+    echo "Downloading '${MPC_URL}'..."
+    curl -L "${MPC_URL}" --output "${MPC_ARCHIVE}"
+  fi
+
+  # Unpack MPC.
   cd "${WORK_FOLDER_PATH}"
   echo
   echo "Unpacking '${MPC_ARCHIVE}'..."
@@ -721,20 +812,20 @@ fi
 
 # ----- Get ISL. -----
 
-# Download the ISL library.
-if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${ISL_ARCHIVE}" ]
-then
-  mkdir -p "${DOWNLOAD_FOLDER_PATH}"
-
-  cd "${DOWNLOAD_FOLDER_PATH}"
-  echo
-  echo "Downloading '${ISL_URL}'..."
-  curl -L "${ISL_URL}" --output "${ISL_ARCHIVE}"
-fi
-
-# Unpack ISL.
 if [ ! -d "${WORK_FOLDER_PATH}/${ISL_FOLDER}" ]
 then
+  if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${ISL_ARCHIVE}" ]
+  then
+    mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+    # Download the ISL library.
+    cd "${DOWNLOAD_FOLDER_PATH}"
+    echo
+    echo "Downloading '${ISL_URL}'..."
+    curl -L "${ISL_URL}" --output "${ISL_ARCHIVE}"
+  fi
+
+  # Unpack ISL.
   cd "${WORK_FOLDER_PATH}"
   echo
   echo "Unpacking '${ISL_ARCHIVE}'..."
