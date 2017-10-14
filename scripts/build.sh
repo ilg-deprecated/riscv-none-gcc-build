@@ -2579,32 +2579,32 @@ __EOF__
 
 # ^===========================================================================^
 
-# ----- Build the OS X distribution. -----
+# ----- Build the native distribution. -----
 
-if [ "${HOST_UNAME}" == "Darwin" ]
+if [ -z "${DO_BUILD_OSX}${DO_BUILD_DEB64}${DO_BUILD_WIN64}${DO_BUILD_DEB32}${DO_BUILD_WIN32}" ]
 then
+
+  do_host_build_target "Creating the native distribution..." 
+
+else
+
+  # ----- Build the OS X distribution. -----
+
   if [ "${DO_BUILD_OSX}" == "y" ]
   then
-    do_host_build_target "Creating the OS X distribution..." \
-      --target-name osx
+    if [ "${HOST_UNAME}" == "Darwin" ]
+    then
+      do_host_build_target "Creating the OS X distribution..." \
+        --target-name osx
+    else
+      echo "Building the macOS image is not possible on this platform."
+      exit 1
+    fi
   fi
-fi
 
-# ----- Build the Debian 64-bits distribution. -----
+  # ----- Build the Debian 64-bits distribution. -----
 
-if [ "${DO_BUILD_DEB64}" == "y" ]
-then
-  do_host_build_target "Creating the Debian 64-bits distribution..." \
-    --target-name debian \
-    --target-bits 64 \
-    --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
-fi
-
-# ----- Build the Windows 64-bits distribution. -----
-
-if [ "${DO_BUILD_WIN64}" == "y" ]
-then
-  if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+  if [ "${DO_BUILD_DEB64}" == "y" ]
   then
     do_host_build_target "Creating the Debian 64-bits distribution..." \
       --target-name debian \
@@ -2612,29 +2612,28 @@ then
       --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
   fi
 
-  do_host_build_target "Creating the Windows 64-bits distribution..." \
-    --target-name win \
-    --target-bits 64 \
-    --docker-image "ilegeul/debian:9-gnu-mcu-eclipse" \
-    --build-binaries-path "install/debian64/${APP_LC_NAME}/bin"
-fi
+  # ----- Build the Windows 64-bits distribution. -----
 
-# ----- Build the Debian 32-bits distribution. -----
+  if [ "${DO_BUILD_WIN64}" == "y" ]
+  then
+    if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    then
+      do_host_build_target "Creating the Debian 64-bits distribution..." \
+        --target-name debian \
+        --target-bits 64 \
+        --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
+    fi
 
-if [ "${DO_BUILD_DEB32}" == "y" ]
-then
-  do_host_build_target "Creating the Debian 32-bits distribution..." \
-    --target-name debian \
-    --target-bits 32 \
-    --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
-fi
+    do_host_build_target "Creating the Windows 64-bits distribution..." \
+      --target-name win \
+      --target-bits 64 \
+      --docker-image "ilegeul/debian:9-gnu-mcu-eclipse" \
+      --build-binaries-path "install/debian64/${APP_LC_NAME}/bin"
+  fi
 
-# ----- Build the Windows 32-bits distribution. -----
+  # ----- Build the Debian 32-bits distribution. -----
 
-# Since the actual container is a 32-bits, use the debian32 binaries.
-if [ "${DO_BUILD_WIN32}" == "y" ]
-then
-  if [ ! -f "${WORK_FOLDER_PATH}/install/debian32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+  if [ "${DO_BUILD_DEB32}" == "y" ]
   then
     do_host_build_target "Creating the Debian 32-bits distribution..." \
       --target-name debian \
@@ -2642,11 +2641,26 @@ then
       --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
   fi
 
-  do_host_build_target "Creating the Windows 32-bits distribution..." \
-    --target-name win \
-    --target-bits 32 \
-    --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse" \
-    --build-binaries-path "install/debian32/${APP_LC_NAME}/bin"
+  # ----- Build the Windows 32-bits distribution. -----
+
+  # Since the actual container is a 32-bits, use the debian32 binaries.
+  if [ "${DO_BUILD_WIN32}" == "y" ]
+  then
+    if [ ! -f "${WORK_FOLDER_PATH}/install/debian32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    then
+      do_host_build_target "Creating the Debian 32-bits distribution..." \
+        --target-name debian \
+        --target-bits 32 \
+        --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
+    fi
+
+    do_host_build_target "Creating the Windows 32-bits distribution..." \
+      --target-name win \
+      --target-bits 32 \
+      --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse" \
+      --build-binaries-path "install/debian32/${APP_LC_NAME}/bin"
+  fi
+
 fi
 
 do_host_show_sha
