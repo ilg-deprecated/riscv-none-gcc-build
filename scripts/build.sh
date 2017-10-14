@@ -240,7 +240,7 @@ do
     --help)
       echo "Build the GNU MCU Eclipse ${APP_NAME} distributions."
       echo "Usage:"
-      echo "    bash $0 helper_script [--win32] [--win64] [--deb32] [--deb64] [--osx] [--all] [clean|cleanall|pull|build-images|preload-images] [--help]"
+      echo "    bash $0 helper_script [--win32] [--win64] [--deb32] [--deb64] [--osx] [--all] [clean|cleanall|build-images|preload-images] [--help]"
       echo
       exit 1
       ;;
@@ -587,53 +587,6 @@ else
   fi
 
 fi
-
-# ----- Process "pull" actions. -----
-
-do_repo_action() {
-
-  # $1 = action (pull)
-  if [ "${ACTION}" == "pull" ]
-  then
-    echo
-    echo "Running git pull..."
-
-    if [ -d "${PROJECT_GIT_FOLDER_PATH}" ]
-    then
-
-      echo
-      if [ "${USER}" == "ilg" ]
-      then
-        echo "If asked, enter ${USER} GitHub password for git pull"
-      fi
-
-      cd "${PROJECT_GIT_FOLDER_PATH}"
-
-      git pull --recurse-submodules
-      # git submodule update --init --recursive --remote
-
-    else
-
-      echo "No git folder."
-      exit 1
-    fi
-  fi
-
-}
-
-# For this to work, the following settings are required:
-# git branch --set-upstream-to=origin/gnu-mcu-eclipse-dev gnu-mcu-eclipse-dev
-# git branch --set-upstream-to=origin/gnu-mcu-eclipse gnu-mcu-eclipse
-
-case "${ACTION}" in
-  pull)
-    do_repo_action "pull"
-    ;;
-    
-  checkout-dev|checkout-stable)
-    echo "Not implemented"
-    exit 1
-esac
 
 # Get the current Git branch name, to know if we are building the stable or
 # the development release.
