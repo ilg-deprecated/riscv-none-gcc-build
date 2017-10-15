@@ -40,6 +40,13 @@ IFS=$'\n\t'
 #
 # When running on OS X, a custom Homebrew is required to provide the 
 # missing libraries and TeX binaries.
+# 
+# Without specifying a --xxx platform option, builds are assumed
+# to be native on the GNU/Linux or macOS host.
+# In this case all prerequisites must be met by the host. For example 
+# for Ubuntu the following were needed:
+#
+# $ apt-get install -y automake cmake libtool libudev-dev patchelf texinfo texlive
 #
 # The GCC cross build requires several steps:
 # - build the binutils & gdb
@@ -48,11 +55,11 @@ IFS=$'\n\t'
 # - build the final C/C++ compilers
 #
 # For the Windows target, we are in a 'canadian build' case; since
-# the Windows binaries cannot be executed directly, the Debian 
+# the Windows binaries cannot be executed directly, the GNU/Linux 
 # binaries are expected in the PATH.
 #
 # As a consequence, the Windows build is always done after the
-# Debian build.
+# GNU/Linux build.
 #
 # The script also builds a size optimised version of the system libraries,
 # similar to ARM **nano** version.
@@ -153,8 +160,8 @@ mkdir -p "${WORK_FOLDER_PATH}"
 ACTION=""
 DO_BUILD_WIN32=""
 DO_BUILD_WIN64=""
-DO_BUILD_DEB32=""
-DO_BUILD_DEB64=""
+DO_BUILD_LINUX32=""
+DO_BUILD_LINUX64=""
 DO_BUILD_OSX=""
 helper_script_path=""
 do_no_strip=""
@@ -180,12 +187,12 @@ do
       DO_BUILD_WIN64="y"
       shift
       ;;
-    --deb32|--debian32)
-      DO_BUILD_DEB32="y"
+    --linux32|--deb32|--debian32)
+      DO_BUILD_LINUX32="y"
       shift
       ;;
-    --deb64|--debian64)
-      DO_BUILD_DEB64="y"
+    --linux64|--deb64|--debian64)
+      DO_BUILD_LINUX64="y"
       shift
       ;;
     --osx)
@@ -196,8 +203,8 @@ do
     --all)
       DO_BUILD_WIN32="y"
       DO_BUILD_WIN64="y"
-      DO_BUILD_DEB32="y"
-      DO_BUILD_DEB64="y"
+      DO_BUILD_LINUX32="y"
+      DO_BUILD_LINUX64="y"
       DO_BUILD_OSX="y"
       shift
       ;;
@@ -240,7 +247,7 @@ do
     --help)
       echo "Build the GNU MCU Eclipse ${APP_NAME} distributions."
       echo "Usage:"
-      echo "    bash $0 helper_script [--win32] [--win64] [--deb32] [--deb64] [--osx] [--all] [clean|cleanall|build-images|preload-images] [--help]"
+      echo "    bash $0 helper_script [--win32] [--win64] [--deb32] [--deb64] [--osx] [--all] [clean|cleanall|build-images|preload-images] [--disable-strip] [--without-pdf] [--disable-multilib] [--develop] [--use-gits] [--help]"
       echo
       exit 1
       ;;
@@ -262,7 +269,8 @@ then
   build_script_path=$(pwd)/$0
 fi
 
-# Copy the current script to Work area, to later copy it into the install folder.
+# Copy the current script to Work area, to later copy it into 
+# the install folder.
 mkdir -p "${WORK_FOLDER_PATH}/scripts"
 cp "${build_script_path}" "${WORK_FOLDER_PATH}/scripts/build-${APP_LC_NAME}.sh"
 
@@ -548,7 +556,7 @@ do_host_prepare_prerequisites
 
 # ----- Prepare Docker, if needed. -----
 
-if [ -n "${DO_BUILD_WIN32}${DO_BUILD_WIN64}${DO_BUILD_DEB32}${DO_BUILD_DEB64}" ]
+if [ -n "${DO_BUILD_WIN32}${DO_BUILD_WIN64}${DO_BUILD_LINUX32}${DO_BUILD_LINUX64}" ]
 then
   do_host_prepare_docker
 fi
@@ -597,6 +605,7 @@ do_host_get_git_head
 # Use the UTC date as version in the name of the distribution file.
 do_host_get_current_date
 
+
 # ----- Get BINUTILS & GDB. -----
 
 if [ ! -d "${WORK_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}" ]
@@ -632,6 +641,7 @@ then
     tar -xf "${DOWNLOAD_FOLDER_PATH}/${BINUTILS_ARCHIVE_NAME}"
   fi
 fi
+
 
 # ----- Get GCC. -----
 
@@ -669,8 +679,8 @@ then
   fi
 fi
 
-# ----- Get NEWLIB. -----
 
+# ----- Get NEWLIB. -----
 
 if [ ! -d "${WORK_FOLDER_PATH}/${NEWLIB_FOLDER_NAME}" ]
 then
@@ -705,6 +715,7 @@ then
     tar -xf "${DOWNLOAD_FOLDER_PATH}/${NEWLIB_ARCHIVE_NAME}"
   fi
 fi
+
 
 # ----- Get GMP. -----
 
@@ -910,16 +921,24 @@ extra_path=""
 while [ $# -gt 0 ]
 do
   case "$1" in
-    --build-folder)
-      build_folder_path="$2"
+    --container-build-folder)
+      container_build_folder_path="$2"
+      shift 2
+      ;;
+    --container-install-folder)
+      container_install_folder_path="$2"
+      shift 2
+      ;;
+    --container-output-folder)
+      container_output_folder_path="$2"
       shift 2
       ;;
     --docker-container-name)
       docker_container_name="$2"
       shift 2
       ;;
-    --target-name)
-      target_name="$2"
+    --target-os)
+      target_os="$2"
       shift 2
       ;;
     --target-bits)
@@ -930,16 +949,8 @@ do
       work_folder_path="$2"
       shift 2
       ;;
-    --output-folder)
-      output_folder_path="$2"
-      shift 2
-      ;;
     --distribution-folder)
       distribution_folder="$2"
-      shift 2
-      ;;
-    --install-folder)
-      install_folder="$2"
       shift 2
       ;;
     --download-folder)
@@ -972,6 +983,11 @@ do
   esac
 done
 
+# Run the helper script in this shell, to get the support functions.
+source "${helper_script_path}"
+
+do_container_detect
+
 mkdir -p "${install_folder}"
 start_stamp_file="${install_folder}/stamp_started"
 if [ ! -f "${start_stamp_file}" ]
@@ -988,33 +1004,6 @@ app_prefix_doc="${app_prefix}/share/doc"
 
 app_prefix_nano="${app_prefix}-nano"
 app_prefix_nano_doc="${app_prefix_nano}/share/doc"
-
-echo
-uname -a
-
-# Run the helper script in this shell, to get the support functions.
-source "${helper_script_path}"
-
-target_folder=${target_name}${target_bits:-""}
-
-if [ "${target_name}" == "win" ]
-then
-
-  # For Windows targets, decide which cross toolchain to use.
-  if [ "${target_bits}" == "32" ]
-  then
-    cross_compile_prefix="i686-w64-mingw32"
-  elif [ "${target_bits}" == "64" ]
-  then
-    cross_compile_prefix="x86_64-w64-mingw32"
-  fi
-
-elif [ "${target_name}" == "osx" ]
-then
-
-  target_bits="64"
-
-fi
 
 # The \x2C is a comma in hex; without this trick the regular expression
 # that processes this string in the Makefile, silently fails and the 
@@ -1037,13 +1026,13 @@ echo
 echo "Checking automake..."
 automake --version 2>/dev/null | grep automake
 
-if [ "${target_name}" != "osx" ]
+if [ "${target_os}" != "osx" ]
 then
   echo "Checking readelf..."
   readelf --version | grep readelf
 fi
 
-if [ "${target_name}" == "win" ]
+if [ "${target_os}" == "win" ]
 then
   echo "Checking ${cross_compile_prefix}-gcc..."
   ${cross_compile_prefix}-gcc --version 2>/dev/null | egrep -e 'gcc|clang'
@@ -1063,7 +1052,7 @@ else
   gcc --version 2>/dev/null | egrep -e 'gcc|clang'
 fi
 
-if [ "${target_name}" == "debian" ]
+if [ "${target_os}" == "linux" ]
 then
   echo "Checking patchelf..."
   patchelf --version
@@ -1073,7 +1062,7 @@ if [ -z "${do_no_pdf}" ]
 then
 
   # TODO: check on new Debian 9 containers
-  if [ "${target_name}" == "osx" ]
+  if [ "${target_os}" == "osx" ]
   then
 
     echo "Checking makeinfo..."
@@ -1111,7 +1100,7 @@ then
   # ABI is mandatory, otherwise configure fails on 32-bits.
   # (see https://gmplib.org/manual/ABI-and-ISA.html)
 
-  if [ "${target_name}" == "win" ]
+  if [ "${target_os}" == "win" ]
   then
 
     CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -pipe -ffunction-sections -fdata-sections" \
@@ -1128,7 +1117,7 @@ then
       --disable-shared \
       --enable-static
     
-  elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+  elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
 
     CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
@@ -1172,7 +1161,7 @@ then
 
   cd "${build_folder_path}/${MPFR_FOLDER}"
 
-  if [ "${target_name}" == "win" ]
+  if [ "${target_os}" == "win" ]
   then
 
     CFLAGS="-pipe -ffunction-sections -fdata-sections" \
@@ -1189,7 +1178,7 @@ then
       --disable-shared \
       --enable-static
 
-  elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+  elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
 
     CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
@@ -1233,7 +1222,7 @@ then
 
   cd "${build_folder_path}/${MPC_FOLDER}"
 
-  if [ "${target_name}" == "win" ]
+  if [ "${target_os}" == "win" ]
   then
 
     CFLAGS="-pipe -ffunction-sections -fdata-sections" \
@@ -1249,7 +1238,7 @@ then
       --disable-shared \
       --enable-static
 
-  elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+  elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
 
     CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" \
@@ -1292,7 +1281,7 @@ then
 
   cd "${build_folder_path}/${ISL_FOLDER}"
 
-  if [ "${target_name}" == "win" ]
+  if [ "${target_os}" == "win" ]
   then
 
     CFLAGS="-Wno-dangling-else -pipe -ffunction-sections -fdata-sections" \
@@ -1308,7 +1297,7 @@ then
       --disable-shared \
       --enable-static
 
-  elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+  elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
 
     CFLAGS="-Wno-dangling-else -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
@@ -1357,7 +1346,7 @@ then
   if [ ! -f "config.status" ]
   then
 
-    if [ "${target_name}" == "win" ]
+    if [ "${target_os}" == "win" ]
     then
       
       CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -pipe -ffunction-sections -fdata-sections" \
@@ -1392,7 +1381,7 @@ then
         --with-sysroot="${app_prefix}/${gcc_target}" \
       | tee "configure-output.txt"
 
-    elif [ "${target_name}" == "osx" ]
+    elif [ "${target_os}" == "osx" ]
     then
 
       CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
@@ -1425,7 +1414,7 @@ then
         --with-sysroot="${app_prefix}/${gcc_target}" \
       | tee "configure-output.txt"
 
-    elif [ "${target_name}" == "debian" ]
+    elif [ "${target_os}" == "linux" ]
     then
 
       CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
@@ -1489,7 +1478,7 @@ fi
 # The first stage creates a compiler without libraries, that is required
 # to compile newlib. 
 # For the Windows target this step is more or less useless, since 
-# the build uses the Debian binaries (possible future optimisation).
+# the build uses the GNU/Linux binaries (possible future optimisation).
 
 gcc_folder="gcc"
 gcc_stage1_folder="gcc-first"
@@ -1528,7 +1517,7 @@ then
     # --with-newlib Specifies that ‘newlib’ is being used as the target C library. This causes `__eprintf`` to be omitted from `libgcc.a`` on the assumption that it will be provided by newlib.
     # --enable-languages=c newlib does not use C++, so C should be enough
     
-    if [ "${target_name}" == "win" ]
+    if [ "${target_os}" == "win" ]
     then
 
       # All variables below are passed on the command line before 'configure'.
@@ -1582,7 +1571,7 @@ then
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target}" \
         | tee "configure-output.txt"
 
-    elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+    elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
     then
 
       # All variables below are passed on the command line before 'configure'.
@@ -1685,7 +1674,7 @@ then
     echo
     echo "Running newlib configure..."
 
-    if [ "${target_name}" == "win" ]
+    if [ "${target_os}" == "win" ]
     then
 
       # All variables below are passed on the command line before 'configure'.
@@ -1714,7 +1703,7 @@ then
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
 
-    elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+    elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
     then
 
       # All variables below are passed on the command line before 'configure'.
@@ -1812,7 +1801,7 @@ then
     echo
     echo "Running newlib-nano configure..."
 
-    if [ "${target_name}" == "win" ]
+    if [ "${target_os}" == "win" ]
     then
 
       # All variables below are passed on the command line before 'configure'.
@@ -1850,7 +1839,7 @@ then
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
 
-    elif [ \( "${target_name}" == "osx" \) -o \( "${target_name}" == "debian" \) ]
+    elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
     then
 
       # All variables below are passed on the command line before 'configure'.
@@ -1925,7 +1914,7 @@ then
     echo
     echo "Running gcc final stage configure..."
 
-    if [ "${target_name}" == "win" ]
+    if [ "${target_os}" == "win" ]
     then
 
       # --without-system-zlib assume libz is not available
@@ -1983,7 +1972,7 @@ then
         LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections" \
         | tee "configure-output.txt"
 
-    elif [ "${target_name}" == "osx" ]
+    elif [ "${target_os}" == "osx" ]
     then
 
       # no -ffunction-sections -fdata-sections / -Wl,--gc-sections for 
@@ -2040,7 +2029,7 @@ then
         LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections" \
         | tee "configure-output.txt"
   
-    elif [ "${target_name}" == "debian" ]
+    elif [ "${target_os}" == "linux" ]
     then
 
       # All variables below are passed on the command line before 'configure'.
@@ -2134,7 +2123,7 @@ then
     echo
     echo "Running gcc final stage nano configure..."
 
-    if [ "${target_name}" == "win" ]
+    if [ "${target_os}" == "win" ]
     then
 
       # --without-system-zlib assume libz is not available
@@ -2193,7 +2182,7 @@ then
         LDFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -Wl,--gc-sections" \
         | tee "configure-output.txt"
 
-    elif [ "${target_name}" == "osx" ]
+    elif [ "${target_os}" == "osx" ]
     then
 
       # No -ffunction-sections -fdata-sections / -Wl,--gc-sections since  
@@ -2253,7 +2242,7 @@ then
         LDFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -Wl,--gc-sections" \
         | tee "configure-output.txt"
 
-    elif [ "${target_name}" == "debian" ]
+    elif [ "${target_os}" == "linux" ]
     then
 
       # All variables below are passed on the command line before 'configure'.
@@ -2321,7 +2310,7 @@ then
     make ${jobs}
     make ${jobs} install
 
-    if [ "${target_name}" == "win" ]
+    if [ "${target_os}" == "win" ]
     then
       host_gcc="${gcc_target}-gcc"
     else
@@ -2353,7 +2342,7 @@ checking_stamp_file="${build_folder_path}/stamp_check_completed"
 if [ ! -f "${checking_stamp_file}" ]
 then
 
-  if [ "${target_name}" == "win" ]
+  if [ "${target_os}" == "win" ]
   then
 
     if [ -z "${do_no_strip}" ]
@@ -2409,7 +2398,7 @@ then
       done
     )
 
-  elif [ "${target_name}" == "debian" ]
+  elif [ "${target_os}" == "linux" ]
   then
 
     if [ -z "${do_no_strip}" ]
@@ -2459,7 +2448,7 @@ then
       done
     )
 
-  elif [ "${target_name}" == "osx" ]
+  elif [ "${target_os}" == "osx" ]
   then
 
     if [ -z "${do_no_strip}" ]
@@ -2520,7 +2509,7 @@ then
   do_container_copy_license \
     "${work_folder_path}/${ISL_FOLDER}" "${ISL_FOLDER}"
 
-  if [ "${target_name}" == "win" ]
+  if [ "${target_os}" == "win" ]
   then
     # Copy the LICENSE to be used by nsis.
     /usr/bin/install -v -c -m 644 "${git_folder_path}/LICENSE" "${install_folder}/${APP_LC_NAME}/licenses"
@@ -2581,7 +2570,7 @@ __EOF__
 
 # ----- Build the native distribution. -----
 
-if [ -z "${DO_BUILD_OSX}${DO_BUILD_DEB64}${DO_BUILD_WIN64}${DO_BUILD_DEB32}${DO_BUILD_WIN32}" ]
+if [ -z "${DO_BUILD_OSX}${DO_BUILD_LINUX64}${DO_BUILD_WIN64}${DO_BUILD_LINUX32}${DO_BUILD_WIN32}" ]
 then
 
   do_host_build_target "Creating the native distribution..." 
@@ -2595,19 +2584,19 @@ else
     if [ "${HOST_UNAME}" == "Darwin" ]
     then
       do_host_build_target "Creating the OS X distribution..." \
-        --target-name osx
+        --target-os osx
     else
       echo "Building the macOS image is not possible on this platform."
       exit 1
     fi
   fi
 
-  # ----- Build the Debian 64-bits distribution. -----
+  # ----- Build the GNU/Linux 64-bits distribution. -----
 
-  if [ "${DO_BUILD_DEB64}" == "y" ]
+  if [ "${DO_BUILD_LINUX64}" == "y" ]
   then
-    do_host_build_target "Creating the Debian 64-bits distribution..." \
-      --target-name debian \
+    do_host_build_target "Creating the GNU/Linux 64-bits distribution..." \
+      --target-os linux \
       --target-bits 64 \
       --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
   fi
@@ -2618,25 +2607,25 @@ else
   then
     if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
-      do_host_build_target "Creating the Debian 64-bits distribution..." \
-        --target-name debian \
+      do_host_build_target "Creating the GNU/Linux 64-bits distribution..." \
+        --target-os linux \
         --target-bits 64 \
         --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
     fi
 
     do_host_build_target "Creating the Windows 64-bits distribution..." \
-      --target-name win \
+      --target-os win \
       --target-bits 64 \
       --docker-image "ilegeul/debian:9-gnu-mcu-eclipse" \
       --build-binaries-path "install/debian64/${APP_LC_NAME}/bin"
   fi
 
-  # ----- Build the Debian 32-bits distribution. -----
+  # ----- Build the GNU/Linux 32-bits distribution. -----
 
-  if [ "${DO_BUILD_DEB32}" == "y" ]
+  if [ "${DO_BUILD_LINUX32}" == "y" ]
   then
-    do_host_build_target "Creating the Debian 32-bits distribution..." \
-      --target-name debian \
+    do_host_build_target "Creating the GNU/Linux 32-bits distribution..." \
+      --target-os linux \
       --target-bits 32 \
       --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
   fi
@@ -2648,14 +2637,14 @@ else
   then
     if [ ! -f "${WORK_FOLDER_PATH}/install/debian32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
-      do_host_build_target "Creating the Debian 32-bits distribution..." \
-        --target-name debian \
+      do_host_build_target "Creating the GNU/Linux 32-bits distribution..." \
+        --target-os linux \
         --target-bits 32 \
         --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
     fi
 
     do_host_build_target "Creating the Windows 32-bits distribution..." \
-      --target-name win \
+      --target-os win \
       --target-bits 32 \
       --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse" \
       --build-binaries-path "install/debian32/${APP_LC_NAME}/bin"
