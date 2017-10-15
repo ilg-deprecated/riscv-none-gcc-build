@@ -80,7 +80,7 @@ IFS=$'\n\t'
 # an absolute location), the `--with-sysroot` must point to a sub-folder
 # below `--prefix`.
 #
-# Configuration environment variables:
+# Configuration environment variables (see the script on how to use them):
 #
 # - WORK_FOLDER_PATH
 # - DISTRIBUTION_FILE_DATE
@@ -91,9 +91,41 @@ IFS=$'\n\t'
 # - gcc_target
 # - gcc_arch
 # - gcc_abi
+# - BUILD_FOLDER_NAME
 # - BUILD_FOLDER_PATH
+# - DOWNLOAD_FOLDER_NAME
 # - DOWNLOAD_FOLDER_PATH
 # - DEPLOY_FOLDER_NAME
+# - RELEASE_VERSION
+# - BINUTILS_FOLDER_NAME
+# - BINUTILS_GIT_URL
+# - BINUTILS_GIT_BRANCH
+# - BINUTILS_GIT_COMMIT
+# - BINUTILS_VERSION
+# - BINUTILS_TAG
+# - BINUTILS_ARCHIVE_URL
+# - BINUTILS_ARCHIVE_URL
+# - BINUTILS_ARCHIVE_NAME
+# - GCC_FOLDER_NAME
+# - GCC_GIT_URL
+# - GCC_GIT_BRANCH
+# - GCC_GIT_COMMIT
+# - GCC_VERSION
+# - GCC_FOLDER_NAME
+# - GCC_TAG
+# - GCC_ARCHIVE_URL
+# - GCC_ARCHIVE_NAME
+# - GCC_MULTILIB
+# - GCC_MULTILIB_FILE
+# - NEWLIB_FOLDER_NAME
+# - NEWLIB_GIT_URL
+# - NEWLIB_GIT_BRANCH
+# - NEWLIB_GIT_COMMIT
+# - NEWLIB_VERSION
+# - NEWLIB_FOLDER_NAME
+# - NEWLIB_TAG
+# - NEWLIB_ARCHIVE_URL
+# - NEWLIB_ARCHIVE_NAME
 #
 
 # -----------------------------------------------------------------------------
@@ -380,7 +412,6 @@ then
   NEWLIB_GIT_URL=${NEWLIB_GIT_URL:-"https://github.com/gnu-mcu-eclipse/riscv-newlib.git"}
   NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0"}
   NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"bcf3078d2203be52ac7e31c58ef2dbfe02388d58"}
-
 else
   NEWLIB_VERSION=${NEWLIB_VERSION:-"${RELEASE_VERSION}"}
   NEWLIB_FOLDER_NAME=${NEWLIB_FOLDER_NAME:-"${NEWLIB_PROJECT_NAME}-${NEWLIB_VERSION}"}
@@ -925,58 +956,72 @@ do
       container_build_folder_path="$2"
       shift 2
       ;;
+
     --container-install-folder)
       container_install_folder_path="$2"
       shift 2
       ;;
+
     --container-output-folder)
       container_output_folder_path="$2"
       shift 2
       ;;
+
     --docker-container-name)
       docker_container_name="$2"
       shift 2
       ;;
+
     --target-os)
       target_os="$2"
       shift 2
       ;;
+
     --target-bits)
       target_bits="$2"
       shift 2
       ;;
+
     --work-folder)
       work_folder_path="$2"
       shift 2
       ;;
+
     --distribution-folder)
       distribution_folder="$2"
       shift 2
       ;;
+
     --download-folder)
       download_folder="$2"
       shift 2
       ;;
+
     --helper-script)
       helper_script_path="$2"
       shift 2
       ;;
+
     --group-id)
       group_id="$2"
       shift 2
       ;;
+
     --user-id)
       user_id="$2"
       shift 2
       ;;
+
     --host-uname)
       host_uname="$2"
       shift 2
       ;;
+
     --extra-path)
       extra_path="$2"
       shift 2
       ;;
+      
     *)
       echo "Unknown option $1, exit."
       exit 1
