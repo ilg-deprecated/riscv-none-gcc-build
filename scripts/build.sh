@@ -46,7 +46,7 @@ IFS=$'\n\t'
 # In this case all prerequisites must be met by the host. For example 
 # for Ubuntu the following were needed:
 #
-# $ apt-get install -y automake cmake libtool libudev-dev patchelf texinfo texlive
+# $ apt-get -y install automake cmake libtool libudev-dev patchelf bison flex texinfo texlive
 #
 # The GCC cross build requires several steps:
 # - build the binutils & gdb
@@ -1021,7 +1021,7 @@ do
       extra_path="$2"
       shift 2
       ;;
-      
+
     *)
       echo "Unknown option $1, exit."
       exit 1
@@ -1121,6 +1121,12 @@ then
 
   fi
 fi
+
+echo "Checking bison..."
+bison --version
+
+echo "Checking flex..."
+flex --version
 
 echo "Checking shasum..."
 shasum --version
