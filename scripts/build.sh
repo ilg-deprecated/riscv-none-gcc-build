@@ -967,6 +967,12 @@ do
       shift 2
       ;;
 
+    --shared-install-folder)
+      shared_install_folder_path="$2"
+      shift 2
+      ;;
+
+
     --docker-container-name)
       docker_container_name="$2"
       shift 2
@@ -2606,6 +2612,8 @@ do_container_create_distribution
 do_check_application "${gcc_target}-gdb" --version
 do_check_application "${gcc_target}-g++" --version
 
+do_container_copy_install
+
 # Requires ${distribution_file} and ${result}
 do_container_completed
 
@@ -2664,6 +2672,12 @@ else
         --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
     fi
 
+    if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    then
+      echo "Mandatory GNU/Linux binaries missing."
+      exit 1
+    fi
+
     do_host_build_target "Creating the Windows 64-bits distribution..." \
       --target-os win \
       --target-bits 64 \
@@ -2692,6 +2706,12 @@ else
         --target-os linux \
         --target-bits 32 \
         --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
+    fi
+
+    if [ ! -f "${WORK_FOLDER_PATH}/install/debian32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    then
+      echo "Mandatory GNU/Linux binaries missing."
+      exit 1
     fi
 
     do_host_build_target "Creating the Windows 32-bits distribution..." \
