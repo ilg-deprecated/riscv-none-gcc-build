@@ -358,6 +358,9 @@ do_host_get_current_date
 # RELEASE_VERSION=${RELEASE_VERSION:-"7.1.1-2-20170912"}
 RELEASE_VERSION=${RELEASE_VERSION:-$(cat "${PROJECT_GIT_FOLDER_PATH}/gnu-mcu-eclipse/VERSION")-${DISTRIBUTION_FILE_DATE}}
 
+echo
+echo "Preparing release ${RELEASE_VERSION}..."
+
 # ----- Input archives -----
 
 # The archives are available from dedicated Git repositories,
