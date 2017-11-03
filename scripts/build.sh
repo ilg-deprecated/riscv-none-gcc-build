@@ -639,15 +639,6 @@ else
 
 fi
 
-# Get the current Git branch name, to know if we are building the stable or
-# the development release.
-do_host_get_git_head
-
-# ----- Get current date. -----
-
-# Use the UTC date as version in the name of the distribution file.
-do_host_get_current_date
-
 
 # ----- Get BINUTILS & GDB. -----
 
@@ -894,7 +885,6 @@ cat <<__EOF__ >> "${script_file_path}"
 APP_NAME="${APP_NAME}"
 APP_LC_NAME="${APP_LC_NAME}"
 APP_UC_NAME="${APP_UC_NAME}"
-GIT_HEAD="${GIT_HEAD}"
 DISTRIBUTION_FILE_DATE="${DISTRIBUTION_FILE_DATE}"
 PROJECT_GIT_FOLDER_NAME="${PROJECT_GIT_FOLDER_NAME}"
 BINUTILS_FOLDER_NAME="${BINUTILS_FOLDER_NAME}"
