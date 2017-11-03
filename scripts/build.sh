@@ -441,7 +441,8 @@ fi
 # https://gmplib.org/download/gmp/
 # https://gmplib.org/download/gmp/gmp-6.1.0.tar.bz2
 
-GMP_VERSION="6.1.0"
+# GMP_VERSION="6.1.0"
+GMP_VERSION="6.1.2"
 
 GMP_FOLDER="gmp-${GMP_VERSION}"
 GMP_ARCHIVE="${GMP_FOLDER}.tar.bz2"
