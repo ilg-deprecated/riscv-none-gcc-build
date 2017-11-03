@@ -139,7 +139,8 @@ APP_LC_NAME=${APP_LC_NAME:-"riscv-none-gcc"}
 
 branding=${branding:-"GNU MCU Eclipse RISC-V Embedded GCC"}
 
-gcc_target=${gcc_target:-"riscv64-unknown-elf"}
+# gcc_target=${gcc_target:-"riscv64-unknown-elf"}
+gcc_target=${gcc_target:-"riscv-none-embed"}
 gcc_arch=${gcc_arch:-"rv64imafdc"}
 gcc_abi=${gcc_abi:-"lp64d"}
 
