@@ -472,7 +472,8 @@ MPC_URL="ftp://ftp.gnu.org/gnu/mpc/${MPC_ARCHIVE}"
 # http://isl.gforge.inria.fr
 # http://isl.gforge.inria.fr/isl-0.16.1.tar.bz2
 
-ISL_VERSION="0.16.1"
+# ISL_VERSION="0.16.1"
+ISL_VERSION="0.18"
 
 ISL_FOLDER="isl-${ISL_VERSION}"
 ISL_ARCHIVE="${ISL_FOLDER}.tar.bz2"
