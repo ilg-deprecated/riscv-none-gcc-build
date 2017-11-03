@@ -452,7 +452,8 @@ GMP_URL="https://gmplib.org/download/gmp/${GMP_ARCHIVE}"
 # http://www.mpfr.org
 # http://www.mpfr.org/mpfr-3.1.5/mpfr-3.1.5.tar.bz2
 
-MPFR_VERSION="3.1.4"
+# MPFR_VERSION="3.1.4"
+MPFR_VERSION="3.1.6"
 
 MPFR_FOLDER="mpfr-${MPFR_VERSION}"
 MPFR_ARCHIVE="${MPFR_FOLDER}.tar.bz2"
