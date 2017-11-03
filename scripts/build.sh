@@ -173,9 +173,6 @@ DOWNLOAD_FOLDER_NAME=${DOWNLOAD_FOLDER_NAME:-"download"}
 DOWNLOAD_FOLDER_PATH=${DOWNLOAD_FOLDER_PATH:-"${WORK_FOLDER_PATH}/${DOWNLOAD_FOLDER_NAME}"}
 DEPLOY_FOLDER_NAME=${DEPLOY_FOLDER_NAME:-"deploy"}
 
-# RELEASE_VERSION=${RELEASE_VERSION:-"7.1.1-2-20170912"}
-RELEASE_VERSION=${RELEASE_VERSION:-"7.2.0-1-20171103"}
-
 # ----- Define build Git constants. -----
 
 PROJECT_GIT_FOLDER_NAME="riscv-none-gcc-build.git"
@@ -350,6 +347,16 @@ fi
 echo "Helper script: \"${helper_script_path}\"."
 source "${helper_script_path}"
 
+# ----- Get current date. -----
+
+# Use the UTC date as version in the name of the distribution file.
+do_host_get_current_date
+
+# Be sure the changes are commited for the version to be used,
+# otherwise the copied git will use the previous version.
+
+# RELEASE_VERSION=${RELEASE_VERSION:-"7.1.1-2-20170912"}
+RELEASE_VERSION=${RELEASE_VERSION:-$(cat "${PROJECT_GIT_FOLDER_PATH}/gnu-mcu-eclipse/VERSION")-${DISTRIBUTION_FILE_DATE}}
 
 # ----- Input archives -----
 
@@ -613,7 +620,7 @@ if [ -d "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}" ]
 then
 
   # If the folder is already present in Downloads, copy it.
-  echo "Copying ${PROJECT_GIT_FOLDER_NAME} from Downloads..."
+  echo "Copying ${PROJECT_GIT_FOLDER_NAME} from Downloads (be sure it is commited!)..."
   rm -rf "${PROJECT_GIT_FOLDER_PATH}"
   mkdir -p "${PROJECT_GIT_FOLDER_PATH}"
   git clone "${PROJECT_GIT_DOWNLOADS_FOLDER_PATH}" "${PROJECT_GIT_FOLDER_PATH}"
