@@ -141,6 +141,7 @@ branding=${branding:-"GNU MCU Eclipse RISC-V Embedded GCC"}
 
 # gcc_target=${gcc_target:-"riscv64-unknown-elf"}
 gcc_target=${gcc_target:-"riscv-none-embed"}
+
 gcc_arch=${gcc_arch:-"rv64imafdc"}
 gcc_abi=${gcc_abi:-"lp64d"}
 
@@ -172,6 +173,8 @@ DOWNLOAD_FOLDER_NAME=${DOWNLOAD_FOLDER_NAME:-"download"}
 DOWNLOAD_FOLDER_PATH=${DOWNLOAD_FOLDER_PATH:-"${WORK_FOLDER_PATH}/${DOWNLOAD_FOLDER_NAME}"}
 DEPLOY_FOLDER_NAME=${DEPLOY_FOLDER_NAME:-"deploy"}
 
+# RELEASE_VERSION=${RELEASE_VERSION:-"7.1.1-2-20170912"}
+RELEASE_VERSION=${RELEASE_VERSION:-"7.2.0-1-20171103"}
 
 # ----- Define build Git constants. -----
 
@@ -354,9 +357,6 @@ source "${helper_script_path}"
 # part of the GNU MCU Eclipse project hosted on GitHub.
 # Generally these projects follow the official RISC-V GCC 
 # with updates after every RISC-V GCC public release.
-
-# RELEASE_VERSION=${RELEASE_VERSION:-"7.1.1-2-20170912"}
-RELEASE_VERSION=${RELEASE_VERSION:-"7.2.0-1-20171103"}
 
 BINUTILS_PROJECT_NAME="riscv-binutils-gdb"
 
