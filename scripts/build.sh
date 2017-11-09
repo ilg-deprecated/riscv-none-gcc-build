@@ -356,8 +356,7 @@ do_host_get_current_date
 # otherwise the copied git will use the previous version.
 
 # RELEASE_VERSION=${RELEASE_VERSION:-"7.1.1-2-20170912"}
-# "7.2.0-1-20171109"
-RELEASE_VERSION=${RELEASE_VERSION:-$(cat "${PROJECT_GIT_FOLDER_PATH}/gnu-mcu-eclipse/VERSION")-20171109}
+RELEASE_VERSION=${RELEASE_VERSION:-"7.2.0-1-20171109"}
 
 echo
 echo "Preparing release ${RELEASE_VERSION}..."
