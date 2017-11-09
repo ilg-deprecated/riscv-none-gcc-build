@@ -352,6 +352,10 @@ source "${helper_script_path}"
 # Use the UTC date as version in the name of the distribution file.
 do_host_get_current_date
 
+touch "${WORK_FOLDER_PATH}/${DISTRIBUTION_FILE_DATE}"
+echo
+echo "DISTRIBUTION_FILE_DATE=\"${DISTRIBUTION_FILE_DATE}\""
+
 # Be sure the changes are commited for the version to be used,
 # otherwise the copied git will use the previous version.
 
