@@ -1121,10 +1121,10 @@ then
   echo "Checking unix2dos..."
   unix2dos --version 2>&1 | grep unix2dos
 
-  echo "Checking makensis..."
-  echo "makensis $(makensis -VERSION)"
+  # echo "Checking makensis..."
+  # echo "makensis $(makensis -VERSION)"
 
-  apt-get --yes install zip
+  # apt-get --yes install zip
 
   echo "Checking zip..."
   zip -v | grep "This is Zip"
