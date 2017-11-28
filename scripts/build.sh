@@ -1197,7 +1197,6 @@ then
         \
         --disable-shared \
         --enable-static \
-        --with-sysroot="${install_folder}" \
     )
   elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
@@ -1213,7 +1212,6 @@ then
         \
         --disable-shared \
         --enable-static \
-        --with-sysroot="${install_folder}" \
     )
   fi
 
@@ -1262,7 +1260,6 @@ then
         --disable-warnings \
         --disable-shared \
         --enable-static \
-        --with-sysroot="${install_folder}" \
     )
   elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
@@ -1278,7 +1275,6 @@ then
         --disable-warnings \
         --disable-shared \
         --enable-static \
-        --with-sysroot="${install_folder}" \
     )
   fi
 
@@ -1320,7 +1316,6 @@ then
       bash "${work_folder_path}/${MPC_FOLDER}/configure" --help
       bash "${work_folder_path}/${MPC_FOLDER}/configure" \
         --prefix="${install_folder}" \
-        --with-sysroot="${install_folder}" \
         \
         --build="$(uname -m)-linux-gnu" \
         \
@@ -1341,7 +1336,6 @@ then
         \
         --disable-shared \
         --enable-static \
-        --with-sysroot="${install_folder}" \
     )
   fi
 
@@ -1389,7 +1383,6 @@ then
         \
         --disable-shared \
         --enable-static \
-        --with-sysroot="${install_folder}" \
     )
   elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
@@ -1404,7 +1397,6 @@ then
         \
         --disable-shared \
         --enable-static \
-        --with-sysroot="${install_folder}" \
     )
   fi
 
