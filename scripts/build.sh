@@ -1141,20 +1141,13 @@ fi
 
 if [ -z "${do_no_pdf}" ]
 then
-
-  # TODO: check on new Debian 9 containers
-  if [ "${target_os}" == "osx" ]
+  echo "Checking makeinfo..."
+  makeinfo --version | grep 'GNU texinfo'
+  makeinfo_ver=$(makeinfo --version | grep 'GNU texinfo' | sed -e 's/.*) //' -e 's/\..*//')
+  if [ "${makeinfo_ver}" -lt "6" ]
   then
-
-    echo "Checking makeinfo..."
-    makeinfo --version | grep 'GNU texinfo'
-    makeinfo_ver=$(makeinfo --version | grep 'GNU texinfo' | sed -e 's/.*) //' -e 's/\..*//')
-    if [ "${makeinfo_ver}" -lt "6" ]
-    then
-      echo "makeinfo too old, abort."
-      exit 1
-    fi
-
+    echo "makeinfo too old, abort."
+    exit 1
   fi
 fi
 
