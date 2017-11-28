@@ -2685,27 +2685,31 @@ else
 
   # ----- Build the GNU/Linux 64-bits distribution. -----
 
+  docker_linux64_image="ilegeul/centos:6-xbb-v2"
+  docker_linux32_image="ilegeul/centos32:6-xbb-v2"
+  linux_distribution="centos"
+  
   if [ "${DO_BUILD_LINUX64}" == "y" ]
   then
     do_host_build_target "Creating the GNU/Linux 64-bits distribution..." \
       --target-os linux \
       --target-bits 64 \
-      --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
+      --docker-image "${docker_linux64_image}"
   fi
 
   # ----- Build the Windows 64-bits distribution. -----
 
   if [ "${DO_BUILD_WIN64}" == "y" ]
   then
-    if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    if [ ! -f "${WORK_FOLDER_PATH}/install/${linux_distribution}64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
       do_host_build_target "Creating the GNU/Linux 64-bits distribution..." \
         --target-os linux \
         --target-bits 64 \
-        --docker-image "ilegeul/debian:9-gnu-mcu-eclipse"
+        --docker-image "${docker_linux64_image}"
     fi
 
-    if [ ! -f "${WORK_FOLDER_PATH}/install/debian64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    if [ ! -f "${WORK_FOLDER_PATH}/install/${linux_distribution}64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
       echo "Mandatory GNU/Linux binaries missing."
       exit 1
@@ -2714,8 +2718,8 @@ else
     do_host_build_target "Creating the Windows 64-bits distribution..." \
       --target-os win \
       --target-bits 64 \
-      --docker-image "ilegeul/debian:9-gnu-mcu-eclipse" \
-      --build-binaries-path "install/debian64/${APP_LC_NAME}/bin"
+      --docker-image "${docker_linux64_image}" \
+      --build-binaries-path "install/${linux_distribution}64/${APP_LC_NAME}/bin"
   fi
 
   # ----- Build the GNU/Linux 32-bits distribution. -----
@@ -2725,7 +2729,7 @@ else
     do_host_build_target "Creating the GNU/Linux 32-bits distribution..." \
       --target-os linux \
       --target-bits 32 \
-      --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
+      --docker-image "${docker_linux32_image}"
   fi
 
   # ----- Build the Windows 32-bits distribution. -----
@@ -2733,15 +2737,15 @@ else
   # Since the actual container is a 32-bits, use the debian32 binaries.
   if [ "${DO_BUILD_WIN32}" == "y" ]
   then
-    if [ ! -f "${WORK_FOLDER_PATH}/install/debian32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    if [ ! -f "${WORK_FOLDER_PATH}/install/${linux_distribution}32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
       do_host_build_target "Creating the GNU/Linux 32-bits distribution..." \
         --target-os linux \
         --target-bits 32 \
-        --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse"
+        --docker-image "${docker_linux32_image}"
     fi
 
-    if [ ! -f "${WORK_FOLDER_PATH}/install/debian32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    if [ ! -f "${WORK_FOLDER_PATH}/install/${linux_distribution}32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
       echo "Mandatory GNU/Linux binaries missing."
       exit 1
@@ -2750,8 +2754,8 @@ else
     do_host_build_target "Creating the Windows 32-bits distribution..." \
       --target-os win \
       --target-bits 32 \
-      --docker-image "ilegeul/debian32:9-gnu-mcu-eclipse" \
-      --build-binaries-path "install/debian32/${APP_LC_NAME}/bin"
+      --docker-image "${docker_linux32_image}" \
+      --build-binaries-path "install/${linux_distribution}32/${APP_LC_NAME}/bin"
   fi
 
 fi
