@@ -1896,7 +1896,7 @@ then
       (
         export CFLAGS="-Wno-implicit-function-declaration -pipe" 
         export CXXFLAGS="-pipe" 
-        export CFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" 
+        export CFLAGS_FOR_TARGET="-Wno-implicit-function-declaration -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-logical-op-parentheses ${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" 
         export CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" 
         
         bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" --help
