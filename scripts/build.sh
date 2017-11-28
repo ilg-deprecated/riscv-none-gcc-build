@@ -1221,7 +1221,7 @@ then
   # Build.
   # make clean
   make ${jobs}
-  make ${jobs} install-strip
+  make install-strip
 
   touch "${gmp_stamp_file}"
 fi
@@ -1284,7 +1284,7 @@ then
   # Build.
   # make clean
   make ${jobs}
-  make ${jobs} install-strip
+  make install-strip
 
   touch "${mpfr_stamp_file}"
 fi
@@ -1345,7 +1345,7 @@ then
   # Build.
   # make clean
   make ${jobs}
-  make ${jobs} install-strip
+  make install-strip
 
   touch "${mpc_stamp_file}"
 fi
@@ -1406,7 +1406,7 @@ then
   # Build.
   # make clean
   make ${jobs}
-  make ${jobs} install-strip
+  make install-strip
 
   touch "${isl_stamp_file}"
 fi
@@ -1550,11 +1550,11 @@ then
   (
     # make clean
     make ${jobs} 
-    make ${jobs} install
+    make install
     if [ -z "${do_no_pdf}" ]
     then
       make ${jobs} html pdf
-      make ${jobs} install-html install-pdf
+      make install-html install-pdf
     fi
 
     # Without this copy, the build for the nano version of the GCC second 
@@ -1728,7 +1728,7 @@ then
     # No need to make 'all', 'all-gcc' is enough to compile the libraries.
     # Parallel build fails for win32.
     make all-gcc
-    make ${jobs} install-gcc
+    make install-gcc
   ) | tee "make-all-output.txt"
 
   touch "${gcc_stage1_stamp_file}"
@@ -1829,7 +1829,7 @@ then
   (
     # make clean
     make ${jobs}  
-    make ${jobs} install 
+    make install 
 
     if [ -z "${do_no_pdf}" ]
     then
@@ -1972,7 +1972,7 @@ then
   (
     # make clean
     make ${jobs}  
-    make ${jobs} install 
+    make install 
   ) | tee "make-newlib-all-output.txt"
 
   touch "${newlib_nano_stamp_file}"
@@ -2179,10 +2179,10 @@ then
 
   (
     make ${jobs} 
-    make ${jobs} install-strip
+    make install-strip
     if [ -z "${do_no_pdf}" ]
     then
-      make ${jobs} install-pdf install-html
+      make install-pdf install-html
     fi
   ) | tee "make-all-output.txt"
 
@@ -2389,7 +2389,7 @@ then
 
   (
     make ${jobs}
-    make ${jobs} install-strip
+    make install-strip
 
     if [ "${target_os}" == "win" ]
     then
