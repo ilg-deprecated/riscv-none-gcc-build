@@ -673,7 +673,7 @@ then
       cd "${DOWNLOAD_FOLDER_PATH}"
       echo
       echo "Downloading '${BINUTILS_ARCHIVE_URL}'..."
-      curl -L "${BINUTILS_ARCHIVE_URL}" --output "${BINUTILS_ARCHIVE_NAME}"
+      curl --fail -L "${BINUTILS_ARCHIVE_URL}" --output "${BINUTILS_ARCHIVE_NAME}"
     fi
 
     # Unpack BINUTILS.
@@ -710,7 +710,7 @@ then
       cd "${DOWNLOAD_FOLDER_PATH}"
       echo
       echo "Downloading '${GCC_ARCHIVE_URL}'..."
-      curl -L "${GCC_ARCHIVE_URL}" --output "${GCC_ARCHIVE_NAME}"
+      curl --fail -L "${GCC_ARCHIVE_URL}" --output "${GCC_ARCHIVE_NAME}"
     fi
 
     # Unpack GCC.
@@ -747,7 +747,7 @@ then
       cd "${DOWNLOAD_FOLDER_PATH}"
       echo
       echo "Downloading '${NEWLIB_ARCHIVE_URL}'..."
-      curl -L "${NEWLIB_ARCHIVE_URL}" --output "${NEWLIB_ARCHIVE_NAME}"
+      curl --fail -L "${NEWLIB_ARCHIVE_URL}" --output "${NEWLIB_ARCHIVE_NAME}"
     fi
 
     # Unpack NEWLIB.
@@ -771,7 +771,7 @@ then
     cd "${DOWNLOAD_FOLDER_PATH}"
     echo
     echo "Downloading '${GMP_URL}'..."
-    curl -L "${GMP_URL}" --output "${GMP_ARCHIVE}"
+    curl --fail -L "${GMP_URL}" --output "${GMP_ARCHIVE}"
   fi
 
   # Unpack GMP.
@@ -794,7 +794,7 @@ then
     cd "${DOWNLOAD_FOLDER_PATH}"
     echo
     echo "Downloading '${MPFR_URL}'..."
-    curl -L "${MPFR_URL}" --output "${MPFR_ARCHIVE}"
+    curl --fail -L "${MPFR_URL}" --output "${MPFR_ARCHIVE}"
   fi
 
   # Unpack MPFR.
@@ -817,7 +817,7 @@ then
     cd "${DOWNLOAD_FOLDER_PATH}"
     echo
     echo "Downloading '${MPC_URL}'..."
-    curl -L "${MPC_URL}" --output "${MPC_ARCHIVE}"
+    curl --fail -L "${MPC_URL}" --output "${MPC_ARCHIVE}"
   fi
 
   # Unpack MPC.
@@ -840,7 +840,7 @@ then
     cd "${DOWNLOAD_FOLDER_PATH}"
     echo
     echo "Downloading '${ISL_URL}'..."
-    curl -L "${ISL_URL}" --output "${ISL_ARCHIVE}"
+    curl --fail -L "${ISL_URL}" --output "${ISL_ARCHIVE}"
   fi
 
   # Unpack ISL.
