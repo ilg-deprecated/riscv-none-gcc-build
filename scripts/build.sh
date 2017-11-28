@@ -145,7 +145,8 @@ gcc_target=${gcc_target:-"riscv-none-embed"}
 gcc_arch=${gcc_arch:-"rv64imafdc"}
 gcc_abi=${gcc_abi:-"lp64d"}
 
-jobs=""
+# Default to 2. Attempts to use 8 occasionally failed.
+jobs="--jobs=2"
 
 # On Parallels virtual machines, prefer host Work folder.
 # Second choice are Work folders on secondary disks.
@@ -280,7 +281,7 @@ do
     --help)
       echo "Build the GNU MCU Eclipse ${APP_NAME} distributions."
       echo "Usage:"
-      echo "    bash $0 helper_script [--win32] [--win64] [--deb32] [--deb64] [--osx] [--all] [clean|cleanall|build-images|preload-images] [--disable-strip] [--without-pdf] [--disable-multilib] [--develop] [--use-gits] [--help]"
+      echo "    bash $0 helper_script [--win32] [--win64] [--linux32] [--linux64] [--osx] [--all] [clean|cleanall|build-images|preload-images] [--disable-strip] [--without-pdf] [--disable-multilib] [--develop] [--use-gits] [--jobs N] [--help]"
       echo
       exit 1
       ;;
