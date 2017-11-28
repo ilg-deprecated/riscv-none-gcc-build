@@ -1466,6 +1466,7 @@ then
         --enable-plugins \
         --without-system-zlib \
         --with-sysroot="${app_prefix}/${gcc_target}" \
+        --without-python \
       | tee "configure-output.txt"
 
     elif [ "${target_os}" == "osx" ]
@@ -1499,6 +1500,7 @@ then
         --enable-plugins \
         --without-system-zlib \
         --with-sysroot="${app_prefix}/${gcc_target}" \
+        --without-python \
       | tee "configure-output.txt"
 
     elif [ "${target_os}" == "linux" ]
@@ -1532,6 +1534,7 @@ then
         --enable-plugins \
         --without-system-zlib \
         --with-sysroot="${app_prefix}/${gcc_target}" \
+        --without-python \
       | tee "configure-output.txt"
 
     fi
