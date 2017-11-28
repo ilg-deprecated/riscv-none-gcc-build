@@ -1439,7 +1439,7 @@ then
       CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" \
       \
       bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}" \
@@ -1475,7 +1475,7 @@ then
       CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib" \
+      LDFLAGS="-L${install_folder}/lib -static-libstdc++" \
       \
       bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}" \
@@ -1509,7 +1509,7 @@ then
       CFLAGS="-Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" \
       \
       bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}" \
@@ -1612,10 +1612,10 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-implicit-fallthrough -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -1666,10 +1666,10 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-implicit-fallthrough -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib" \
+      LDFLAGS="-L${install_folder}/lib -static-libstdc++" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -1789,7 +1789,7 @@ then
         --enable-newlib-register-fini \
         --disable-newlib-supplied-syscalls \
         --disable-nls \
-        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-implicit-function-declaration" \
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
 
@@ -1816,7 +1816,7 @@ then
         --enable-newlib-register-fini \
         --disable-newlib-supplied-syscalls \
         --disable-nls \
-        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
+        CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-implicit-function-declaration" \
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
         | tee "configure-output.txt"
 
@@ -2011,10 +2011,10 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-format-security -Wno-unused-but-set-variable -Wno-implicit-function-declaration -Wno-suggest-attribute -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-format -Wno-format-extra-args -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -2059,7 +2059,7 @@ then
         --with-sysroot="${app_prefix}/${gcc_target}" \
         CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" \
         CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" \
-        LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections" \
+        LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections -static-libstdc++" \
         | tee "configure-output.txt"
 
     elif [ "${target_os}" == "osx" ]
@@ -2070,10 +2070,10 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-char-subscripts -Wno-format-security -m${target_bits} -pipe" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-char-subscripts -Wno-format-security -Wno-unused-but-set-variable -Wno-implicit-function-declaration -Wno-suggest-attribute -m${target_bits} -pipe" \
       CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -Wno-format -Wno-format-extra-args -m${target_bits} -pipe" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib" \
+      LDFLAGS="-L${install_folder}/lib -static-libstdc++" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -2124,10 +2124,10 @@ then
 
       # All variables below are passed on the command line before 'configure'.
       # Be sure all these lines end in '\' to ensure lines are concatenated.
-      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
+      CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-format-security -Wno-unused-but-set-variable -Wno-implicit-function-declaration -Wno-suggest-attribute -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -Wno-format -Wno-format-extra-args -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix}"  \
@@ -2223,7 +2223,7 @@ then
       CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-format-security -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-format -Wno-format-extra-args -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix_nano}"  \
@@ -2285,7 +2285,7 @@ then
       CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof  -Wno-char-subscripts -Wno-format-security -m${target_bits} -pipe" \
       CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof  -Wno-mismatched-tags -Wno-ignored-attributes -Wno-format -Wno-format-extra-args -m${target_bits} -pipe" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib" \
+      LDFLAGS="-L${install_folder}/lib -static-libstdc++" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix_nano}"  \
@@ -2340,7 +2340,7 @@ then
       CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof  -Wno-format-security -Wno-format -Wno-format-extra-args -m${target_bits} -pipe -ffunction-sections -fdata-sections" \
       CPPFLAGS="-I${install_folder}/include" \
-      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections" \
+      LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" \
       \
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
         --prefix="${app_prefix_nano}"  \
