@@ -1346,10 +1346,10 @@ then
         --prefix="${install_folder}" \
         \
         --build="$(uname -m)-linux-gnu" \
+        --host="${cross_compile_prefix}" \
         \
         --disable-shared \
         --enable-static \
-        --host="${cross_compile_prefix}" \
       | tee "configure-output.txt"
     )
   elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
