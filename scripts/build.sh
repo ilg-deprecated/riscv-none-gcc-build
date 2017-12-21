@@ -1547,6 +1547,7 @@ then
         export LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" 
         
         bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" --help
+        bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/gdb/configure" --help
         bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
           --prefix="${app_prefix}" \
           --infodir="${app_prefix_doc}/info" \
@@ -1587,6 +1588,7 @@ then
         export LDFLAGS="-L${install_folder}/lib -static-libstdc++" 
         
         bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" --help
+        bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/gdb/configure" --help
         bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
           --prefix="${app_prefix}" \
           --infodir="${app_prefix_doc}/info" \
@@ -1625,6 +1627,7 @@ then
         export LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" 
         
         bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" --help
+        bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/gdb/configure" --help
         bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" \
           --prefix="${app_prefix}" \
           --infodir="${app_prefix_doc}/info" \
