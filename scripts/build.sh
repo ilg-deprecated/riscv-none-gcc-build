@@ -1730,7 +1730,7 @@ then
     if [ "${target_os}" == "win" ]
     then
       (
-        export CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-implicit-fallthrough -pipe -ffunction-sections -fdata-sections" 
+        export CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-implicit-fallthrough -Wno-implicit-function-declaration -pipe -ffunction-sections -fdata-sections" 
         export CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-implicit-fallthrough -pipe -ffunction-sections -fdata-sections" 
         export CPPFLAGS="-I${install_folder}/include" 
         export LDFLAGS="-L${install_folder}/lib -Wl,--gc-sections -static-libstdc++" 
@@ -1783,8 +1783,8 @@ then
     elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
     then
       (
-        export CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-implicit-fallthrough -m${target_bits} -pipe -ffunction-sections -fdata-sections" 
-        export CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -Wno-implicit-fallthrough -m${target_bits} -pipe -ffunction-sections -fdata-sections" 
+        export CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-mismatched-tags -m${target_bits} -pipe -ffunction-sections -fdata-sections" 
+        export CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -Wno-implicit-fallthrough  -Wno-mismatched-tags -m${target_bits} -pipe -ffunction-sections -fdata-sections" 
         export CPPFLAGS="-I${install_folder}/include" 
         export LDFLAGS="-L${install_folder}/lib -static-libstdc++" 
         export CFLAGS_FOR_TARGET="${cflags_optimizations_for_target}" 
