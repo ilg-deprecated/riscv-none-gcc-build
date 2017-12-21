@@ -1565,6 +1565,8 @@ then
           --with-gmp="${install_folder}" \
           --with-isl="${install_folder}" \
           \
+          --disable-shared \
+          --enable-static \
           --disable-werror \
           --disable-build-warnings \
           --disable-gdb-build-warnings \
@@ -1601,6 +1603,8 @@ then
           --with-gmp="${install_folder}" \
           --with-isl="${install_folder}" \
           \
+          --disable-shared \
+          --enable-static \
           --disable-werror \
           --disable-build-warnings \
           --disable-gdb-build-warnings \
@@ -1637,6 +1641,8 @@ then
           --with-gmp="${install_folder}" \
           --with-isl="${install_folder}" \
           \
+          --disable-shared \
+          --enable-static \
           --disable-werror \
           --disable-build-warnings \
           --disable-gdb-build-warnings \
