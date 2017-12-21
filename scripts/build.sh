@@ -1084,16 +1084,7 @@ if [ -f "/opt/xbb/xbb.sh" ]
 then
   source "/opt/xbb/xbb.sh"
 
-  # Use only the executables, not including the libraries is
-  # equivalent to prefering the application to provide them.
-  export PATH="${XBB_FOLDER}/bin:${PATH}"
-
-  # Some of the builds create internal tools. For them to run,
-  # access to the shared libs (like `libz.so.1`, `libstdc++.so.6`
-  # is required, thus the need for `LD_LIBRARY_PATH`.
-  set +u
-  export LD_LIBRARY_PATH="${XBB_FOLDER}/lib64:${XBB_FOLDER}/lib:${LD_LIBRARY_PATH}"
-  set -u
+  xbb_activate
 
   # Don't forget to add `-static-libstdc++` to app LDFLAGS,
   # otherwise the final executable will have a reference to 
