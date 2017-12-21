@@ -1230,6 +1230,7 @@ then
         \
         --disable-shared \
         --enable-static \
+      | tee "configure-output.txt"
     )
   elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
@@ -1245,6 +1246,7 @@ then
         \
         --disable-shared \
         --enable-static \
+      | tee "configure-output.txt"
     )
   fi
 
@@ -1293,6 +1295,7 @@ then
         --disable-warnings \
         --disable-shared \
         --enable-static \
+      | tee "configure-output.txt"
     )
   elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
@@ -1308,6 +1311,7 @@ then
         --disable-warnings \
         --disable-shared \
         --enable-static \
+      | tee "configure-output.txt"
     )
   fi
 
@@ -1355,6 +1359,7 @@ then
         --disable-shared \
         --enable-static \
         --host="${cross_compile_prefix}" \
+      | tee "configure-output.txt"
     )
   elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
@@ -1369,6 +1374,7 @@ then
         \
         --disable-shared \
         --enable-static \
+      | tee "configure-output.txt"
     )
   fi
 
@@ -1416,6 +1422,7 @@ then
         \
         --disable-shared \
         --enable-static \
+      | tee "configure-output.txt"
     )
   elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
   then
@@ -1430,6 +1437,7 @@ then
         \
         --disable-shared \
         --enable-static \
+      | tee "configure-output.txt"
     )
   fi
 
