@@ -496,6 +496,15 @@ ISL_FOLDER="isl-${ISL_VERSION}"
 ISL_ARCHIVE="${ISL_FOLDER}.tar.bz2"
 ISL_URL="http://isl.gforge.inria.fr/${ISL_ARCHIVE}"
 
+# https://libexpat.github.io
+# https://github.com/libexpat/libexpat/releases
+
+EXPAT_VERSION="2.2.5"
+
+EXPAT_FOLDER="expat-${EXPAT_VERSION}"
+EXPAT_ARCHIVE="${EXPAT_FOLDER}.tar.bz2"
+EXPAT_RELEASE="R_$(echo ${EXPAT_VERSION} | sed -e 's|[.]|_|g')"
+EXPAT_URL="https://github.com/libexpat/libexpat/releases/download/${EXPAT_RELEASE}/${EXPAT_ARCHIVE}"
 
 # ----- Process actions. -----
 
@@ -518,6 +527,7 @@ then
   rm -rf "${WORK_FOLDER_PATH}/${MPFR_FOLDER}"
   rm -rf "${WORK_FOLDER_PATH}/${MPC_FOLDER}"
   rm -rf "${WORK_FOLDER_PATH}/${ISL_FOLDER}"
+  rm -rf "${WORK_FOLDER_PATH}/${EXPAT_FOLDER}"
 
   if [ -z "${do_use_gits}" ]
   then
@@ -850,6 +860,27 @@ then
   tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${ISL_ARCHIVE}"
 fi
 
+# ----- Get EXPAT. -----
+
+if [ ! -d "${WORK_FOLDER_PATH}/${EXPAT_FOLDER}" ]
+then
+  if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${EXPAT_ARCHIVE}" ]
+  then
+    mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+    # Download the EXPAT library.
+    cd "${DOWNLOAD_FOLDER_PATH}"
+    echo
+    echo "Downloading '${EXPAT_URL}'..."
+    curl --fail -L "${EXPAT_URL}" --output "${EXPAT_ARCHIVE}"
+  fi
+
+  # Unpack EXPAT.
+  cd "${WORK_FOLDER_PATH}"
+  echo
+  echo "Unpacking '${EXPAT_ARCHIVE}'..."
+  tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${EXPAT_ARCHIVE}"
+fi
 
 # v===========================================================================v
 # Create the build script (needs to be separate for Docker).
@@ -912,6 +943,8 @@ MPC_ARCHIVE="${MPC_ARCHIVE}"
 
 ISL_FOLDER="${ISL_FOLDER}"
 ISL_ARCHIVE="${ISL_ARCHIVE}"
+
+EXPAT_FOLDER="${EXPAT_FOLDER}"
 
 do_no_strip="${do_no_strip}"
 do_no_pdf="${do_no_pdf}"
@@ -1411,6 +1444,69 @@ then
   touch "${isl_stamp_file}"
 fi
 
+# ----- Build and install the EXPAT library. -----
+
+expat_stamp_file="${build_folder_path}/${EXPAT_FOLDER}/stamp-install-completed"
+
+if [ ! -f "${expat_stamp_file}" ]
+then
+
+  rm -rf "${build_folder_path}/${EXPAT_FOLDER}"
+  mkdir -p "${build_folder_path}/${EXPAT_FOLDER}"
+
+  mkdir -p "${install_folder}"
+
+  echo
+  echo "Running expat configure..."
+
+  cd "${build_folder_path}/${EXPAT_FOLDER}"
+
+  if [ "${target_os}" == "win" ]
+  then
+    (
+      export CFLAGS="-pipe -ffunction-sections -fdata-sections" 
+      export CPPFLAGS="-I${install_folder}/include" 
+      export LDFLAGS="-L${install_folder}/lib" 
+      
+      bash "${work_folder_path}/${EXPAT_FOLDER}/configure" --help
+      bash "${work_folder_path}/${EXPAT_FOLDER}/configure" \
+        --prefix="${install_folder}" \
+        \
+        --build="$(uname -m)-linux-gnu" \
+        --host="${cross_compile_prefix}" \
+        \
+        --disable-shared \
+        --enable-static \
+      | tee "configure-output.txt"
+    )
+  elif [ \( "${target_os}" == "osx" \) -o \( "${target_os}" == "linux" \) ]
+  then
+    (
+      export CFLAGS="-m${target_bits} -pipe -ffunction-sections -fdata-sections" 
+      export CPPFLAGS="-I${install_folder}/include" 
+      export LDFLAGS="-L${install_folder}/lib" 
+      
+      bash "${work_folder_path}/${EXPAT_FOLDER}/configure" --help
+      bash "${work_folder_path}/${EXPAT_FOLDER}/configure" \
+        --prefix="${install_folder}" \
+        \
+        --disable-shared \
+        --enable-static \
+      | tee "configure-output.txt"
+    )
+  fi
+
+  echo
+  echo "Running expat make..."
+
+  # Build.
+  # make clean
+  make ${jobs}
+  make install-strip
+
+  touch "${expat_stamp_file}"
+fi
+
 # -------------------------------------------------------------
 
 mkdir -p "${app_prefix}"
@@ -1468,6 +1564,7 @@ then
           --enable-plugins \
           --without-system-zlib \
           --without-python \
+          --with-expat \
           --with-sysroot="${app_prefix}/${gcc_target}" \
         | tee "configure-output.txt"
       )
@@ -1503,6 +1600,7 @@ then
           --enable-plugins \
           --without-system-zlib \
           --without-python \
+          --with-expat \
           --with-sysroot="${app_prefix}/${gcc_target}" \
         | tee "configure-output.txt"
       )
@@ -1538,6 +1636,7 @@ then
           --enable-plugins \
           --without-system-zlib \
           --without-python \
+          --with-expat \
           --with-sysroot="${app_prefix}/${gcc_target}" \
         | tee "configure-output.txt"
       )
