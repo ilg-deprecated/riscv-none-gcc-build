@@ -1212,6 +1212,12 @@ shasum --version
 
 # -----------------------------------------------------------------------------
 
+# Functions to build various components. Each must be
+# called in its build folder.
+# The subshells are necessary to contain the custom
+# environment variables and to capture the output of
+# multiple commands.
+
 function do_gmp() 
 {
   (
@@ -1387,6 +1393,7 @@ function do_binutils()
       echo "Running binutils configure..."
 
       bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/configure" --help
+      bash "${work_folder_path}/${BINUTILS_FOLDER_NAME}/gdb/configure" --help
 
       export CFLAGS="${EXTRA_CFLAGS} -Wno-unknown-warning-option -Wno-extended-offsetof -Wno-deprecated-declarations -Wno-incompatible-pointer-types-discards-qualifiers -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-constant-logical-operand -Wno-shift-negative-value -Wno-format"
       export CXXFLAGS="${EXTRA_CXXFLAGS} -Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-unknown-warning-option -Wno-c++11-narrowing"
@@ -1427,6 +1434,7 @@ function do_binutils()
     (
       make ${jobs} 
       make install
+
       if [ -z "${do_no_pdf}" ]
       then
         make ${jobs} html pdf
@@ -1510,7 +1518,7 @@ function do_gcc_first()
   
     fi
 
-    # ----- Partial build, without documentation. -----
+    # Partial build, without documentation.
     echo
     echo "Running gcc first stage make..."
 
@@ -1524,13 +1532,13 @@ function do_gcc_first()
   )
 }
 
+# For the nano build, call it with "-nano".
 function do_gcc_final() 
 {
   (
     if [ ! -f "config.status" ]
     then
 
-      # https://gcc.gnu.org/install/configure.html
       echo
       echo "Running gcc$1 final stage configure..."
 
@@ -1538,6 +1546,7 @@ function do_gcc_final()
 
       # --without-system-zlib assume libz is not available
 
+      # https://gcc.gnu.org/install/configure.html
       export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-format-security -Wno-unused-but-set-variable -Wno-implicit-function-declaration -Wno-suggest-attribute" 
       EXTRA_CFLAGS_NO_M="$(echo "${EXTRA_CFLAGS}" | sed -e s/-m${target_bits}//)"
       export CFLAGS="${EXTRA_CFLAGS_NO_M} ${GCC_WARN_CFLAGS}"
@@ -1547,15 +1556,18 @@ function do_gcc_final()
       export CPPFLAGS="${EXTRA_CPPFLAGS}" 
       export LDFLAGS="${EXTRA_LDFLAGS}"
 
-      if [ "$1" != "-nano" ]
+      if [ "$1" == "" ]
       then
         export CFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections" 
         export CXXFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" 
         export LDFLAGS_FOR_TARGET="${cflags_optimizations_for_target} -Wl,--gc-sections -static-libstdc++" 
-      else
+      elif [ "$1" == "-nano" ]
+      then
         export CFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections" 
         export CXXFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -ffunction-sections -fdata-sections -Wno-mismatched-tags -Wno-ignored-attributes" 
         export LDFLAGS_FOR_TARGET="${cflags_optimizations_nano_for_target} -Wl,--gc-sections -static-libstdc++" 
+      else
+        echo "Unsupported do_gcc_final arg $1"
       fi
 
       bash "${work_folder_path}/${GCC_FOLDER_NAME}/configure" \
@@ -1605,14 +1617,15 @@ function do_gcc_final()
       make ${jobs} 
       make install-strip
 
-      if [ "$1" != "-nano" ]
+      if [ "$1" == "" ]
       then
         # Full build, with documentation.
         if [ -z "${do_no_pdf}" ]
         then
           make install-pdf install-html
         fi
-      else 
+      elif [ "$1" == "-nano" ]
+      then
         # Partial build.
         if [ "${target_os}" == "win" ]
         then
@@ -1638,6 +1651,7 @@ function do_gcc_final()
   )
 }
 
+# For the nano build, call it with "-nano".
 function do_newlib()
 {
   (
@@ -1678,7 +1692,7 @@ function do_newlib()
       # the list of options, such that it can be extended, so the
       # brute force approach is to duplicate the entire call.
 
-      if [ "$1" != "-nano" ]
+      if [ "$1" == "" ]
       then
 
         bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
@@ -1700,7 +1714,8 @@ function do_newlib()
           --disable-newlib-supplied-syscalls \
           | tee "configure-output.txt"
 
-      else
+      elif [ "$1" == "-nano" ]
+      then
 
         bash "${work_folder_path}/${NEWLIB_FOLDER_NAME}/configure" \
           --prefix="${app_prefix}$1"  \
@@ -1731,6 +1746,8 @@ function do_newlib()
           --enable-newlib-reent-small \
           | tee "configure-output.txt"
 
+      else
+        echo "Unsupported do_newlib arg $1"
       fi
 
     fi
@@ -1742,7 +1759,7 @@ function do_newlib()
       make ${jobs}  
       make install 
 
-      if [ "$1" != "-nano" ]
+      if [ "$1" == "" ]
       then
 
         if [ -z "${do_no_pdf}" ]
@@ -1850,7 +1867,6 @@ function do_copy_shared_libs()
           -type f -executable \
           -exec strip "{}" \;
       )
-
     fi
 
     # Generally this is a very important detail: 'patchelf' sets "runpath"
@@ -1990,7 +2006,9 @@ then
 
     do_gmp
   )
+
   touch "${gmp_stamp_file}"
+
 fi
 
 # ----- Build and install the MPFR library. -----
@@ -2007,7 +2025,9 @@ then
 
     do_mpfr
   )
+
   touch "${mpfr_stamp_file}"
+
 fi
 
 # ----- Build and install the MPC library. -----
@@ -2024,7 +2044,9 @@ then
 
     do_mpc
   )
+
   touch "${mpc_stamp_file}"
+
 fi
 
 # ----- Build and install the ISL library. -----
@@ -2041,7 +2063,9 @@ then
 
     do_isl
   )
+
   touch "${isl_stamp_file}"
+
 fi
 
 # ----- Build and install the EXPAT library. -----
@@ -2058,7 +2082,9 @@ then
 
     do_expat
   )
+
   touch "${expat_stamp_file}"
+
 fi
 
 # -------------------------------------------------------------
@@ -2080,8 +2106,9 @@ then
 
     do_binutils
   )
-  # The binutils were successfuly created.
+
   touch "${binutils_stamp_file}"
+
 fi
 
 # ----- Build GCC, first stage. -----
@@ -2118,7 +2145,9 @@ then
     
     do_gcc_first
   )
+
   touch "${gcc_stage1_stamp_file}"
+
 fi
 
 # ----- Save PATH and set it to include the new binaries -----
@@ -2141,7 +2170,9 @@ then
 
     do_newlib ""
   )
+
   touch "${newlib_stamp_file}"
+
 fi
 
 # ----- Build newlib-nano. -----
@@ -2159,7 +2190,9 @@ then
 
     do_newlib "-nano"
   )
+
   touch "${newlib_nano_stamp_file}"
+
 fi
 
 # -------------------------------------------------------------
@@ -2182,7 +2215,9 @@ then
 
     do_gcc_final ""
   )
+
   touch "${gcc_stage2_stamp_file}"
+
 fi
 
 # -------------------------------------------------------------
@@ -2200,7 +2235,9 @@ then
 
     do_gcc_final "-nano"
   )
+
   touch "${gcc_stage2_nano_stamp_file}"
+
 fi
 
 # ----- Copy dynamic libraries to the install bin folder. -----
@@ -2215,6 +2252,7 @@ then
   do_copy_shared_libs
 
   touch "${checking_stamp_file}"
+
 fi
 
 # ----- Copy the license files. -----
@@ -2227,6 +2265,7 @@ then
   do_copy_license_files
 
   touch "${license_stamp_file}"
+
 fi
 
 # ----- Copy the GNU MCU Eclipse info files. -----
@@ -2239,6 +2278,7 @@ then
   do_copy_gme_info
 
   touch "${info_stamp_file}"
+  
 fi
 
 # ----- Create the distribution package. -----
