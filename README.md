@@ -24,6 +24,12 @@ Another addition compared to the SiFive distribution is the presence of the docu
 
 ## How to build
 
+```
+$ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh clean
+$ caffeinate bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --all
+$ caffeinate bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --win32 --win64 --linux32 --linux64 --osx
+```
+
 The detailed steps are defined in the [How to build the RISC-V Embedded GCC binaries?](https://gnu-mcu-eclipse.github.io/toolchain/riscv/build-procedure/) page.
 
 Warning: with 5 separate distributions, this will take many hours, even on a fast machine.
