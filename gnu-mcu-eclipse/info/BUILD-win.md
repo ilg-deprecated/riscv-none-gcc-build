@@ -21,7 +21,7 @@ section are installed, then download the script and execute it with bash:
 $ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --win32 --win64
 ```
 
-The output of the build script are two `setup.exe` files in the 
+The output of the build script are two `.zip` files in the 
 `${WORK_FOLDER}/deploy` folder.
 
 The script was developed on OS X 10.12 with Homebrew, but also runs

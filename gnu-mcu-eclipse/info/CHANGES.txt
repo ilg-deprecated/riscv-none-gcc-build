@@ -1,6 +1,12 @@
 
 The changes applied to the original projects, in reverse chronological order:
 
+[2018-01-10]
+
+- v7.2.0-2-20180110 released
+- update to latest SiFive commits from 2018-01-10
+- dismiss the `data-list-register-names` patch, no longer needed
+
 [2017-11-09]
 
 - v7.2.0-1-20171109 released

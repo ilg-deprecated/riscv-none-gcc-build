@@ -17,11 +17,10 @@ To run it, first be sure that the packages required in the Prerequisites
 section are installed, then download the script and execute it with bash:
 
 ```console
-$ caffeinate bash
-$ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --osx
+$ caffeinate bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --osx
 ```
 
-The output of the build script is a `.pkg` install and a `*.tgz` 
+The output of the build script is a `*.tgz` 
 in the `${WORK_FOLDER}/deploy` folder.
 
 The script was developed on OS X 10.12 with Homebrew. Running it on other 

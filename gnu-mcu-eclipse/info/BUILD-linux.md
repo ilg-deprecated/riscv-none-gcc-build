@@ -18,7 +18,7 @@ To run it, first be sure that the packages required in the Prerequisites
 section are installed, then download the script and execute it with bash:
 
 ```console
-$ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --debian32 --debian64
+$ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --linux32 --linux64
 ```
 
 The output of the build script are two `.tgz` files in the 

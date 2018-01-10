@@ -365,7 +365,7 @@ echo "DISTRIBUTION_FILE_DATE=\"${DISTRIBUTION_FILE_DATE}\""
 # otherwise the copied git will use the previous version.
 
 # RELEASE_VERSION=${RELEASE_VERSION:-"7.1.1-2-20170912"}
-RELEASE_VERSION=${RELEASE_VERSION:-"7.2.0-1-20171109"}
+RELEASE_VERSION=${RELEASE_VERSION:-"7.2.0-2-20180110"}
 
 echo
 echo "Preparing release ${RELEASE_VERSION}..."
