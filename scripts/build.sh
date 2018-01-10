@@ -146,7 +146,7 @@ gcc_arch=${gcc_arch:-"rv64imafdc"}
 gcc_abi=${gcc_abi:-"lp64d"}
 
 # Default to 2. Attempts to use 8 occasionally failed.
-jobs="--jobs=2"
+jobs="--jobs=4"
 
 # On Parallels virtual machines, prefer host Work folder.
 # Second choice are Work folders on secondary disks.
