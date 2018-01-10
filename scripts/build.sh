@@ -181,6 +181,10 @@ PROJECT_GIT_FOLDER_PATH="${WORK_FOLDER_PATH}/${PROJECT_GIT_FOLDER_NAME}"
 PROJECT_GIT_DOWNLOADS_FOLDER_PATH="${HOME}/Downloads/${PROJECT_GIT_FOLDER_NAME}"
 PROJECT_GIT_URL="https://github.com/gnu-mcu-eclipse/${PROJECT_GIT_FOLDER_NAME}"
 
+# ----- Docker images. -----
+
+docker_linux64_image="ilegeul/centos:6-xbb-v1"
+docker_linux32_image="ilegeul/centos32:6-xbb-v1"
 
 # ----- Create Work folder. -----
 
@@ -208,7 +212,7 @@ while [ $# -gt 0 ]
 do
   case "$1" in
 
-    clean|cleanall|pull|checkout-dev|checkout-stable|build-images|preload-images)
+    clean|cleanall|pull|checkout-dev|checkout-stable|preload-images)
       ACTION="$1"
       shift
       ;;
@@ -568,40 +572,14 @@ then
   echo "Check/Preload Docker images..."
 
   echo
-  docker run --interactive --tty ilegeul/debian:9-gnu-mcu-eclipse \
-  lsb_release --description --short
+  docker run --interactive --tty ${docker_linux64_image} \
+    lsb_release --description --short
 
   echo
-  docker run --interactive --tty ilegeul/debian32:9-gnu-mcu-eclipse \
-  lsb_release --description --short
+  docker run --interactive --tty ${docker_linux64_image} \
+    lsb_release --description --short
 
   echo
-  docker images
-
-  do_host_stop_timer
-
-  exit 0
-fi
-
-# ----- Process "build-images" action. -----
-
-if [ "${ACTION}" == "build-images" ]
-then
-  do_host_prepare_docker
-
-  # Remove most build and temporary folders.
-  echo
-  echo "Build Docker images..."
-
-  # Be sure it will not crash on errors, in case the images are already there.
-  set +e
-
-  docker build --tag "ilegeul/debian32:9-gnu-mcu-eclipse" \
-  https://github.com/ilg-ul/docker/raw/master/debian32/9-gnu-mcu-eclipse/Dockerfile
-
-  docker build --tag "ilegeul/debian:9-gnu-mcu-eclipse" \
-  https://github.com/ilg-ul/docker/raw/master/debian/9-gnu-mcu-eclipse/Dockerfile
-
   docker images
 
   do_host_stop_timer
