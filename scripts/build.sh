@@ -2172,6 +2172,12 @@ function do_copy_license_files()
     "${work_folder_path}/${MPC_FOLDER}" "${MPC_FOLDER}"
   do_container_copy_license \
     "${work_folder_path}/${ISL_FOLDER}" "${ISL_FOLDER}"
+  do_container_copy_license \
+    "${work_folder_path}/${EXPAT_FOLDER}" "${EXPAT_FOLDER}"
+  do_container_copy_license \
+    "${work_folder_path}/${LIBICONV_FOLDER}" "${LIBICONV_FOLDER}"
+  do_container_copy_license \
+    "${work_folder_path}/${XZ_FOLDER}" "${XZ_FOLDER}"
 
   if [ "${target_os}" == "win" ]
   then
