@@ -2048,7 +2048,7 @@ function do_copy_shared_libs()
       do_container_win_copy_gcc_dll "libgcc_s_seh-1.dll"
     fi
 
-    # do_container_win_copy_libwinpthread_dll
+    do_container_win_copy_libwinpthread_dll
 
     if [ -z "${do_no_strip}" ]
     then
