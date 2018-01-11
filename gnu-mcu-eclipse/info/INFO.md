@@ -9,7 +9,7 @@ This release closely follows the official [RISC-V distribution](https://github.c
 
 The current version is based on the following commits:
 
-- the [riscv/riscv-gcc](https://github.com/riscv/riscv-gcc) project, commit [c163f53](https://github.com/gnu-mcu-eclipse/riscv-none-gcc/commit/c163f530adc5c0d6d1ca7e4024e688a7df79e905) from from Jan 10th, 2018
+- the [riscv/riscv-gcc](https://github.com/riscv/riscv-gcc) project, commit [5bf0f1d](https://github.com/gnu-mcu-eclipse/riscv-none-gcc/commit/5bf0f1db0ed4dd3e0cdd9395e7b258234ac976d9) from from Jan 8th, 2018
 - the [riscv/riscv-binutils-gdb](https://github.com/riscv/riscv-binutils-gdb) project, commit [5d812b7](https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb/commit/5d812b72c943d8cfa08d67baed73d1a64eb943e7) from Jan 9th, 2018
 - the [riscv/riscv-newlib](https://github.com/riscv/riscv-newlib) project, commit [32a3de0](https://github.com/gnu-mcu-eclipse/riscv-newlib/commit/32a3de0bba1535fc1ca0d8dfae147d1dacaf0979) from Dec 21st, 2017
 
