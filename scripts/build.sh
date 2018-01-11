@@ -1337,6 +1337,7 @@ function do_ncurses()
       --with-cxx-static \
       --without-cxx-shared \
     | tee "${install_folder}/configure-ncurses-output.txt"
+    cp "config.log" "${install_folder}"/config-ncurses-log.txt
 
     echo
     echo "Running ncurses make..."
@@ -1376,6 +1377,7 @@ function do_gmp()
       --disable-shared \
       --enable-static \
     | tee "${install_folder}/configure-gmp-output.txt"
+    cp "config.log" "${install_folder}"/config-gmp-log.txt
 
     echo
     echo "Running gmp make..."
@@ -1410,7 +1412,8 @@ function do_mpfr()
       --disable-warnings \
       --disable-shared \
       --enable-static \
-      | tee "${install_folder}/configure-mpfr-output.txt"
+    | tee "${install_folder}/configure-mpfr-output.txt"
+    cp "config.log" "${install_folder}"/config-mpfr-log.txt
 
     echo
     echo "Running mpfr make..."
@@ -1445,6 +1448,7 @@ function do_mpc()
       --disable-shared \
       --enable-static \
     | tee "${install_folder}/configure-mpc-output.txt"
+    cp "config.log" "${install_folder}"/config-mpc-log.txt
 
     echo
     echo "Running mpc make..."
@@ -1479,6 +1483,7 @@ function do_isl()
       --disable-shared \
       --enable-static \
     | tee "${install_folder}/configure-isl-output.txt"
+    cp "config.log" "${install_folder}"/config-isl-log.txt
 
     echo
     echo "Running isl make..."
@@ -1513,6 +1518,7 @@ function do_expat()
       --disable-shared \
       --enable-static \
     | tee "${install_folder}/configure-expat-output.txt"
+    cp "config.log" "${install_folder}"/config-expat-log.txt
 
     echo
     echo "Running expat make..."
@@ -1547,6 +1553,7 @@ function do_libiconv()
       --disable-shared \
       --enable-static \
     | tee "${install_folder}/configure-libiconv-output.txt"
+    cp "config.log" "${install_folder}"/config-libiconv-log.txt
 
     echo
     echo "Running libiconv make..."
@@ -1582,6 +1589,7 @@ function do_xz()
       --enable-static \
       --disable-rpath \
     | tee "${install_folder}/configure-xz-output.txt"
+    cp "config.log" "${install_folder}"/config-xz-log.txt
 
     echo
     echo "Running xz make..."
@@ -1638,6 +1646,7 @@ function do_binutils()
         --with-expat \
         --with-sysroot="${app_prefix}/${gcc_target}" \
       | tee "${install_folder}/configure-binutils-output.txt"
+      cp "config.log" "${install_folder}"/config-binutils-log.txt
 
     fi
 
@@ -1728,7 +1737,8 @@ function do_gcc_first()
         --with-arch="${gcc_arch}" \
         --with-sysroot="${app_prefix}/${gcc_target}" \
         WARN_PEDANTIC='' \
-        | tee "${install_folder}/configure-gcc-first-output.txt"
+      | tee "${install_folder}/configure-gcc-first-output.txt"
+      cp "config.log" "${install_folder}"/config-gcc-first-log.txt
   
     fi
 
@@ -1821,7 +1831,8 @@ function do_gcc_final()
         --with-arch="${gcc_arch}" \
         --with-sysroot="${app_prefix}$1/${gcc_target}" \
         WARN_PEDANTIC='' \
-        | tee "${install_folder}/configure-gcc$1-final-output.txt"
+      | tee "${install_folder}/configure-gcc$1-final-output.txt"
+      cp "config.log" "${install_folder}"/config-gcc$1-final-log.txt
 
     fi
 
@@ -1927,7 +1938,7 @@ function do_newlib()
           --enable-newlib-io-c99-formats \
           --enable-newlib-register-fini \
           --disable-newlib-supplied-syscalls \
-          | tee "${install_folder}/configure-newlib$1-output.txt"
+        | tee "${install_folder}/configure-newlib$1-output.txt"
 
       elif [ "$1" == "-nano" ]
       then
@@ -1959,11 +1970,13 @@ function do_newlib()
           --enable-newlib-global-atexit \
           --enable-newlib-nano-formatted-io \
           --enable-newlib-reent-small \
-          | tee "${install_folder}/configure-newlib$1-output.txt"
+        | tee "${install_folder}/configure-newlib$1-output.txt"
 
       else
         echo "Unsupported do_newlib arg $1"
+        exit 1
       fi
+      cp "config.log" "${install_folder}"/config-newlib$1-log.txt
 
     fi
 
@@ -2197,6 +2210,11 @@ function do_copy_gme_info()
     "${install_folder}"/configure-*-output.txt \
     "${app_prefix}/gnu-mcu-eclipse"
   do_unix2dos "${app_prefix}"/gnu-mcu-eclipse/configure-*-output.txt
+
+  /usr/bin/install -cv -m 644 \
+    "${install_folder}"/config-*-log.txt \
+    "${app_prefix}/gnu-mcu-eclipse"
+  do_unix2dos "${app_prefix}"/gnu-mcu-eclipse/config-*-log.txt
 
   /usr/bin/install -cv -m 644 \
     "${install_folder}"/make-*-output.txt \
