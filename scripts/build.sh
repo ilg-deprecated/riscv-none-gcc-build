@@ -1971,7 +1971,8 @@ function do_newlib()
     echo "Running newlib$1 make..."
 
     (
-      make ${jobs}  
+      # Parallel build failed on CentOS
+      make  
       make install 
 
       if [ "$1" == "" ]
