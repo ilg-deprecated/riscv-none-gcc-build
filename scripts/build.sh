@@ -457,6 +457,15 @@ fi
 # LIBZ_ARCHIVE="${LIBZ_FOLDER}.tar.gz"
 # LIBZ_URL="https://sourceforge.net/projects/libpng/files/zlib/${LIBZ_VERSION}/${LIBZ_ARCHIVE}"
 
+# https://www.gnu.org/software/ncurses/
+# https://ftp.gnu.org/gnu/ncurses/
+# https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=ncurses-full-git
+
+NCURSES_VERSION="6.0"
+
+NCURSES_FOLDER="ncurses-${NCURSES_VERSION}"
+NCURSES_ARCHIVE="${NCURSES_FOLDER}.tar.gz"
+NCURSES_URL="https://ftp.gnu.org/gnu/ncurses/${NCURSES_ARCHIVE}"
 
 # https://gmplib.org
 # https://gmplib.org/download/gmp/
@@ -509,6 +518,29 @@ EXPAT_FOLDER="expat-${EXPAT_VERSION}"
 EXPAT_ARCHIVE="${EXPAT_FOLDER}.tar.bz2"
 EXPAT_RELEASE="R_$(echo ${EXPAT_VERSION} | sed -e 's|[.]|_|g')"
 EXPAT_URL="https://github.com/libexpat/libexpat/releases/download/${EXPAT_RELEASE}/${EXPAT_ARCHIVE}"
+
+# https://www.gnu.org/software/libiconv/
+# https://ftp.gnu.org/pub/gnu/libiconv/
+# https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=libiconv
+
+# 2017-02-02
+LIBICONV_VERSION="1.15"
+
+LIBICONV_FOLDER="libiconv-${LIBICONV_VERSION}"
+LIBICONV_ARCHIVE="${LIBICONV_FOLDER}.tar.gz"
+LIBICONV_URL="https://ftp.gnu.org/pub/gnu/libiconv/${LIBICONV_ARCHIVE}"
+
+# https://tukaani.org/xz/
+# https://sourceforge.net/projects/lzmautils/files/
+# https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=xz-git
+
+# 2016-12-30
+XZ_VERSION="5.2.3"
+
+XZ_FOLDER="xz-${XZ_VERSION}"
+XZ_ARCHIVE="${XZ_FOLDER}.tar.xz"
+# XZ_URL="https://sourceforge.net/projects/lzmautils/files/${XZ_ARCHIVE}"
+XZ_URL="https://github.com/gnu-mcu-eclipse/files/raw/master/libs/${XZ_ARCHIVE}"
 
 # ----- Process actions. -----
 
@@ -747,6 +779,29 @@ then
 fi
 
 
+# ----- Get NCURSES. -----
+
+if false # [ ! -d "${WORK_FOLDER_PATH}/${NCURSES_FOLDER}" ]
+then
+  if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${NCURSES_ARCHIVE}" ]
+  then
+    mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+    # Download the NCURSES library.
+    cd "${DOWNLOAD_FOLDER_PATH}"
+    echo
+    echo "Downloading '${NCURSES_URL}'..."
+    curl --fail -L "${NCURSES_URL}" --output "${NCURSES_ARCHIVE}"
+  fi
+
+  # Unpack NCURSES.
+  cd "${WORK_FOLDER_PATH}"
+  echo
+  echo "Unpacking '${NCURSES_ARCHIVE}'..."
+  tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${NCURSES_ARCHIVE}"
+fi
+
+
 # ----- Get GMP. -----
 
 if [ ! -d "${WORK_FOLDER_PATH}/${GMP_FOLDER}" ]
@@ -860,6 +915,50 @@ then
   tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${EXPAT_ARCHIVE}"
 fi
 
+# ----- Get LIBICONV. -----
+
+if [ ! -d "${WORK_FOLDER_PATH}/${LIBICONV_FOLDER}" ]
+then
+  if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${LIBICONV_ARCHIVE}" ]
+  then
+    mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+    # Download the LIBICONV library.
+    cd "${DOWNLOAD_FOLDER_PATH}"
+    echo
+    echo "Downloading '${LIBICONV_URL}'..."
+    curl --fail -L "${LIBICONV_URL}" --output "${LIBICONV_ARCHIVE}"
+  fi
+
+  # Unpack LIBICONV.
+  cd "${WORK_FOLDER_PATH}"
+  echo
+  echo "Unpacking '${LIBICONV_ARCHIVE}'..."
+  tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${LIBICONV_ARCHIVE}"
+fi
+
+# ----- Get XZ. -----
+
+if [ ! -d "${WORK_FOLDER_PATH}/${XZ_FOLDER}" ]
+then
+  if [ ! -f "${DOWNLOAD_FOLDER_PATH}/${XZ_ARCHIVE}" ]
+  then
+    mkdir -p "${DOWNLOAD_FOLDER_PATH}"
+
+    # Download the XZ library.
+    cd "${DOWNLOAD_FOLDER_PATH}"
+    echo
+    echo "Downloading '${XZ_URL}'..."
+    curl --fail -L "${XZ_URL}" --output "${XZ_ARCHIVE}"
+  fi
+
+  # Unpack XZ.
+  cd "${WORK_FOLDER_PATH}"
+  echo
+  echo "Unpacking '${XZ_ARCHIVE}'..."
+  tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${XZ_ARCHIVE}"
+fi
+
 # v===========================================================================v
 # Create the build script (needs to be separate for Docker).
 
@@ -910,19 +1009,23 @@ NEWLIB_FOLDER_NAME="${NEWLIB_FOLDER_NAME}"
 
 DEPLOY_FOLDER_NAME="${DEPLOY_FOLDER_NAME}"
 
+NCURSES_FOLDER="${NCURSES_FOLDER}"
+
 GMP_FOLDER="${GMP_FOLDER}"
-GMP_ARCHIVE="${GMP_ARCHIVE}"
+# GMP_ARCHIVE="${GMP_ARCHIVE}"
 
 MPFR_FOLDER="${MPFR_FOLDER}"
-MPFR_ARCHIVE="${MPFR_ARCHIVE}"
+# MPFR_ARCHIVE="${MPFR_ARCHIVE}"
 
 MPC_FOLDER="${MPC_FOLDER}"
-MPC_ARCHIVE="${MPC_ARCHIVE}"
+# MPC_ARCHIVE="${MPC_ARCHIVE}"
 
 ISL_FOLDER="${ISL_FOLDER}"
-ISL_ARCHIVE="${ISL_ARCHIVE}"
+# ISL_ARCHIVE="${ISL_ARCHIVE}"
 
 EXPAT_FOLDER="${EXPAT_FOLDER}"
+LIBICONV_FOLDER="${LIBICONV_FOLDER}"
+XZ_FOLDER="${XZ_FOLDER}"
 
 do_no_strip="${do_no_strip}"
 do_no_pdf="${do_no_pdf}"
@@ -1107,15 +1210,23 @@ branding="${branding}\x2C ${target_bits}-bits"
 EXTRA_CFLAGS="-ffunction-sections -fdata-sections -m${target_bits} -pipe"
 EXTRA_CXXFLAGS="-ffunction-sections -fdata-sections -m${target_bits} -pipe"
 EXTRA_CPPFLAGS="-I${install_folder}/include"
-EXTRA_LDFLAGS_LIB="-L${install_folder}/lib64 -L${install_folder}/lib"
+EXTRA_LDFLAGS_LIB="-L${install_folder}/lib"
 EXTRA_LDFLAGS="${EXTRA_LDFLAGS_LIB} -static-libstdc++"
+PKG_CONFIG=pkg-config-verbose
+PKG_CONFIG_LIBDIR="${install_folder}/lib/pkgconfig"
+
 if [ "${CONTAINER_UNAME}" != "Darwin" ]
 then
   EXTRA_LDFLAGS+=" -Wl,--gc-sections"
+  if [ "${CONTAINER_MACHINE}" == "x86_64" ]
+  then
+    EXTRA_LDFLAGS_LIB="-L${install_folder}/lib64 ${EXTRA_LDFLAGS_LIB}"
+    PKG_CONFIG_LIBDIR="${install_folder}/lib64/pkgconfig":"${PKG_CONFIG_LIBDIR}"
+  fi
 fi
 
-export PKG_CONFIG=pkg-config-verbose
-export PKG_CONFIG_LIBDIR="${install_folder}/lib64/pkgconfig":"${install_folder}/lib/pkgconfig"
+export PKG_CONFIG
+export PKG_CONFIG_LIBDIR
 
 if [ -f "${extra_path}/${gcc_target}-gcc" ]
 then
@@ -1196,6 +1307,49 @@ shasum --version
 # environment variables and to capture the output of
 # multiple commands.
 
+function do_ncurses() 
+{
+  (
+    echo
+    echo "Running ncurses configure..."
+
+    bash "${work_folder_path}/${NCURSES_FOLDER}/configure" --help
+
+    export CFLAGS="${EXTRA_CFLAGS}"
+    export CPPFLAGS="${EXTRA_CPPFLAGS}"
+    export LDFLAGS="${EXTRA_LDFLAGS}"
+  
+    bash "${work_folder_path}/${NCURSES_FOLDER}/configure" \
+      --prefix="${install_folder}" \
+      \
+      --build=${BUILD} \
+      --host=${HOST} \
+      --target=${TARGET} \
+      \
+      --disable-shared \
+      --enable-static \
+      --with-normal \
+      --without-debug \
+      --without-ada \
+      --enable-widec \
+      --enable-pc-files \
+      --with-cxx-binding \
+      --with-cxx-static \
+      --without-cxx-shared \
+    | tee "${install_folder}/configure-ncurses-output.txt"
+
+    echo
+    echo "Running ncurses make..."
+
+    (
+      # Build.
+      make ${jobs}
+      make install
+    ) | tee "${install_folder}/make-ncurses-output.txt"
+  )
+}
+
+
 function do_gmp() 
 {
   (
@@ -1221,14 +1375,16 @@ function do_gmp()
       \
       --disable-shared \
       --enable-static \
-    | tee "configure-output.txt"
+    | tee "${install_folder}/configure-gmp-output.txt"
 
     echo
     echo "Running gmp make..."
 
-    # Build.
-    make ${jobs}
-    make install-strip
+    (
+      # Build.
+      make ${jobs}
+      make install-strip
+    ) | tee "${install_folder}/make-gmp-output.txt"
   )
 }
 
@@ -1254,14 +1410,16 @@ function do_mpfr()
       --disable-warnings \
       --disable-shared \
       --enable-static \
-      | tee "configure-output.txt"
+      | tee "${install_folder}/configure-mpfr-output.txt"
 
     echo
     echo "Running mpfr make..."
 
-    # Build.
-    make ${jobs}
-    make install-strip
+    (
+      # Build.
+      make ${jobs}
+      make install-strip
+    ) | tee "${install_folder}/make-mpfr-output.txt"
   )
 }
 
@@ -1286,14 +1444,16 @@ function do_mpc()
       \
       --disable-shared \
       --enable-static \
-    | tee "configure-output.txt"
+    | tee "${install_folder}/configure-mpc-output.txt"
 
     echo
     echo "Running mpc make..."
 
-    # Build.
-    make ${jobs}
-    make install-strip
+    (
+      # Build.
+      make ${jobs}
+      make install-strip
+    ) | tee "${install_folder}/make-mpc-output.txt"
   )  
 }
 
@@ -1318,14 +1478,16 @@ function do_isl()
       \
       --disable-shared \
       --enable-static \
-    | tee "configure-output.txt"
+    | tee "${install_folder}/configure-isl-output.txt"
 
     echo
     echo "Running isl make..."
 
-    # Build.
-    make ${jobs}
-    make install-strip
+    (
+      # Build.
+      make ${jobs}
+      make install-strip
+    ) | tee "${install_folder}/make-isl-output.txt"
   )
 }
 
@@ -1350,14 +1512,85 @@ function do_expat()
       \
       --disable-shared \
       --enable-static \
-    | tee "configure-output.txt"
+    | tee "${install_folder}/configure-expat-output.txt"
 
     echo
     echo "Running expat make..."
 
-    # Build.
-    make ${jobs}
-    make install-strip
+    (
+      # Build.
+      make ${jobs}
+      make install-strip
+    ) | tee "${install_folder}/make-expat-output.txt"
+  )
+}
+
+function do_libiconv()
+{
+  (
+    echo
+    echo "Running libiconv configure..."
+
+    bash "${work_folder_path}/${LIBICONV_FOLDER}/configure" --help
+
+    export CFLAGS="${EXTRA_CFLAGS} -Wno-tautological-compare -Wno-parentheses-equality -Wno-static-in-inline"
+    export CPPFLAGS="${EXTRA_CPPFLAGS}"
+    export LDFLAGS="${EXTRA_LDFLAGS}"
+
+    bash "${work_folder_path}/${LIBICONV_FOLDER}/configure" \
+      --prefix="${install_folder}" \
+      \
+      --build=${BUILD} \
+      --host=${HOST} \
+      --target=${TARGET} \
+      \
+      --disable-shared \
+      --enable-static \
+    | tee "${install_folder}/configure-libiconv-output.txt"
+
+    echo
+    echo "Running libiconv make..."
+
+    (
+      # Build.
+      make ${jobs}
+      make install-strip
+    ) | tee "${install_folder}/make-libiconv-output.txt"
+  )
+}
+
+function do_xz()
+{
+  (
+    echo
+    echo "Running xz configure..."
+
+    bash "${work_folder_path}/${XZ_FOLDER}/configure" --help
+
+    export CFLAGS="${EXTRA_CFLAGS} -Wno-implicit-fallthrough"
+    export CPPFLAGS="${EXTRA_CPPFLAGS}"
+    export LDFLAGS="${EXTRA_LDFLAGS}"
+
+    bash "${work_folder_path}/${XZ_FOLDER}/configure" \
+      --prefix="${install_folder}" \
+      \
+      --build=${BUILD} \
+      --host=${HOST} \
+      --target=${TARGET} \
+      \
+      --disable-shared \
+      --enable-static \
+      --disable-rpath \
+    | tee "${install_folder}/configure-xz-output.txt"
+
+    echo
+    echo "Running xz make..."
+
+    (
+      # Build.
+      make ${jobs}
+      make install-strip
+    ) | tee "${install_folder}/make-xz-output.txt"
   )
 }
 
@@ -1397,12 +1630,14 @@ function do_binutils()
         --disable-build-warnings \
         --disable-gdb-build-warnings \
         --disable-nls \
+        --disable-rpath \
         --enable-plugins \
         --without-system-zlib \
         --without-python \
+        --without-curses \
         --with-expat \
         --with-sysroot="${app_prefix}/${gcc_target}" \
-      | tee "configure-output.txt"
+      | tee "${install_folder}/configure-binutils-output.txt"
 
     fi
 
@@ -1423,8 +1658,7 @@ function do_binutils()
       # step fails with unexpected errors, like "cannot compute suffix of 
       # object files: cannot compile".
       do_copy_dir "${app_prefix}" "${app_prefix}"-nano
-    ) | tee "make-newlib-all-output.txt"
-
+    ) | tee "${install_folder}/make-newlib-output.txt"
   )
 }
 
@@ -1441,7 +1675,7 @@ function do_gcc_first()
 
       export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-mismatched-tags"
       export CFLAGS="${EXTRA_CFLAGS} ${GCC_WARN_CFLAGS}" 
-      export GCC_WARN_CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-mismatched-tags" 
+      export GCC_WARN_CXXFLAGS="-Wno-keyword-macro -Wno-unused-private-field -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-gnu-zero-variadic-macro-arguments -Wno-mismatched-tags -Wno-c99-extensions -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-mismatched-tags -Wno-format-security" 
       export CXXFLAGS="${EXTRA_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
       export CPPFLAGS="${EXTRA_CPPFLAGS}" 
       export LDFLAGS="${EXTRA_LDFLAGS}" 
@@ -1482,6 +1716,7 @@ function do_gcc_first()
         --disable-libssp \
         --disable-libstdcxx-pch \
         --disable-nls \
+        --disable-rpath \
         --enable-checking=no \
         ${multilib_flags} \
         --without-system-zlib \
@@ -1492,7 +1727,8 @@ function do_gcc_first()
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
         --with-sysroot="${app_prefix}/${gcc_target}" \
-        | tee "configure-output.txt"
+        WARN_PEDANTIC='' \
+        | tee "${install_folder}/configure-gcc-first-output.txt"
   
     fi
 
@@ -1505,8 +1741,7 @@ function do_gcc_first()
       # Parallel build fails for win32.
       make all-gcc
       make install-gcc
-    ) | tee "make-all-output.txt"
-
+    ) | tee "${install_folder}/make-gcc-first-output.txt"
   )
 }
 
@@ -1528,7 +1763,7 @@ function do_gcc_final()
       export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unknown-warning-option -Wno-unused-value -Wno-extended-offsetof -Wno-format-security -Wno-unused-but-set-variable -Wno-implicit-function-declaration -Wno-suggest-attribute" 
       EXTRA_CFLAGS_NO_M="$(echo "${EXTRA_CFLAGS}" | sed -e s/-m${target_bits}//)"
       export CFLAGS="${EXTRA_CFLAGS_NO_M} ${GCC_WARN_CFLAGS}"
-      export GCC_WARN_CXXFLAGS="-Wno-c99-extensions -Wno-mismatched-tags -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-private-field -Wno-keyword-macro -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -Wno-format -Wno-format-extra-args" 
+      export GCC_WARN_CXXFLAGS="-Wno-c99-extensions -Wno-mismatched-tags -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-private-field -Wno-keyword-macro -Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-extended-offsetof -Wno-invalid-offsetof -Wno-format -Wno-format-extra-args -Wno-format-security" 
       EXTRA_CXXFLAGS_NO_M="$(echo "${EXTRA_CXXFLAGS}" | sed -e s/-m${target_bits}//)"
       export CXXFLAGS="${EXTRA_CXXFLAGS_NO_M} ${GCC_WARN_CXXFLAGS}"
       export CPPFLAGS="${EXTRA_CPPFLAGS}" 
@@ -1575,6 +1810,7 @@ function do_gcc_final()
         --disable-libssp \
         --disable-libstdcxx-pch \
         --disable-nls \
+        --disable-rpath \
         ${multilib_flags} \
         --without-system-zlib \
         --with-newlib \
@@ -1584,7 +1820,8 @@ function do_gcc_final()
         --with-abi="${gcc_abi}" \
         --with-arch="${gcc_arch}" \
         --with-sysroot="${app_prefix}$1/${gcc_target}" \
-        | tee "configure-output.txt"
+        WARN_PEDANTIC='' \
+        | tee "${install_folder}/configure-gcc$1-final-output.txt"
 
     fi
 
@@ -1625,7 +1862,7 @@ function do_gcc_final()
         cp -v -f "${app_prefix}-nano/${gcc_target}/include/newlib.h" \
           "${app_prefix}/${gcc_target}/include/newlib-nano/newlib.h"
       fi
-    ) | tee "make-all-output.txt"
+    ) | tee "${install_folder}/make-gcc$1-final-output.txt"
   )
 }
 
@@ -1690,7 +1927,7 @@ function do_newlib()
           --enable-newlib-io-c99-formats \
           --enable-newlib-register-fini \
           --disable-newlib-supplied-syscalls \
-          | tee "configure-output.txt"
+          | tee "${install_folder}/configure-newlib$1-output.txt"
 
       elif [ "$1" == "-nano" ]
       then
@@ -1722,7 +1959,7 @@ function do_newlib()
           --enable-newlib-global-atexit \
           --enable-newlib-nano-formatted-io \
           --enable-newlib-reent-small \
-          | tee "configure-output.txt"
+          | tee "${install_folder}/configure-newlib$1-output.txt"
 
       else
         echo "Unsupported do_newlib arg $1"
@@ -1769,7 +2006,7 @@ function do_newlib()
 
       fi
 
-    ) | tee "make-newlib-all-output.txt"
+    ) | tee "make-newlib$1-output.txt"
   )
 }
 
@@ -1970,6 +2207,25 @@ function do_copy_gme_info()
 
 cd "${build_folder_path}"
 
+# ----- Build and install the NCURSES library. -----
+
+ncurses_stamp_file="${build_folder_path}/${NCURSES_FOLDER}/stamp-install-completed"
+
+if false # [ ! -f "${ncurses_stamp_file}" ]
+then
+
+  rm -rf "${build_folder_path}/${NCURSES_FOLDER}"
+  mkdir -p "${build_folder_path}/${NCURSES_FOLDER}"
+  (
+    cd "${build_folder_path}/${NCURSES_FOLDER}"
+
+    do_ncurses
+  )
+
+  touch "${ncurses_stamp_file}"
+
+fi
+
 # ----- Build and install the GMP library. -----
 
 gmp_stamp_file="${build_folder_path}/${GMP_FOLDER}/stamp-install-completed"
@@ -2062,6 +2318,44 @@ then
   )
 
   touch "${expat_stamp_file}"
+
+fi
+
+# ----- Build and install the LIBICONV library. -----
+
+libiconv_stamp_file="${build_folder_path}/${LIBICONV_FOLDER}/stamp-install-completed"
+
+if [ ! -f "${libiconv_stamp_file}" ]
+then
+
+  rm -rf "${build_folder_path}/${LIBICONV_FOLDER}"
+  mkdir -p "${build_folder_path}/${LIBICONV_FOLDER}"
+  (
+    cd "${build_folder_path}/${LIBICONV_FOLDER}"
+
+    do_libiconv
+  )
+
+  touch "${libiconv_stamp_file}"
+
+fi
+
+# ----- Build and install the XZ library. -----
+
+xz_stamp_file="${build_folder_path}/${XZ_FOLDER}/stamp-install-completed"
+
+if [ ! -f "${xz_stamp_file}" ]
+then
+
+  rm -rf "${build_folder_path}/${XZ_FOLDER}"
+  mkdir -p "${build_folder_path}/${XZ_FOLDER}"
+  (
+    cd "${build_folder_path}/${XZ_FOLDER}"
+
+    do_xz
+  )
+
+  touch "${xz_stamp_file}"
 
 fi
 
