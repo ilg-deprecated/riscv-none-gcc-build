@@ -2007,7 +2007,7 @@ function do_newlib()
 
       fi
 
-    ) | tee "make-newlib$1-output.txt"
+    ) | tee "${install_folder}/make-newlib$1-output.txt"
   )
 }
 
@@ -2188,19 +2188,14 @@ function do_copy_gme_info()
   do_container_copy_info
 
   /usr/bin/install -cv -m 644 \
-    "${build_folder_path}/${binutils_folder}/configure-output.txt" \
-    "${app_prefix}/gnu-mcu-eclipse/binutils-configure-output.txt"
-  do_unix2dos "${app_prefix}/gnu-mcu-eclipse/binutils-configure-output.txt"
+    "${install_folder}"/configure-*-output.txt \
+    "${app_prefix}/gnu-mcu-eclipse"
+  do_unix2dos "${app_prefix}"/gnu-mcu-eclipse/configure-*-output.txt
 
   /usr/bin/install -cv -m 644 \
-    "${build_folder_path}/${newlib_folder}/configure-output.txt" \
-    "${app_prefix}/gnu-mcu-eclipse/newlib-configure-output.txt"
-  do_unix2dos "${app_prefix}/gnu-mcu-eclipse/newlib-configure-output.txt"
-
-  /usr/bin/install -cv -m 644 \
-    "${build_folder_path}/${gcc_stage2_folder}/configure-output.txt" \
-    "${app_prefix}/gnu-mcu-eclipse/gcc-configure-output.txt"
-  do_unix2dos "${app_prefix}/gnu-mcu-eclipse/gcc-configure-output.txt"
+    "${install_folder}"/make-*-output.txt \
+    "${app_prefix}/gnu-mcu-eclipse"
+  do_unix2dos "${app_prefix}"/gnu-mcu-eclipse/make-*-output.txt
 }
 
 # =============================================================================
