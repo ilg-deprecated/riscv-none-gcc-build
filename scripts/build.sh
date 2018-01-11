@@ -2601,8 +2601,8 @@ else
 
   # ----- Build the GNU/Linux 64-bits distribution. -----
 
-  docker_linux64_image="ilegeul/centos:6-xbb-tex-v1"
-  docker_linux32_image="ilegeul/centos32:6-xbb-tex-v1"
+  docker_linux64_image="ilegeul/centos:6-xbb-v1"
+  docker_linux32_image="ilegeul/centos32:6-xbb-v1"
   linux_distribution="centos"
   
   if [ "${DO_BUILD_LINUX64}" == "y" ]
