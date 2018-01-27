@@ -46,7 +46,7 @@ IFS=$'\n\t'
 # In this case all prerequisites must be met by the host. For example 
 # for Ubuntu the following were needed:
 #
-# $ apt-get -y install automake cmake libtool libudev-dev patchelf bison flex texinfo texlive
+# $ apt-get -y install automake cmake libtool libudev-dev patchelf bison flex texinfo texlive pkg-config
 #
 # The GCC cross build requires several steps:
 # - build the binutils & gdb
@@ -243,7 +243,10 @@ do
       DO_BUILD_WIN64="y"
       DO_BUILD_LINUX32="y"
       DO_BUILD_LINUX64="y"
-      DO_BUILD_OSX="y"
+      if [ "$(uname)" == "Darwin" ] 
+      then
+        DO_BUILD_OSX="y"
+      fi
       shift
       ;;
 
