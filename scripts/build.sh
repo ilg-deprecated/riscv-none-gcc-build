@@ -937,7 +937,7 @@ then
   cd "${WORK_FOLDER_PATH}"
   echo
   echo "Unpacking '${LIBICONV_ARCHIVE}'..."
-  tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${LIBICONV_ARCHIVE}"
+  tar -xvf "${DOWNLOAD_FOLDER_PATH}/${LIBICONV_ARCHIVE}"
 fi
 
 # ----- Get XZ. -----
@@ -959,7 +959,7 @@ then
   cd "${WORK_FOLDER_PATH}"
   echo
   echo "Unpacking '${XZ_ARCHIVE}'..."
-  tar -xjvf "${DOWNLOAD_FOLDER_PATH}/${XZ_ARCHIVE}"
+  tar -xvf "${DOWNLOAD_FOLDER_PATH}/${XZ_ARCHIVE}"
 fi
 
 # v===========================================================================v
