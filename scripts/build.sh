@@ -2639,15 +2639,15 @@ else
 
   if [ "${DO_BUILD_WIN64}" == "y" ]
   then
-    if [ ! -f "${WORK_FOLDER_PATH}/install/${linux_distribution}64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    if [ ! -x "${WORK_FOLDER_PATH}/install/${linux_distribution}64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
-      do_host_build_target "Creating the GNU/Linux 64-bits distribution..." \
+      do_host_build_target "Creating the GNU/Linux 64-bits distribution... too..." \
         --target-os linux \
         --target-bits 64 \
         --docker-image "${docker_linux64_image}"
     fi
 
-    if [ ! -f "${WORK_FOLDER_PATH}/install/${linux_distribution}64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    if [ ! -x "${WORK_FOLDER_PATH}/install/${linux_distribution}64/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
       echo "Mandatory GNU/Linux binaries missing."
       exit 1
@@ -2675,15 +2675,15 @@ else
   # Since the actual container is a 32-bits, use the debian32 binaries.
   if [ "${DO_BUILD_WIN32}" == "y" ]
   then
-    if [ ! -f "${WORK_FOLDER_PATH}/install/${linux_distribution}32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    if [ ! -x "${WORK_FOLDER_PATH}/install/${linux_distribution}32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
-      do_host_build_target "Creating the GNU/Linux 32-bits distribution..." \
+      do_host_build_target "Creating the GNU/Linux 32-bits distribution... too..." \
         --target-os linux \
         --target-bits 32 \
         --docker-image "${docker_linux32_image}"
     fi
 
-    if [ ! -f "${WORK_FOLDER_PATH}/install/${linux_distribution}32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
+    if [ ! -x "${WORK_FOLDER_PATH}/install/${linux_distribution}32/${APP_LC_NAME}/bin/${gcc_target}-gcc" ]
     then
       echo "Mandatory GNU/Linux binaries missing."
       exit 1
