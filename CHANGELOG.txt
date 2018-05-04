@@ -1,6 +1,10 @@
 
 The changes applied to the original projects, in reverse chronological order:
 
+[2018-05-04]
+
+- update the build scripts to use XBB
+
 [2018-01-10]
 
 - v7.2.0-2-20180110 released
