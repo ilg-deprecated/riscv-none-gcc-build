@@ -401,7 +401,7 @@ else
   # ---------------------------------------------------------------------------
 fi
 
-BINUTILS_FOLDER_NAME="binutils-gdb-${BINUTILS_VERSION}"
+BINUTILS_FOLDER_NAME="binutils-${BINUTILS_VERSION}-gdb-${GDB_VERSION}"
 GCC_FOLDER_NAME="gcc-${GCC_VERSION}"
 NEWLIB_FOLDER_NAME="newlib-${NEWLIB_VERSION}"
 
