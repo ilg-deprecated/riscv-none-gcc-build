@@ -959,7 +959,7 @@ function do_gdb()
         then
           if [ "${TARGET_OS}" == "win" ]
           then
-            extra_python_opts="--with-python=${WORK_FOLDER_PATH}/${GCC_COMBO_FOLDER_NAME}/python-config.sh"
+            extra_python_opts="--with-python=${WORK_FOLDER_PATH}/build.git/scripts/python-config.sh"
           else
             extra_python_opts="--with-python=yes"
           fi
