@@ -9,9 +9,9 @@ This release closely follows the official [RISC-V distribution](https://github.c
 
 The current version is based on the following commits:
 
-- the [riscv/riscv-gcc](https://github.com/riscv/riscv-gcc) project, commit [5bf0f1d](https://github.com/gnu-mcu-eclipse/riscv-none-gcc/commit/5bf0f1db0ed4dd3e0cdd9395e7b258234ac976d9) from from Jan 8th, 2018
-- the [riscv/riscv-binutils-gdb](https://github.com/riscv/riscv-binutils-gdb) project, commit [5d812b7](https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb/commit/5d812b72c943d8cfa08d67baed73d1a64eb943e7) from Jan 9th, 2018
-- the [riscv/riscv-newlib](https://github.com/riscv/riscv-newlib) project, commit [32a3de0](https://github.com/gnu-mcu-eclipse/riscv-newlib/commit/32a3de0bba1535fc1ca0d8dfae147d1dacaf0979) from Dec 21st, 2017
+- the [riscv/riscv-gcc](https://github.com/riscv/riscv-gcc) project, branch `riscv-gcc-7.3.0`, commit [d2dfcf0](https://github.com/gnu-mcu-eclipse/riscv-none-gcc/commit/d2dfcf08212c7e8767de88c71f627396807a1cce) from from Mar 29th, 2018
+- the [riscv/riscv-binutils-gdb](https://github.com/riscv/riscv-binutils-gdb) project, branch `riscv-binutils-2.29`, commit [f60a065](https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb/commit/f60a065a25cc54169a34ed351931097a44703a5c7) from May 3rd, 2018
+- the [riscv/riscv-newlib](https://github.com/riscv/riscv-newlib) project, commit [1e50b13](https://github.com/gnu-mcu-eclipse/riscv-newlib/commit/1e50b130fe1514a96eb4dc12f4a661d14f5cf6d4) from Feb 27th, 2018
 
 ## Changes
 

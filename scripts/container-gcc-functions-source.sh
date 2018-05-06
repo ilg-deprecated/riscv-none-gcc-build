@@ -40,7 +40,6 @@ function download_gcc()
   fi
 }
 
-
 function download_newlib() 
 {
   if [ ! -d "${WORK_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}" ]
