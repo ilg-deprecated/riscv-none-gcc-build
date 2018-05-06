@@ -5,32 +5,52 @@ This is the **GNU MCU Eclipse** (formerly GNU ARM Eclipse) version of the
 
 ## Compliance
 
-This release closely follows the official [RISC-V distribution](https://github.com/riscv/riscv-gcc) maintained by [SiFive](https://www.sifive.com).
+This release closely follows the official 
+[RISC-V distribution](https://github.com/riscv/riscv-gcc) maintained by 
+[SiFive](https://www.sifive.com).
 
-The current version is based on the following commits:
+By the date of this release, the `riscv-gcc-7.3.0` branch is not yet 
+stable, thus the current version is still based on GCC 7.2, using the 
+following commits:
 
-- the [riscv/riscv-gcc](https://github.com/riscv/riscv-gcc) project, branch `riscv-gcc-7.3.0`, commit [d2dfcf0](https://github.com/gnu-mcu-eclipse/riscv-none-gcc/commit/d2dfcf08212c7e8767de88c71f627396807a1cce) from from Mar 29th, 2018
-- the [riscv/riscv-binutils-gdb](https://github.com/riscv/riscv-binutils-gdb) project, branch `riscv-binutils-2.29`, commit [f60a065](https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb/commit/f60a065a25cc54169a34ed351931097a44703a5c7) from May 3rd, 2018
-- the [riscv/riscv-newlib](https://github.com/riscv/riscv-newlib) project, commit [1e50b13](https://github.com/gnu-mcu-eclipse/riscv-newlib/commit/1e50b130fe1514a96eb4dc12f4a661d14f5cf6d4) from Feb 27th, 2018
+- the [riscv/riscv-gcc](https://github.com/riscv/riscv-gcc) project, 
+branch `riscv-gcc-7.2.0`, commit
+[36e932c](https://github.com/gnu-mcu-eclipse/riscv-none-gcc/commit/36e932c683490ddfa5225ad8d842b002a8a74ed4)
+from from Jan 16th, 2018
+- the [riscv/riscv-binutils-gdb](https://github.com/riscv/riscv-binutils-gdb) 
+project, branch `riscv-binutils-2.29`, commit 
+[f60a065](https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb/commit/f60a065a25cc54169a34ed351931097a44703a5c)
+from May 3rd, 2018
+- the [riscv/riscv-newlib](https://github.com/riscv/riscv-newlib) project,
+commit [1e50b13](https://github.com/gnu-mcu-eclipse/riscv-newlib/commit/1e50b130fe1514a96eb4dc12f4a661d14f5cf6d4)
+from Feb 27th, 2018
 
 ## Changes
 
-Compared to the original RISC-V version, the **same architecture and API** options are supported, and there are minimal functional changes 
+Compared to the original RISC-V version, the **same architecture and API** 
+options are supported, and there are minimal functional changes 
 
 * newlib-nano is supported
 * `march=rv32imaf/mabi=ilp32f` was added to the list of multilibs
 
 ## newlib-nano
 
-The only notable addition is support for **newlib-nano**, using the `--specs=nano.specs` option. For better results, this option must be added to both compile and link time (the next release of the GNU MCU Eclipse plug-ins will add support for this).
+The only notable addition is support for **newlib-nano**, using the 
+`--specs=nano.specs` option. For better results, this option must be 
+added to both compile and link time (the next release of the GNU MCU 
+Eclipse plug-ins will add support for this).
 
-If no syscalls are needed, `--specs=nosys.specs` can be used at link time to provide empty implementations for the POSIX system calls.
+If no syscalls are needed, `--specs=nosys.specs` can be used at link 
+time to provide empty implementations for the POSIX system calls.
 
-The _nano_ versions of the libraries are compiled with `-Os -mcmodel=medlow`, while the regular versions are compiled with `-O2 -mcmodel=medany`.
+The _nano_ versions of the libraries are compiled with 
+`-Os -mcmodel=medlow`, while the regular versions are compiled with 
+`-O2 -mcmodel=medany`.
 
 ## Documentation
 
-Another addition compared to the SiFive distribution is the presence of the documentation, including the PDF manuals for all tools.
+Another addition compared to the SiFive distribution is the presence 
+of the documentation, including the PDF manuals for all tools.
 
 ## More info
 

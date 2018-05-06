@@ -276,7 +276,7 @@ NEWLIB_PROJECT_NAME="riscv-newlib"
 MULTILIB_FLAGS=""
 
 # Keep them in sync with combo archive content.
-if [[ "${RELEASE_VERSION}" =~ 7\.2\.0-* ]]
+if [[ "${RELEASE_VERSION}" =~ 7\.2\.0-3-* ]]
 then
 
   # ---------------------------------------------------------------------------
@@ -303,7 +303,7 @@ then
   if [ "${USE_GITS}" != "y" ]
   then
 
-    GH_RELEASE="7.2.0-2-20180110"
+    GH_RELEASE="7.2.0-3-20180506"
     BINUTILS_GH_RELEASE=${BINUTILS_GH_RELEASE:-"${GH_RELEASE}"}
     GCC_GH_RELEASE=${GCC_GH_RELEASE:-"${GH_RELEASE}"}
     NEWLIB_GH_RELEASE=${NEWLIB_GH_RELEASE:-"${GH_RELEASE}"}
@@ -312,13 +312,13 @@ then
 
     BINUTILS_GIT_BRANCH=${BINUTILS_GIT_BRANCH:-"riscv-binutils-2.29-gme"}
     # June 17, 2017
-    BINUTILS_GIT_COMMIT=${BINUTILS_GIT_COMMIT:-"6ec8666647037cd61536b59ee4bdc731af75f6e6"}
+    BINUTILS_GIT_COMMIT=${BINUTILS_GIT_COMMIT:-"a8d8cd7ff85a945b30ddd484a4d7592af3ed8fbb"}
 
     GCC_GIT_BRANCH=${GCC_GIT_BRANCH:-"riscv-gcc-7.2.0-gme"}
-    GCC_GIT_COMMIT=${GCC_GIT_COMMIT:-"ab6b9b49de587375797fc0a587bc1d42d270584f"}
+    GCC_GIT_COMMIT=${GCC_GIT_COMMIT:-"ea82ccadd6c4906985249c52009deddc6b623b16"}
 
     NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0-gme"}
-    NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"edc15ed0a7fb342e8832967a50483f1b157b388b"}
+    NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"325bec1e33fb0a1c30ce5a9aeeadd623f559ef1a"}
 
   fi
   
@@ -339,6 +339,8 @@ then
   # ---------------------------------------------------------------------------
 elif [[ "${RELEASE_VERSION}" =~ 7\.3\.0-* ]]
 then
+
+  # WARNING: Experimental, do not use for releases!
 
   # ---------------------------------------------------------------------------
 
