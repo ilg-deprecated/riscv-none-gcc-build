@@ -3,12 +3,16 @@
 These are the scripts and additional files required to build the 
 [GNU MCU Eclipse RISC-V Embedded GCC](https://github.com/gnu-mcu-eclipse/riscv-gcc).
 
-This release closely follows the official 
+This release follows the official 
 [RISC-V distribution](https://github.com/riscv/riscv-gcc) maintained by 
-[SiFive](https://www.sifive.com).
+[SiFive](https://www.sifive.com), as part of the 
+[riscv/riscv-gnu-toolchain](https://github.com/riscv/riscv-gnu-toolchain)
+project.
 
-The current version is based on project 
-[riscv/riscv-gnu-toolchain](https://github.com/riscv/riscv-gnu-toolchain).
+The build scripts use the 
+[xPack Build Box (XBB)](https://github.com/xpack/xpack-build-box), 
+a set of elaborate build environments based on GCC 7.2 (Docker containers
+for GNU/Linux and Windows or a custom HomeBrew for MacOS).
 
 ## Changes
 
@@ -30,6 +34,12 @@ The _nano_ versions of the libraries are compiled with
 `-Os -mcmodel=medlow`, while the regular versions are compiled with 
 `-O2 -mcmodel=medany`.
 
+### gdb-py
+
+Similarly to the ARM binary distribution, a separate version GDB with
+Python support was added. To run it, a functional Python must be 
+available.
+
 ### Documentation
 
 Another addition compared to the SiFive distribution is the presence of 
@@ -39,13 +49,19 @@ the documentation, including the PDF manuals for all tools.
 
 ### Prerequisites
 
-The prerequisites are common to all binary builds. Please follow the instructions in the separate [Prerequisites for building binaries](https://gnu-mcu-eclipse.github.io/developer/build-binaries-prerequisites-xbb/) page and return when ready.
+The prerequisites are common to all binary builds. Please follow the 
+instructions in the separate 
+[Prerequisites for building binaries](https://gnu-mcu-eclipse.github.io/developer/build-binaries-prerequisites-xbb/) 
+page and return when ready.
 
 ### Download the build scripts repo
 
-The build script is available from GitHub and can be [viewed online](https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build/blob/master/scripts/build.sh).
+The build script is available from GitHub and can be 
+[viewed online](https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build/blob/master/scripts/build.sh).
 
-To download it, clone the [gnu-mcu-eclipse/riscv-none-gcc-build](https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build) Git repo, including submodules. 
+To download it, clone the 
+[gnu-mcu-eclipse/riscv-none-gcc-build](https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build) 
+Git repo, including submodules. 
 
 ```console
 $ rm -rf ~/Downloads/riscv-none-gcc-build.git
@@ -55,13 +71,18 @@ $ git clone --recurse-submodules https://github.com/gnu-mcu-eclipse/riscv-none-g
 
 ### Check the script
 
-The script creates a temporary build `Work/riscv-none-gcc-${version}` folder in the user home. Although not recommended, if for any reasons you need to change this, you can redefine `WORK_FOLDER_PATH` variable before invoking the script.
+The script creates a temporary build `Work/riscv-none-gcc-${version}` folder 
+in the user home. Although not recommended, if for any reasons you need to 
+change this, you can redefine `WORK_FOLDER_PATH` variable before invoking 
+the script.
 
 ### Preload the Docker images
 
-Docker does not require to explicitly download new images, but does this automatically at first use.
+Docker does not require to explicitly download new images, but does this 
+automatically at first use.
 
-However, since the images used for this build are relatively large, it is recommended to load them explicitly before starting the build:
+However, since the images used for this build are relatively large, it is 
+recommended to load them explicitly before starting the build:
 
 ```console
 $ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh preload-images
@@ -79,7 +100,9 @@ hello-world         latest              f2a91732366c        2 months ago        
 
 ### Update git repos
 
-The GNU MCU Eclipse RISC-V GCC is generally following the official [RISC-V releases](https://github.com/riscv/riscv-gnu-toolchain/releases), with as little differences as possible.
+The GNU MCU Eclipse RISC-V GCC is generally following the official 
+[RISC-V releases](https://github.com/riscv/riscv-gnu-toolchain/releases), 
+with as little differences as possible.
 
 The procedure is to first merge the remote branches to the local branches.
 
@@ -95,9 +118,12 @@ After merging the remote branches, merge the result into the `-gme` branch.
 
 ### Prepare release
 
-To prepare a new release, first determine the GCC version (like `7.2.0`) and update the `scripts/VERSION` file. The format is `7.2.0-3`. The fourth digit is the GNU MCU Eclipse release number of this version.
+To prepare a new release, first determine the GCC version (like `7.2.0`) 
+and update the `scripts/VERSION` file. The format is `7.2.0-3`. The 
+fourth digit is the GNU MCU Eclipse release number of this version.
 
-Add a new set of definitions in the `scripts/container-build.sh`, with the versions of various components.
+Add a new set of definitions in the `scripts/container-build.sh`, with the 
+versions of various components.
 
 ### Update CHANGELOG.txt
 
@@ -105,11 +131,15 @@ Check `riscv-none-gcc-build.git/CHANGELOG.txt` and add the new release.
 
 ### Build
 
-Although it is perfectly possible to build all binaries in a single step on a macOS system, due to Docker specifics, it is faster to build the GNU/Linux and Windows binaries on a GNU/Linux system and the macOS binary separately.
+Although it is perfectly possible to build all binaries in a single step on 
+a macOS system, due to Docker specifics, it is faster to build the GNU/Linux 
+and Windows binaries on a GNU/Linux system and the macOS binary separately.
 
 #### Build the GNU/Linux and Windows binaries
 
-The current platform for GNU/Linux and Windows production builds is an Ubuntu 17.10 VirtualBox image running on a macMini with 16 GB of RAM and a fast SSD.
+The current platform for GNU/Linux and Windows production builds is an 
+Ubuntu 17.10 VirtualBox image running on a macMini with 16 GB of RAM and 
+a fast SSD.
 
 Before starting a multi-platform build, check if Docker is started:
 
@@ -117,7 +147,9 @@ Before starting a multi-platform build, check if Docker is started:
 $ docker info
 ```
 
-To build both the 32/64-bits Windows and GNU/Linux versions, use `--all`; to build selectively, use `--linux64 --win64` or `--linux32 --win32` (GNU/Linux can be built alone; Windows also requires the GNU/Linux build).
+To build both the 32/64-bits Windows and GNU/Linux versions, use `--all`; 
+to build selectively, use `--linux64 --win64` or `--linux32 --win32` 
+(GNU/Linux can be built alone; Windows also requires the GNU/Linux build).
 
 ```console
 $ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --all
@@ -129,7 +161,8 @@ To build one of the previous versions:
 $ RELEASE_VERSION=7.2.0-3 bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --all
 ```
 
-Several hours later, the output of the build script is a set of 4 files and their SHA signatures, created in the `deploy` folder:
+Several hours later, the output of the build script is a set of 4 files 
+and their SHA signatures, created in the `deploy` folder:
 
 ```console
 $ ls -l deploy
@@ -144,7 +177,8 @@ total 495652
 -rw-r--r-- 1 ilg ilg       129 May  7 12:04 gnu-mcu-eclipse-riscv-none-gcc-7.2.0-3-20180506-1300-win64.zip.sha
 ```
 
-To copy the files from the build machine to the current development machine, open the `deploy` folder in a terminal and use `scp`:
+To copy the files from the build machine to the current development machine, 
+open the `deploy` folder in a terminal and use `scp`:
 
 ```console
 $ cd ${HOME}/Work/riscv-none-gcc-7.2.0-3/deploy
@@ -153,7 +187,8 @@ $ scp * ilg@ilg-mbp.local:Downloads
 
 #### Build the macOS binary
 
-The current platform for macOS production builds is a macOS 10.10.5 VirtualBox image running on the same macMini with 16 GB of RAM and a fast SSD.
+The current platform for macOS production builds is a macOS 10.10.5 
+VirtualBox image running on the same macMini with 16 GB of RAM and a fast SSD.
 
 To build the latest macOS version, with the same timestamp as the previous build:
 
@@ -167,9 +202,11 @@ To build one of the previous macOS versions:
 $ RELEASE_VERSION=7.2.0-3 caffeinate bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --osx --date YYYYMMDD-HHMM
 ```
 
-For consistency reasons, the date should be the same as the GNU/Linux and Windows builds.
+For consistency reasons, the date should be the same as the GNU/Linux 
+and Windows builds.
 
-Several hours later, the output of the build script is a compressed archive and its SHA signature, created in the `deploy` folder:
+Several hours later, the output of the build script is a compressed 
+archive and its SHA signature, created in the `deploy` folder:
 
 ```console
 $ ls -l deploy
@@ -178,7 +215,8 @@ total 238824
 -rw-r--r--  1 ilg  staff        129 May  7 01:36 gnu-mcu-eclipse-riscv-none-gcc-7.2.0-3-20180506-1300-macos.tgz.sha
 ```
 
-To copy the files from the build machine to the current development machine, open the `deploy` folder in a terminal and use `scp`:
+To copy the files from the build machine to the current development 
+machine, open the `deploy` folder in a terminal and use `scp`:
 
 ```console
 $ cd ${HOME}/Work/riscv-none-gcc-7.2.0-3/deploy
@@ -195,7 +233,10 @@ Instead of `--all`, you can use any combination of:
 --win32 --win64 --linux32 --linux64
 ```
 
-Please note that, due to the specifics of the GCC build process, the Windows build requires the corresponding GNU/Linux build, so `--win32` alone is equivalent to `--linux32 --win32` and `--win64` alone is equivalent to `--linux64 --win64`.
+Please note that, due to the specifics of the GCC build process, 
+the Windows build requires the corresponding GNU/Linux build, so `--win32` 
+alone is equivalent to `--linux32 --win32` and `--win64` alone is 
+equivalent to `--linux64 --win64`.
 
 #### clean
 
@@ -215,23 +256,33 @@ For production builds it is recommended to completely remove the build folder.
 
 #### --develop
 
-For performance reasons, the actual build folders are internal to each Docker run, and are not persistent. This gives the best speed, but has the disadvantage that interrupted builds cannot be resumed.
+For performance reasons, the actual build folders are internal to each 
+Docker run, and are not persistent. This gives the best speed, but has 
+the disadvantage that interrupted builds cannot be resumed.
 
-For development builds, it is possible to define the build folders in the host file system, and resume an interrupted build.
+For development builds, it is possible to define the build folders in 
+the host file system, and resume an interrupted build.
 
 #### --debug
 
-For development builds, it is also possible to create everything with `-g -O0` and be able to run debug sessions.
+For development builds, it is also possible to create everything with 
+`-g -O0` and be able to run debug sessions.
 
 #### Interrupted builds
 
-The Docker scripts run with root privileges. This is generally not a problem, since at the end of the script the output files are reassigned to the actual user.
+The Docker scripts run with root privileges. This is generally not a 
+problem, since at the end of the script the output files are reassigned 
+to the actual user.
 
-However, for an interrupted build, this step is skipped, and files in the install folder will remain owned by root. Thus, before removing the build folder, it might be necessary to run a recursive `chown`.
+However, for an interrupted build, this step is skipped, and files in 
+the install folder will remain owned by root. Thus, before removing 
+the build folder, it might be necessary to run a recursive `chown`.
 
 ## Install
 
-The procedure to install GNU MCU Eclipse RISC-V Embedded GCC is platform specific, but relatively straight forward (a .zip archive on Windows, a compressed tar archive on macOS and GNU/Linux).
+The procedure to install GNU MCU Eclipse RISC-V Embedded GCC is platform 
+specific, but relatively straight forward (a .zip archive on Windows, 
+a compressed tar archive on macOS and GNU/Linux).
 
 A portable method is to use [`xpm`](https://www.npmjs.com/package/xpm):
 
@@ -239,9 +290,12 @@ A portable method is to use [`xpm`](https://www.npmjs.com/package/xpm):
 $ xpm install @gnu-mcu-eclipse/riscv-none-gcc --global
 ```
 
-More details are available on the [How to install the RISC-V toolchain?](https://gnu-mcu-eclipse.github.io/toolchain/riscv/install/) page.
+More details are available on the 
+[How to install the RISC-V toolchain?](https://gnu-mcu-eclipse.github.io/toolchain/riscv/install/) 
+page.
 
-After install, the package should create a structure like this (only the first two depth levels are shown):
+After install, the package should create a structure like this (only 
+the first two depth levels are shown):
 
 ```console
 $ tree -L 2 /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1/.content/
@@ -306,13 +360,17 @@ No other files are installed in any system folders or other locations.
 
 ## Uninstall
 
-The binaries are distributed as portable archives; thus they do not need to run a setup and do not require an uninstall.
+The binaries are distributed as portable archives; thus they do not need 
+to run a setup and do not require an uninstall.
 
 ## Test
 
-A simple test is performed by the script at the end, by launching the executable to check if all shared/dynamic libraries are correctly used.
+A simple test is performed by the script at the end, by launching the 
+executable to check if all shared/dynamic libraries are correctly used.
 
-For a true test you need to first install the package and then run the program from the final location. For example on macOS the output should look like:
+For a true test you need to first install the package and then run the 
+program from the final location. For example on macOS the output should 
+look like:
 
 ```console
 $ /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1/.content/bin/riscv-none-embed-gcc --version
@@ -321,4 +379,9 @@ riscv-none-embed-gcc (GNU MCU Eclipse RISC-V Embedded GCC, 64-bits) 7.2.0
 
 ## More build details
 
-The build process is split into several scripts. The build starts on the host, with `build.sh`, which runs `container-build.sh` several times, once for each target, in one of the two docker containers. Both scripts include several other helper scripts. The entire process is quite complex, and an attempt to explain its functionality in a few words would not be realistic. Thus, the authoritative source of details remains the source code.
+The build process is split into several scripts. The build starts on 
+the host, with `build.sh`, which runs `container-build.sh` several times, 
+once for each target, in one of the two docker containers. Both scripts 
+include several other helper scripts. The entire process is quite complex, 
+and an attempt to explain its functionality in a few words would not be 
+realistic. Thus, the authoritative source of details remains the source code.
