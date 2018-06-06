@@ -339,6 +339,67 @@ then
   PYTHON_WIN_VERSION="2.7.13"
 
   # ---------------------------------------------------------------------------
+elif [[ "${RELEASE_VERSION}" =~ 7\.2\.0-4-* ]]
+then
+
+  # ---------------------------------------------------------------------------
+
+  # The default is:
+  # rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--
+  # Add 'rv32imaf-ilp32f--'. 
+  GCC_MULTILIB=(rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--)
+
+  GCC_MULTILIB_FILE=${GCC_MULTILIB_FILE:-"t-elf-multilib"}
+
+  # ---------------------------------------------------------------------------
+
+  BINUTILS_VERSION="2.29"
+  # From gcc/BASE_VER
+  GCC_VERSION="7.2.0"
+  # From newlib/configure, VERSION=
+  NEWLIB_VERSION="2.5.0"
+  # From gdb/VERSION.in
+  GDB_VERSION="8.0"
+
+  # ---------------------------------------------------------------------------
+
+  if [ "${USE_GITS}" != "y" ]
+  then
+
+    GH_RELEASE="7.2.0-4-20180606"
+    BINUTILS_GH_RELEASE=${BINUTILS_GH_RELEASE:-"${GH_RELEASE}"}
+    GCC_GH_RELEASE=${GCC_GH_RELEASE:-"${GH_RELEASE}"}
+    NEWLIB_GH_RELEASE=${NEWLIB_GH_RELEASE:-"${GH_RELEASE}"}
+
+  else
+
+    BINUTILS_GIT_BRANCH=${BINUTILS_GIT_BRANCH:-"riscv-binutils-2.29-gme"}
+    # June 17, 2017
+    BINUTILS_GIT_COMMIT=${BINUTILS_GIT_COMMIT:-"a8d8cd7ff85a945b30ddd484a4d7592af3ed8fbb"}
+
+    GCC_GIT_BRANCH=${GCC_GIT_BRANCH:-"riscv-gcc-7.2.0-gme"}
+    GCC_GIT_COMMIT=${GCC_GIT_COMMIT:-"ea82ccadd6c4906985249c52009deddc6b623b16"}
+
+    NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0-gme"}
+    NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"325bec1e33fb0a1c30ce5a9aeeadd623f559ef1a"}
+
+  fi
+  
+  # ---------------------------------------------------------------------------
+
+  ZLIB_VERSION="1.2.8"
+  GMP_VERSION="6.1.2"
+  MPFR_VERSION="3.1.6"
+  MPC_VERSION="1.0.3"
+  ISL_VERSION="0.18"
+  LIBELF_VERSION="0.8.13"
+  EXPAT_VERSION="2.2.5"
+  LIBICONV_VERSION="1.15"
+  XZ_VERSION="5.2.3"
+
+  PYTHON_WIN_VERSION="2.7.13"
+
+  # ---------------------------------------------------------------------------
 elif [[ "${RELEASE_VERSION}" =~ 7\.3\.0-* ]]
 then
 
