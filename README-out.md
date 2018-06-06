@@ -50,6 +50,23 @@ The libraries are compiled with `-O2 -mcmodel=medany`.
 Another addition compared to the SiFive distribution is the presence 
 of the documentation, including the PDF manuals for all tools.
 
+## Support
+
+For issues related to the procedure used to build the 
+GNU MCU Eclipse RISC-V Embedded GCC binaries, please report them via 
+[gnu-mcu-eclipse/riscv-none-gcc-build GitHub Issues](https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build/issues).
+
+For issues related to the xPack used to install the binaries, 
+please report them via
+[gnu-mcu-eclipse/riscv-none-gcc-xpack GitHub issues](https://github.com/gnu-mcu-eclipse/riscv-none-gcc-xpack/issues).
+
+For issues related to the toolchain functionality (compiler, newlib
+gdb, etc) please report them via their original RISC-V projects:
+
+- [riscv/riscv-gcc](https://github.com/riscv/riscv-gcc/issues)
+- [riscv/riscv-newlib](https://github.com/riscv/riscv-newlib/issues)
+- [riscv/riscv-binutils-gdb](https://github.com/riscv/riscv-binutils-gdb/issues)
+
 ## More info
 
 For more info and support, please see the GNU MCU Eclipse project pages from:
