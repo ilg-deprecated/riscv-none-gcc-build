@@ -1203,7 +1203,7 @@ function copy_gme_files()
   echo "Copying GME files..."
 
   cd "${WORK_FOLDER_PATH}"/build.git
-  /usr/bin/install -v -c -m 644 "README-out.md" \
+  /usr/bin/install -v -c -m 644 "README-${RELEASE_VERSION}.md" \
     "${APP_PREFIX}"/README.md
 }
 
