@@ -268,6 +268,8 @@ APP_PREFIX_NANO="${INSTALL_FOLDER_PATH}/${APP_LC_NAME}"-nano
 # bfdver.h file remains empty.
 BRANDING="${BRANDING}\x2C ${TARGET_BITS}-bits"
 CFLAGS_OPTIMIZATIONS_FOR_TARGET="-ffunction-sections -fdata-sections -O2"
+# Cannot use medlow with 64 bits, so all must be medany.
+CFLAGS_OPTIMIZATIONS_FOR_TARGET+=" -mcmodel=medany"
 
 BINUTILS_PROJECT_NAME="riscv-binutils-gdb"
 GCC_PROJECT_NAME="riscv-none-gcc"
