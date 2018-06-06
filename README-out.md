@@ -43,9 +43,7 @@ Eclipse plug-ins will add support for this).
 If no syscalls are needed, `--specs=nosys.specs` can be used at link 
 time to provide empty implementations for the POSIX system calls.
 
-The _nano_ versions of the libraries are compiled with 
-`-Os -mcmodel=medlow`, while the regular versions are compiled with 
-`-O2 -mcmodel=medany`.
+The libraries are compiled with `-O2 -mcmodel=medany`.
 
 ## Documentation
 
