@@ -1,6 +1,11 @@
 
 The changes applied to the original projects, in reverse chronological order:
 
+[2018-06-06]
+
+- v7.2.0-4-20180606 released
+- add -mcmodel=medany, lost during updates
+
 [2018-05-06]
 
 - v7.2.0-3-20180506 released
