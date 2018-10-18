@@ -472,6 +472,71 @@ then
   PYTHON_WIN_VERSION="2.7.13"
 
   # ---------------------------------------------------------------------------
+elif [[ "${RELEASE_VERSION}" =~ 8\.1\.0-2-* ]]
+then
+  # This is similar to SiFive 20180928 release. (8.1.0-1 was 20180629, skipped)
+  # ---------------------------------------------------------------------------
+
+  # The default is:
+  # rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--
+  # Add 'rv32imaf-ilp32f--'. 
+  GCC_MULTILIB=(rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--)
+
+  GCC_MULTILIB_FILE=${GCC_MULTILIB_FILE:-"t-elf-multilib"}
+
+  # ---------------------------------------------------------------------------
+
+  BINUTILS_VERSION="2.30"
+  # From gcc/BASE_VER
+  GCC_VERSION="8.1.0"
+  # From newlib/configure, VERSION=
+  NEWLIB_VERSION="3.0.0"
+  # From gdb/VERSION.in
+  GDB_VERSION="8.2"
+
+  # ---------------------------------------------------------------------------
+
+  if [ "${USE_GITS}" != "y" ]
+  then
+
+    GH_RELEASE="8.1.0-2-201810xx"
+    BINUTILS_GH_RELEASE=${BINUTILS_GH_RELEASE:-"${GH_RELEASE}"}
+    GCC_GH_RELEASE=${GCC_GH_RELEASE:-"${GH_RELEASE}"}
+    NEWLIB_GH_RELEASE=${NEWLIB_GH_RELEASE:-"${GH_RELEASE}"}
+
+  else
+
+    BINUTILS_GIT_BRANCH=${BINUTILS_GIT_BRANCH:-"riscv-binutils-2.30-gme"}
+    # Oct 17, 2018
+    BINUTILS_GIT_COMMIT=${BINUTILS_GIT_COMMIT:-"983075b97fb5e80ae26ac57410245e642f222bda"}
+
+    GCC_GIT_BRANCH=${GCC_GIT_BRANCH:-"riscv-gcc-8.1.0-gme"}
+    GCC_GIT_COMMIT=${GCC_GIT_COMMIT:-"151e02a6d1627f2aabb41e046295ecff387f64f3"}
+
+    NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-3.0.0-gme"}
+    NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"a6facff93404099561e7d7d5cd6bb37e4a1b698c"}
+
+    GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"gnu-gdb-gme"}
+    GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"ed0b2b7e2a7ef074b6e08a7035abab539a3bab3d"}
+
+  fi
+  
+
+  # ---------------------------------------------------------------------------
+
+  ZLIB_VERSION="1.2.8"
+  GMP_VERSION="6.1.2"
+  MPFR_VERSION="3.1.6"
+  MPC_VERSION="1.0.3"
+  ISL_VERSION="0.18"
+  LIBELF_VERSION="0.8.13"
+  EXPAT_VERSION="2.2.5"
+  LIBICONV_VERSION="1.15"
+  XZ_VERSION="5.2.3"
+
+  PYTHON_WIN_VERSION="2.7.13"
+
+  # ---------------------------------------------------------------------------
 else
   echo "Unsupported version ${RELEASE_VERSION}."
   exit 1
@@ -506,6 +571,10 @@ then
   NEWLIB_ARCHIVE_URL=${NEWLIB_ARCHIVE_URL:-"https://github.com/gnu-mcu-eclipse/${NEWLIB_PROJECT_NAME}/archive/v${NEWLIB_GH_RELEASE}.tar.gz"}
 
   NEWLIB_GIT_URL=""
+
+  # ---------------------------------------------------------------------------
+
+  # Possibly add GDB arhive.
 
   # ---------------------------------------------------------------------------
 else

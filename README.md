@@ -106,9 +106,9 @@ The procedure is to first merge the remote branches to the local branches.
 
 Currently, the following branches are used
 
-* `riscv-gcc-7.2.0`
-* `riscv-newlib-2.5.0`
-* `riscv-binutils-2.29`
+* `riscv-gcc-8.1.0`
+* `riscv-newlib-3.0.0`
+* `riscv-binutils-2.30`
 
 The GNU MCU Eclipse branches have similar names, but suffixed with `-gme`.
 
