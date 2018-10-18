@@ -145,7 +145,7 @@ Before starting a multi-platform build, check if Docker is started:
 $ docker info
 ```
 
-To build both the 32/64-bits Windows and GNU/Linux versions, use `--all`; 
+To build both the 32/64-bit Windows and GNU/Linux versions, use `--all`; 
 to build selectively, use `--linux64 --win64` or `--linux32 --win32` 
 (GNU/Linux can be built alone; Windows also requires the GNU/Linux build).
 
@@ -372,7 +372,7 @@ look like:
 
 ```console
 $ /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1/.content/bin/riscv-none-embed-gcc --version
-riscv-none-embed-gcc (GNU MCU Eclipse RISC-V Embedded GCC, 64-bits) 7.2.0
+riscv-none-embed-gcc (GNU MCU Eclipse RISC-V Embedded GCC, 64-bit) 7.2.0
 ```
 
 ## Support

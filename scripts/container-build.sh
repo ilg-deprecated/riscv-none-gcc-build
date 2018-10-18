@@ -266,7 +266,7 @@ APP_PREFIX_NANO="${INSTALL_FOLDER_PATH}/${APP_LC_NAME}"-nano
 # The \x2C is a comma in hex; without this trick the regular expression
 # that processes this string in the Makefile, silently fails and the 
 # bfdver.h file remains empty.
-BRANDING="${BRANDING}\x2C ${TARGET_BITS}-bits"
+BRANDING="${BRANDING}\x2C ${TARGET_BITS}-bit"
 CFLAGS_OPTIMIZATIONS_FOR_TARGET="-ffunction-sections -fdata-sections -O2"
 # Cannot use medlow with 64 bits, so all must be medany.
 CFLAGS_OPTIMIZATIONS_FOR_TARGET+=" -mcmodel=medany"
