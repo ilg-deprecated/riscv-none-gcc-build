@@ -322,6 +322,7 @@ then
     NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0-gme"}
     NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"325bec1e33fb0a1c30ce5a9aeeadd623f559ef1a"}
 
+    GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"${BINUTILS_PROJECT_NAME}.git"}
     GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"${BINUTILS_GIT_BRANCH}"}
     GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"${BINUTILS_GIT_COMMIT}"}
 
@@ -386,6 +387,7 @@ then
     NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0-gme"}
     NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"325bec1e33fb0a1c30ce5a9aeeadd623f559ef1a"}
 
+    GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"${BINUTILS_PROJECT_NAME}.git"}
     GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"${BINUTILS_GIT_BRANCH}"}
     GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"${BINUTILS_GIT_COMMIT}"}
 
@@ -452,6 +454,7 @@ then
     NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0-gme"}
     NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"325bec1e33fb0a1c30ce5a9aeeadd623f559ef1a"}
 
+    GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"${BINUTILS_PROJECT_NAME}.git"}
     GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"${BINUTILS_GIT_BRANCH}"}
     GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"${BINUTILS_GIT_COMMIT}"}
 
@@ -516,6 +519,7 @@ then
     NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-3.0.0-gme"}
     NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"a6facff93404099561e7d7d5cd6bb37e4a1b698c"}
 
+    GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"binutils-gdb.git"}
     GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"gnu-gdb-gme"}
     GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"ed0b2b7e2a7ef074b6e08a7035abab539a3bab3d"}
 
@@ -604,14 +608,8 @@ else
 
   # ---------------------------------------------------------------------------
 
-  if [ -n "${GDB_GIT_COMMIT+x}" ]
-  then
-    # Separate GDB sources.
-    GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"binutils-gdb.git"}
-  else
-    # Old case, no separate GDB sources, use the ones in binutils.
-    GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"${BINUTILS_SRC_FOLDER_NAME}"}
-  fi
+  # Pre 8.x builds define it to reuse the binutils repo.
+  GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"binutils-gdb.git"}
 
   GDB_GIT_URL=${GDB_GIT_URL:-"https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb.git"}
 
@@ -623,10 +621,10 @@ fi
 # -----------------------------------------------------------------------------
 
 
-BINUTILS_FOLDER_NAME="binutils-${BINUTILS_VERSION}-gdb-${GDB_VERSION}"
+BINUTILS_FOLDER_NAME="binutils-${BINUTILS_VERSION}"
 GCC_FOLDER_NAME="gcc-${GCC_VERSION}"
 NEWLIB_FOLDER_NAME="newlib-${NEWLIB_VERSION}"
-GDB_FOLDER_NAME="${BINUTILS_FOLDER_NAME}"
+GDB_FOLDER_NAME="gdb-${GDB_VERSION}"
 
 # Note: The 5.x build failed with various messages.
 

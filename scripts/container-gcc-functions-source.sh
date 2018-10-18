@@ -916,7 +916,7 @@ function do_gcc_final()
 # $1="" or $1="-py"
 function do_gdb()
 {
-  local gdb_folder_name="${GDB_FOLDER_NAME}/gdb$1"
+  local gdb_folder_name="${GDB_FOLDER_NAME}$1"
   local gdb_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-gdb$1-installed"
 
   if [ ! -f "${gdb_stamp_file_path}" ]
@@ -942,7 +942,7 @@ function do_gdb()
         echo
         echo "Running gdb$1 configure..."
       
-        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/gdb/configure" --help
+        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" --help
 
         export GCC_WARN_CFLAGS="-Wno-implicit-function-declaration -Wno-parentheses -Wno-format -Wno-deprecated-declarations -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-int-in-bool-context -Wno-format-nonliteral -Wno-misleading-indentation"
         export GCC_WARN_CXXFLAGS="-Wno-deprecated-declarations"
@@ -964,7 +964,7 @@ function do_gdb()
           fi
         fi
 
-        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/gdb/configure" \
+        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" \
           --prefix="${APP_PREFIX}"  \
           --infodir="${APP_PREFIX_DOC}/info" \
           --mandir="${APP_PREFIX_DOC}/man" \
@@ -1029,14 +1029,6 @@ function do_gdb()
           fi
           
         fi
-
-      if [ "${TARGET_OS}" == "macos" ]
-      then
-        change_dylib "libstdc++.6.dylib" "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1"
-        change_dylib "libgcc_s.1.dylib" "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1"
-
-        change_dylib "libgcc_s.1.dylib" "${APP_PREFIX}/bin/libstdc++.6.dylib"        
-      fi
 
       ) | tee "${INSTALL_FOLDER_PATH}/make-gdb$1-output.txt"
     )
@@ -1186,7 +1178,7 @@ function copy_gme_files()
 
   copy_license \
     "${WORK_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}" \
-    "binutils-${BINUTILS_VERSION}"
+    "${BINUTILS_FOLDER_NAME}"
   copy_license \
     "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}" \
     "${GCC_FOLDER_NAME}"
@@ -1195,7 +1187,7 @@ function copy_gme_files()
     "${NEWLIB_FOLDER_NAME}"
   copy_license \
     "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}"/gdb \
-    "gdb-${GDB_VERSION}"
+    "${GDB_FOLDER_NAME}"
 
   copy_build_files
 
