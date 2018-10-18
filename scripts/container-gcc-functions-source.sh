@@ -60,17 +60,17 @@ function download_newlib()
 function download_gdb() 
 {
   # Same package as binutils.
-  if [ ! -d "${WORK_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}" ]
+  if [ ! -d "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}" ]
   then
     cd "${WORK_FOLDER_PATH}"
-    if [ -n "${BINUTILS_GIT_URL}" ]
+    if [ -n "${GDB_GIT_URL}" ]
     then
-      git_clone "${BINUTILS_GIT_URL}" "${BINUTILS_GIT_BRANCH}" \
-        "${BINUTILS_GIT_COMMIT}" "${BINUTILS_SRC_FOLDER_NAME}"
-    elif [ -n "${BINUTILS_ARCHIVE_URL}" ]
+      git_clone "${GDB_GIT_URL}" "${GDB_GIT_BRANCH}" \
+        "${GDB_GIT_COMMIT}" "${GDB_SRC_FOLDER_NAME}"
+    elif [ -n "${GDB_ARCHIVE_URL}" ]
     then
-      download_and_extract "${BINUTILS_ARCHIVE_URL}" \
-        "${BINUTILS_ARCHIVE_NAME}" "${BINUTILS_SRC_FOLDER_NAME}"
+      download_and_extract "${GDB_ARCHIVE_URL}" \
+        "${GDB_ARCHIVE_NAME}" "${GDB_SRC_FOLDER_NAME}"
     fi
   fi
 }
@@ -916,7 +916,7 @@ function do_gcc_final()
 # $1="" or $1="-py"
 function do_gdb()
 {
-  local gdb_folder_name="${GDB_FOLDER_NAME}$1"
+  local gdb_folder_name="${GDB_FOLDER_NAME}/gdb$1"
   local gdb_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-gdb$1-installed"
 
   if [ ! -f "${gdb_stamp_file_path}" ]
@@ -942,7 +942,7 @@ function do_gdb()
         echo
         echo "Running gdb$1 configure..."
       
-        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" --help
+        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/gdb/configure" --help
 
         export GCC_WARN_CFLAGS="-Wno-implicit-function-declaration -Wno-parentheses -Wno-format -Wno-deprecated-declarations -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-int-in-bool-context -Wno-format-nonliteral -Wno-misleading-indentation"
         export GCC_WARN_CXXFLAGS="-Wno-deprecated-declarations"
@@ -964,7 +964,7 @@ function do_gdb()
           fi
         fi
 
-        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" \
+        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/gdb/configure" \
           --prefix="${APP_PREFIX}"  \
           --infodir="${APP_PREFIX_DOC}/info" \
           --mandir="${APP_PREFIX_DOC}/man" \
@@ -1186,7 +1186,7 @@ function copy_gme_files()
 
   copy_license \
     "${WORK_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}" \
-    "${BINUTILS_FOLDER_NAME}"
+    "binutils-${BINUTILS_VERSION}"
   copy_license \
     "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}" \
     "${GCC_FOLDER_NAME}"
@@ -1194,8 +1194,8 @@ function copy_gme_files()
     "${WORK_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}" \
     "${NEWLIB_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}" \
-    "${GDB_FOLDER_NAME}"
+    "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}"/gdb \
+    "gdb-${GDB_VERSION}"
 
   copy_build_files
 

@@ -322,6 +322,9 @@ then
     NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0-gme"}
     NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"325bec1e33fb0a1c30ce5a9aeeadd623f559ef1a"}
 
+    GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"${BINUTILS_GIT_BRANCH}"}
+    GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"${BINUTILS_GIT_COMMIT}"}
+
   fi
   
   # ---------------------------------------------------------------------------
@@ -382,6 +385,9 @@ then
 
     NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0-gme"}
     NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"325bec1e33fb0a1c30ce5a9aeeadd623f559ef1a"}
+
+    GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"${BINUTILS_GIT_BRANCH}"}
+    GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"${BINUTILS_GIT_COMMIT}"}
 
   fi
   
@@ -445,6 +451,9 @@ then
 
     NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-2.5.0-gme"}
     NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"325bec1e33fb0a1c30ce5a9aeeadd623f559ef1a"}
+
+    GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"${BINUTILS_GIT_BRANCH}"}
+    GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"${BINUTILS_GIT_COMMIT}"}
 
   fi
   
@@ -525,14 +534,30 @@ else
   NEWLIB_ARCHIVE_URL=""
 
   # ---------------------------------------------------------------------------
+
+  if [ -n "${GDB_GIT_COMMIT+x}" ]
+  then
+    # Separate GDB sources.
+    GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"binutils-gdb.git"}
+  else
+    # Old case, no separate GDB sources, use the ones in binutils.
+    GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"${BINUTILS_SRC_FOLDER_NAME}"}
+  fi
+
+  GDB_GIT_URL=${GDB_GIT_URL:-"https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb.git"}
+
+  GDB_ARCHIVE_URL=""
+
+  # ---------------------------------------------------------------------------
 fi
+
+# -----------------------------------------------------------------------------
+
 
 BINUTILS_FOLDER_NAME="binutils-${BINUTILS_VERSION}-gdb-${GDB_VERSION}"
 GCC_FOLDER_NAME="gcc-${GCC_VERSION}"
 NEWLIB_FOLDER_NAME="newlib-${NEWLIB_VERSION}"
-
-GDB_FOLDER_NAME="${BINUTILS_FOLDER_NAME}"/gdb
-GDB_SRC_FOLDER_NAME="${BINUTILS_SRC_FOLDER_NAME}"/gdb
+GDB_FOLDER_NAME="${BINUTILS_FOLDER_NAME}"
 
 # Note: The 5.x build failed with various messages.
 
