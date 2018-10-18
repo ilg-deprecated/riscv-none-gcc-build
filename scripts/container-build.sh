@@ -274,6 +274,7 @@ CFLAGS_OPTIMIZATIONS_FOR_TARGET+=" -mcmodel=medany"
 BINUTILS_PROJECT_NAME="riscv-binutils-gdb"
 GCC_PROJECT_NAME="riscv-none-gcc"
 NEWLIB_PROJECT_NAME="riscv-newlib"
+GDB_PROJECT_NAME="riscv-binutils-gdb"
 
 MULTILIB_FLAGS=""
 
@@ -309,6 +310,7 @@ then
     BINUTILS_GH_RELEASE=${BINUTILS_GH_RELEASE:-"${GH_RELEASE}"}
     GCC_GH_RELEASE=${GCC_GH_RELEASE:-"${GH_RELEASE}"}
     NEWLIB_GH_RELEASE=${NEWLIB_GH_RELEASE:-"${GH_RELEASE}"}
+    GDB_GH_RELEASE=${GDB_GH_RELEASE:-"${GH_RELEASE}"}
 
   else
 
@@ -374,6 +376,7 @@ then
     BINUTILS_GH_RELEASE=${BINUTILS_GH_RELEASE:-"${GH_RELEASE}"}
     GCC_GH_RELEASE=${GCC_GH_RELEASE:-"${GH_RELEASE}"}
     NEWLIB_GH_RELEASE=${NEWLIB_GH_RELEASE:-"${GH_RELEASE}"}
+    GDB_GH_RELEASE=${GDB_GH_RELEASE:-"${GH_RELEASE}"}
 
   else
 
@@ -441,6 +444,7 @@ then
     BINUTILS_GH_RELEASE=${BINUTILS_GH_RELEASE:-"${GH_RELEASE}"}
     GCC_GH_RELEASE=${GCC_GH_RELEASE:-"${GH_RELEASE}"}
     NEWLIB_GH_RELEASE=${NEWLIB_GH_RELEASE:-"${GH_RELEASE}"}
+    GDB_GH_RELEASE=${GDB_GH_RELEASE:-"${GH_RELEASE}"}
 
   else
 
@@ -502,10 +506,11 @@ then
   if [ "${USE_GITS}" != "y" ]
   then
 
-    GH_RELEASE="8.1.0-2-201810xx"
+    GH_RELEASE="8.1.0-2-20181019"
     BINUTILS_GH_RELEASE=${BINUTILS_GH_RELEASE:-"${GH_RELEASE}"}
     GCC_GH_RELEASE=${GCC_GH_RELEASE:-"${GH_RELEASE}"}
     NEWLIB_GH_RELEASE=${NEWLIB_GH_RELEASE:-"${GH_RELEASE}"}
+    GDB_GH_RELEASE=${GDB_GH_RELEASE:-"${GH_RELEASE}-gdb"}
 
   else
 
@@ -578,7 +583,12 @@ then
 
   # ---------------------------------------------------------------------------
 
-  # Possibly add GDB arhive.
+  GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"${GDB_PROJECT_NAME}-${GDB_GH_RELEASE}"}
+  GDB_ARCHIVE_NAME=${GDB_ARCHIVE_NAME:-"${GDB_SRC_FOLDER_NAME}.tar.gz"}
+
+  GDB_ARCHIVE_URL=${GDB_ARCHIVE_URL:-"https://github.com/gnu-mcu-eclipse/${GDB_PROJECT_NAME}/archive/v${GDB_GH_RELEASE}.tar.gz"}
+
+  GDB_GIT_URL=""
 
   # ---------------------------------------------------------------------------
 else

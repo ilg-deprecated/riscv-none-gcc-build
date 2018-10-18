@@ -163,6 +163,8 @@ function do_binutils()
 
         # ? --without-python --without-curses, --with-expat
 
+        # Note that GDB is disabled here, will be build later, possibly from 
+        # different sources.
         bash "${WORK_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}/configure" \
           --prefix="${APP_PREFIX}" \
           --infodir="${APP_PREFIX_DOC}/info" \
@@ -964,6 +966,7 @@ function do_gdb()
           fi
         fi
 
+        # Note that all components are disabled, except GDB.
         bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" \
           --prefix="${APP_PREFIX}"  \
           --infodir="${APP_PREFIX_DOC}/info" \

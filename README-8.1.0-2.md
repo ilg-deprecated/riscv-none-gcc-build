@@ -26,6 +26,11 @@ from Aug 11th, 2018
 commit [77e11e180](https://github.com/gnu-mcu-eclipse/riscv-newlib/commit/77e11e1800f57cac7f5468b2bd064100a44755d4)
 from July 12th, 2018
 
+GDB is a bit special, since it is only partly upstreamed and the RISC-V repos 
+are no longer updated, so the current build uses 
+`git://sourceware.org/git/binutils-gdb.git`, the `7dd36a6f1c` commit from 
+Aug 23rd, 2018 (same as the SiFive release).
+
 ## Changes
 
 Compared to the original RISC-V version, the **same architecture and API** 

@@ -1,6 +1,10 @@
 
 The changes applied to the original projects, in reverse chronological order:
 
+[2018-10-19]
+
+- v8.1.0-2-20181019 released
+
 [2018-10-18]
 
 - prepare v8.1.0-2-*
@@ -8,6 +12,7 @@ The changes applied to the original projects, in reverse chronological order:
   - riscv-binutils-2.30
   - riscv-gcc-8.1.0
   - riscv-newlib-3.0.0
+- allow GDB to be built from a separate repo/commit
 
 [2018-06-06]
 
