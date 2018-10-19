@@ -3,45 +3,10 @@
 These are the scripts and additional files required to build the 
 [GNU MCU Eclipse RISC-V Embedded GCC](https://github.com/gnu-mcu-eclipse/riscv-gcc).
 
-This release follows the official 
-[RISC-V distribution](https://github.com/riscv/riscv-gcc) maintained by 
-[SiFive](https://www.sifive.com), as part of the 
-[riscv/riscv-gnu-toolchain](https://github.com/riscv/riscv-gnu-toolchain)
-project.
-
 The build scripts use the 
 [xPack Build Box (XBB)](https://github.com/xpack/xpack-build-box), 
 a set of elaborate build environments based on GCC 7.2 (Docker containers
 for GNU/Linux and Windows or a custom HomeBrew for MacOS).
-
-## Changes
-
-Compared to the original RISC-V version, there are no functional changes; 
-the **same architecture and API options** are supported, and **the same 
-combinations of libraries** (derived from newlib) are provided.
-
-### newlib-nano
-
-The only notable addition is support for **newlib-nano**, using the 
-`--specs=nano.specs` option. For better results, this option must be 
-added to both compile and link time (the next release of the GNU MCU 
-Eclipse plug-ins will add support for this).
-
-If no syscalls are needed, `--specs=nosys.specs` can be used at link 
-time to provide empty implementations for the POSIX system calls.
-
-The libraries are compiled with `-O2 -mcmodel=medany`.
-
-### gdb-py
-
-Similarly to the ARM binary distribution, a separate version GDB with
-Python support was added. To run it, a functional Python must be 
-available.
-
-### Documentation
-
-Another addition compared to the SiFive distribution is the presence of 
-the documentation, including the PDF manuals for all tools.
 
 ## How to build
 
@@ -123,9 +88,31 @@ fourth digit is the GNU MCU Eclipse release number of this version.
 Add a new set of definitions in the `scripts/container-build.sh`, with the 
 versions of various components.
 
+By default, the build script uses tagged commits and downloads the corresponding archives.
+
+While preparing the release it is important to be able to use live Git versions. For this, 
+
+* update the commit ids to the desired ones 
+* commit and push
+* start the build script and pass `--use-gits`
+
+```console
+$ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --use-gits
+```
+
+When the result is acceptable, commit all repos and tag all with the same tag (like `v7.2.0-1-20171109`):
+
+* the [gnu-mcu-eclipse/riscv-gcc](https://github.com/gnu-mcu-eclipse/riscv-gcc) project
+* the [gnu-mcu-eclipse/riscv-binutils-gdb](https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb) project
+* the [gnu-mcu-eclipse/riscv-newlib](https://github.com/gnu-mcu-eclipse/riscv-newlib) project
+
 ### Update CHANGELOG.txt
 
 Check `riscv-none-gcc-build.git/CHANGELOG.txt` and add the new release.
+
+## Update the README-xxx.md
+
+Copy from the previous version and update.
 
 ### Build
 
@@ -285,7 +272,7 @@ a compressed tar archive on macOS and GNU/Linux).
 A portable method is to use [`xpm`](https://www.npmjs.com/package/xpm):
 
 ```console
-$ xpm install @gnu-mcu-eclipse/riscv-none-gcc --global
+$ xpm install --global @gnu-mcu-eclipse/riscv-none-gcc
 ```
 
 More details are available on the 
