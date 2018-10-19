@@ -79,7 +79,7 @@ The GNU MCU Eclipse branches have similar names, but suffixed with `-gme`.
 
 After merging the remote branches, merge the result into the `-gme` branch.
 
-### Prepare release
+### Prepare the release
 
 To prepare a new release, first determine the GCC version (like `7.2.0`) 
 and update the `scripts/VERSION` file. The format is `7.2.0-3`. The 
@@ -137,6 +137,7 @@ to build selectively, use `--linux64 --win64` or `--linux32 --win32`
 (GNU/Linux can be built alone; Windows also requires the GNU/Linux build).
 
 ```console
+$ rm -rf ${HOME}/Work/riscv-none-gcc-*
 $ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --all
 ```
 
@@ -178,6 +179,7 @@ VirtualBox image running on the same macMini with 16 GB of RAM and a fast SSD.
 To build the latest macOS version, with the same timestamp as the previous build:
 
 ```console
+$ rm -rf ${HOME}/Work/riscv-none-gcc-*
 $ caffeinate bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --osx --date YYYYMMDD-HHMM
 ```
 
