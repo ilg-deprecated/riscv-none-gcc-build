@@ -989,7 +989,7 @@ function do_gdb()
           --with-expat \
           --with-lzma=yes \
           --with-system-gdbinit="${APP_PREFIX}/${GCC_TARGET}"/lib/gdbinit \
-          '--with-gdb-datadir='\''${prefix}'\''/riscv-none-embed/share/gdb' \
+          --with-gdb-datadir="${APP_PREFIX}/${GCC_TARGET}"/share/gdb \
           \
           ${extra_python_opts} \
           --program-prefix="${GCC_TARGET}-" \
