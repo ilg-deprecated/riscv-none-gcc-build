@@ -88,6 +88,11 @@ do
     --env-file)
       ((++i))
       ENV_FILE="${argv[$i]}"
+      if [ ! -f "${ENV_FILE}" ];
+      then
+        echo "The specified environment file \"${ENV_FILE}\" does not exist, exiting..."
+        exit 1
+      fi
       ;;
 
     --date)
