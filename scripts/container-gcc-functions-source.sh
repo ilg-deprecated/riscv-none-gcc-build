@@ -276,7 +276,11 @@ function do_gcc_first()
 
         # Be sure the ${GCC_MULTILIB} has no quotes, since it defines 
         # multiple strings.
-        ./multilib-generator ${GCC_MULTILIB[@]} >"${GCC_MULTILIB_FILE}"
+
+        # Change IFS temporarily so that we can pass a simple string of
+        # whitespace delimited multilib tokens to multilib-generator
+        local IFS=$' '
+        ./multilib-generator ${GCC_MULTILIB} > "${GCC_MULTILIB_FILE}"
         cat "${GCC_MULTILIB_FILE}"
       )
     fi

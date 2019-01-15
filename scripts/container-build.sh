@@ -287,7 +287,7 @@ then
   # The default is:
   # rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--
   # Add 'rv32imaf-ilp32f--'. 
-  GCC_MULTILIB=(rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--)
+  GCC_MULTILIB=${GCC_MULTILIB:-"rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--"}
 
   GCC_MULTILIB_FILE=${GCC_MULTILIB_FILE:-"t-elf-multilib"}
 
@@ -353,7 +353,7 @@ then
   # The default is:
   # rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--
   # Add 'rv32imaf-ilp32f--'. 
-  GCC_MULTILIB=(rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--)
+  GCC_MULTILIB=${GCC_MULTILIB:-"rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--"}
 
   GCC_MULTILIB_FILE=${GCC_MULTILIB_FILE:-"t-elf-multilib"}
 
@@ -421,7 +421,7 @@ then
   # The default is:
   # rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--
   # Add 'rv32imaf-ilp32f--'. 
-  GCC_MULTILIB=(rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--)
+  GCC_MULTILIB=${GCC_MULTILIB:-"rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--"}
 
   GCC_MULTILIB_FILE=${GCC_MULTILIB_FILE:-"t-elf-multilib"}
 
@@ -487,7 +487,7 @@ then
   # The default is:
   # rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--
   # Add 'rv32imaf-ilp32f--'. 
-  GCC_MULTILIB=(rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--)
+  GCC_MULTILIB=${GCC_MULTILIB:-"rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-rv32imafdc- rv64imac-lp64-- rv64imafdc-lp64d--"}
 
   GCC_MULTILIB_FILE=${GCC_MULTILIB_FILE:-"t-elf-multilib"}
 
