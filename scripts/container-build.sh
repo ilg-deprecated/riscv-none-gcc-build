@@ -551,6 +551,13 @@ else
   exit 1
 fi
 
+# TODO: add rv32imafdc-ilp32d & rv64imafc-lp64f from
+# https://github.com/sifive/riscv-gnu-toolchain/commit/31dffd24952c16a9bbc7d293fa6a5c152b5b43a6
+# GCC_MULTILIB=(rv32i-ilp32--c rv32im-ilp32--c rv32iac-ilp32-- rv32imac-ilp32-- rv32imaf-ilp32f-- rv32imafc-ilp32f-- rv32imafdc-ilp32d-- rv64imac-lp64-- rv64imafc-lp64f-- rv64imafdc-lp64d--)
+# The SiFive toolchain used:
+# newlib_multilib_names="rv32i-ilp32 rv32im-ilp32 rv32iac-ilp32 rv32imac-ilp32 rv32imafc-ilp32f rv32imafdc-ilp32d rv64imac-lp64 rv64imafc-lp64f rv64imafdc-lp64d"
+# https://github.com/sifive/riscv-gnu-toolchain/blob/96ee91acbc24497b3c66b22f7e9aebf6060b0720/configure#L3314
+
 if [ "${USE_GITS}" != "y" ]
 then
 
