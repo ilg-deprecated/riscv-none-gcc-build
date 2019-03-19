@@ -57,29 +57,39 @@ function do_zlib()
       if [ "${TARGET_PLATFORM}" != "win32" ]
       then
 
-        echo
-        echo "Running zlib configure..."
-
-        bash "./configure" --help
-
         export CFLAGS="${XBB_CFLAGS} -Wno-shift-negative-value"
-        bash ${DEBUG} "./configure" \
-          --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
-        | tee "${LOGS_FOLDER_PATH}/configure-zlib-output.txt"
-        cp "configure.log" "${LOGS_FOLDER_PATH}/configure-zlib-log.txt"
 
-      fi
-    
-      (
-        echo
-        echo "Running zlib make..."
-
-        # Build.
-        if [ "${TARGET_PLATFORM}" != "win32" ]
+        if [ ! -f "config.status" ]
         then
+
+          (
+            echo
+            echo "Running zlib configure..."
+
+            bash "./configure" --help
+
+            bash ${DEBUG} "./configure" \
+              --prefix="${LIBS_INSTALL_FOLDER_PATH}"
+
+            cp "configure.log" "${LOGS_FOLDER_PATH}/configure-zlib-log.txt"
+          ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-zlib-output.txt"
+          
+        fi
+
+        (
+          echo
+          echo "Running zlib make..."
+
           make ${JOBS}
           make install
-        else
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-zlib-output.txt"
+
+      else
+
+        (
+          echo
+          echo "Running zlib make..."
+
           make -f win32/Makefile.gcc \
             PREFIX=${CROSS_COMPILE_PREFIX}- \
             prefix="${LIBS_INSTALL_FOLDER_PATH}" \
@@ -89,8 +99,10 @@ function do_zlib()
             INCLUDE_PATH="include" \
             LIBRARY_PATH="lib" \
             BINARY_PATH="bin"
-        fi
-      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-zlib-output.txt"
+
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-zlib-output.txt"
+
+      fi
     )
 
     touch "${zlib_stamp_file_path}"
@@ -132,32 +144,34 @@ function do_gmp()
       xbb_activate
       xbb_activate_this
 
+      export CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -Wno-overflow"
+      export CPPFLAGS="${XBB_CPPFLAGS}"
+      export LDFLAGS="${XBB_LDFLAGS_LIB}"
+
+      # ABI is mandatory, otherwise configure fails on 32-bit.
+      # (see https://gmplib.org/manual/ABI-and-ISA.html)
+      export ABI="${TARGET_BITS}"
+        
       if [ ! -f "config.status" ]
       then 
 
-        echo
-        echo "Running gmp configure..."
+        (
+          echo
+          echo "Running gmp configure..."
 
-        # ABI is mandatory, otherwise configure fails on 32-bit.
-        # (see https://gmplib.org/manual/ABI-and-ISA.html)
+          bash "${SOURCES_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}/configure" --help
 
-        bash "${SOURCES_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}/configure" --help
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}/configure" \
+            --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${TARGET} \
+            \
+            --enable-cxx
 
-        export CFLAGS="-Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare -Wno-overflow"
-        export CPPFLAGS="${XBB_CPPFLAGS}"
-        export LDFLAGS="${XBB_LDFLAGS_LIB}"
-        export ABI="${TARGET_BITS}"
-      
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}/configure" \
-          --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${TARGET} \
-          \
-          --enable-cxx \
-        | tee "${LOGS_FOLDER_PATH}/configure-gmp-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-gmp-log.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-gmp-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gmp-output.txt"
 
       fi
 
@@ -210,28 +224,30 @@ function do_mpfr()
       xbb_activate
       xbb_activate_this
 
+      export CFLAGS="${XBB_CFLAGS}"
+      export CPPFLAGS="${XBB_CPPFLAGS}"
+      export LDFLAGS="${XBB_LDFLAGS_LIB}"
+
       if [ ! -f "config.status" ]
       then 
 
-        echo
-        echo "Running mpfr configure..."
+        (
+          echo
+          echo "Running mpfr configure..."
 
-        bash "${SOURCES_FOLDER_PATH}/${MPFR_SRC_FOLDER_NAME}/configure" --help
+          bash "${SOURCES_FOLDER_PATH}/${MPFR_SRC_FOLDER_NAME}/configure" --help
 
-        export CFLAGS="${XBB_CFLAGS}"
-        export CPPFLAGS="${XBB_CPPFLAGS}"
-        export LDFLAGS="${XBB_LDFLAGS_LIB}"
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${MPFR_SRC_FOLDER_NAME}/configure" \
+            --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${TARGET} \
+            \
+            --disable-warnings
 
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${MPFR_SRC_FOLDER_NAME}/configure" \
-          --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${TARGET} \
-          \
-          --disable-warnings \
-        | tee "${LOGS_FOLDER_PATH}/configure-mpfr-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-mpfr-log.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-mpfr-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-mpfr-output.txt"
 
       fi
 
@@ -285,28 +301,30 @@ function do_mpc()
       xbb_activate
       xbb_activate_this
 
+      export CFLAGS="${XBB_CFLAGS} -Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare"
+      export CPPFLAGS="${XBB_CPPFLAGS}"
+      export LDFLAGS="${XBB_LDFLAGS_LIB}"
+
       if [ ! -f "config.status" ]
       then 
 
-        echo
-        echo "Running mpc configure..."
-      
-        bash "${SOURCES_FOLDER_PATH}/${MPC_SRC_FOLDER_NAME}/configure" --help
+        (
+          echo
+          echo "Running mpc configure..."
+        
+          bash "${SOURCES_FOLDER_PATH}/${MPC_SRC_FOLDER_NAME}/configure" --help
 
-        export CFLAGS="${XBB_CFLAGS} -Wno-unused-value -Wno-empty-translation-unit -Wno-tautological-compare"
-        export CPPFLAGS="${XBB_CPPFLAGS}"
-        export LDFLAGS="${XBB_LDFLAGS_LIB}"
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${MPC_SRC_FOLDER_NAME}/configure" \
+            --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${TARGET} \
+            \
+            --disable-nls
 
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${MPC_SRC_FOLDER_NAME}/configure" \
-          --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${TARGET} \
-          \
-          --disable-nls \
-        | tee "${LOGS_FOLDER_PATH}/configure-mpc-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-mpc-log.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-mpc-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-mpc-output.txt"
 
       fi
 
@@ -364,28 +382,30 @@ function do_isl()
       xbb_activate
       xbb_activate_this
 
+      export CFLAGS="${XBB_CFLAGS} -Wno-dangling-else -Wno-header-guard"
+      export CPPFLAGS="${XBB_CPPFLAGS}"
+      export LDFLAGS="${XBB_LDFLAGS_LIB}"
+
       if [ ! -f "config.status" ]
       then 
 
-        echo
-        echo "Running isl configure..."
+        (
+          echo
+          echo "Running isl configure..."
 
-        bash "${SOURCES_FOLDER_PATH}/${ISL_SRC_FOLDER_NAME}/configure" --help
+          bash "${SOURCES_FOLDER_PATH}/${ISL_SRC_FOLDER_NAME}/configure" --help
 
-        export CFLAGS="${XBB_CFLAGS} -Wno-dangling-else -Wno-header-guard"
-        export CPPFLAGS="${XBB_CPPFLAGS}"
-        export LDFLAGS="${XBB_LDFLAGS_LIB}"
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${ISL_SRC_FOLDER_NAME}/configure" \
+            --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${TARGET} \
+            \
+            --disable-nls
 
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${ISL_SRC_FOLDER_NAME}/configure" \
-          --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${TARGET} \
-          \
-          --disable-nls \
-        | tee "${LOGS_FOLDER_PATH}/configure-isl-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-isl-log.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-isl-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-isl-output.txt"
 
       fi
 
@@ -434,28 +454,30 @@ function do_libelf()
       xbb_activate
       xbb_activate_this
 
+      export CFLAGS="${XBB_CFLAGS} -Wno-tautological-compare"
+      export CPPFLAGS="${XBB_CPPFLAGS}"
+      export LDFLAGS="${XBB_LDFLAGS_LIB}"
+
       if [ ! -f "config.status" ]
       then 
 
-        echo
-        echo "Running libelf configure..."
+        (
+          echo
+          echo "Running libelf configure..."
 
-        bash "${SOURCES_FOLDER_PATH}/${LIBELF_SRC_FOLDER_NAME}/configure" --help
+          bash "${SOURCES_FOLDER_PATH}/${LIBELF_SRC_FOLDER_NAME}/configure" --help
 
-        export CFLAGS="${XBB_CFLAGS} -Wno-tautological-compare"
-        export CPPFLAGS="${XBB_CPPFLAGS}"
-        export LDFLAGS="${XBB_LDFLAGS_LIB}"
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${LIBELF_SRC_FOLDER_NAME}/configure" \
+            --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${TARGET} \
+            \
+            --disable-nls
 
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${LIBELF_SRC_FOLDER_NAME}/configure" \
-          --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${TARGET} \
-          \
-          --disable-nls \
-        | tee "${LOGS_FOLDER_PATH}/configure-libelf-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-libelf-log.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-libelf-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-libelf-output.txt"
 
       fi
 
@@ -513,28 +535,30 @@ function do_expat()
       xbb_activate
       xbb_activate_this
 
+      export CFLAGS="${XBB_CFLAGS}"
+      export CPPFLAGS="${XBB_CPPFLAGS}"
+      export LDFLAGS="${XBB_LDFLAGS_LIB}"
+
       if [ ! -f "config.status" ]
       then 
 
-        echo
-        echo "Running expat configure..."
+        (
+          echo
+          echo "Running expat configure..."
 
-        bash "${SOURCES_FOLDER_PATH}/${EXPAT_SRC_FOLDER_NAME}/configure" --help
+          bash "${SOURCES_FOLDER_PATH}/${EXPAT_SRC_FOLDER_NAME}/configure" --help
 
-        export CFLAGS="${XBB_CFLAGS}"
-        export CPPFLAGS="${XBB_CPPFLAGS}"
-        export LDFLAGS="${XBB_LDFLAGS_LIB}"
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${EXPAT_SRC_FOLDER_NAME}/configure" \
+            --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${TARGET} \
+            \
+            --disable-nls
 
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${EXPAT_SRC_FOLDER_NAME}/configure" \
-          --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${TARGET} \
-          \
-          --disable-nls \
-        | tee "${LOGS_FOLDER_PATH}/configure-expat-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-expat-log.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-expat-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-expat-output.txt"
 
       fi
 
@@ -587,30 +611,32 @@ function do_libiconv()
       xbb_activate
       xbb_activate_this
 
+      # -fgnu89-inline fixes "undefined reference to `aliases2_lookup'"
+      #  https://savannah.gnu.org/bugs/?47953
+      export CFLAGS="${XBB_CFLAGS} -fgnu89-inline -Wno-tautological-compare -Wno-parentheses-equality -Wno-static-in-inline"
+      export CPPFLAGS="${XBB_CPPFLAGS}"
+      export LDFLAGS="${XBB_LDFLAGS_LIB}"
+
       if [ ! -f "config.status" ]
       then 
 
-        echo
-        echo "Running libiconv configure..."
+        (
+          echo
+          echo "Running libiconv configure..."
 
-        bash "${SOURCES_FOLDER_PATH}/${LIBICONV_SRC_FOLDER_NAME}/configure" --help
+          bash "${SOURCES_FOLDER_PATH}/${LIBICONV_SRC_FOLDER_NAME}/configure" --help
 
-        # -fgnu89-inline fixes "undefined reference to `aliases2_lookup'"
-        #  https://savannah.gnu.org/bugs/?47953
-        export CFLAGS="${XBB_CFLAGS} -fgnu89-inline -Wno-tautological-compare -Wno-parentheses-equality -Wno-static-in-inline"
-        export CPPFLAGS="${XBB_CPPFLAGS}"
-        export LDFLAGS="${XBB_LDFLAGS_LIB}"
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${LIBICONV_SRC_FOLDER_NAME}/configure" \
+            --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${TARGET} \
+            \
+            --disable-nls
 
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${LIBICONV_SRC_FOLDER_NAME}/configure" \
-          --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${TARGET} \
-          \
-          --disable-nls \
-        | tee "${LOGS_FOLDER_PATH}/configure-libiconv-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-libiconv-log.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-libiconv-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-libiconv-output.txt"
 
       fi
 
@@ -661,29 +687,31 @@ function do_xz()
       xbb_activate
       xbb_activate_this
 
+      export CFLAGS="${XBB_CFLAGS} -Wno-implicit-fallthrough"
+      export CPPFLAGS="${XBB_CPPFLAGS}"
+      export LDFLAGS="${XBB_LDFLAGS_LIB}"
+
       if [ ! -f "config.status" ]
       then 
 
-        echo
-        echo "Running xz configure..."
+        (
+          echo
+          echo "Running xz configure..."
 
-        bash "${SOURCES_FOLDER_PATH}/${XZ_SRC_FOLDER_NAME}/configure" --help
+          bash "${SOURCES_FOLDER_PATH}/${XZ_SRC_FOLDER_NAME}/configure" --help
 
-        export CFLAGS="${XBB_CFLAGS} -Wno-implicit-fallthrough"
-        export CPPFLAGS="${XBB_CPPFLAGS}"
-        export LDFLAGS="${XBB_LDFLAGS_LIB}"
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${XZ_SRC_FOLDER_NAME}/configure" \
+            --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${TARGET} \
+            \
+            --disable-rpath \
+            --disable-nls
 
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${XZ_SRC_FOLDER_NAME}/configure" \
-          --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${TARGET} \
-          \
-          --disable-rpath \
-          --disable-nls \
-        | tee "${LOGS_FOLDER_PATH}/configure-xz-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-xz-log.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-xz-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-xz-output.txt"
 
       fi
 

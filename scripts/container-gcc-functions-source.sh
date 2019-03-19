@@ -137,55 +137,55 @@ function do_binutils()
       xbb_activate
       xbb_activate_this
 
+      export CFLAGS="${XBB_CFLAGS} -Wno-deprecated-declarations -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-shift-negative-value -Wno-format -Wno-implicit-fallthrough"
+      export CXXFLAGS="${XBB_CXXFLAGS} -Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-c++11-narrowing"
+      export CPPFLAGS="${XBB_CPPFLAGS}"
+      LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
+      if [ "${TARGET_PLATFORM}" == "win32" ]
+      then
+        LDFLAGS="${LDFLAGS} -Wl,${XBB_FOLDER}/${CROSS_COMPILE_PREFIX}/lib/CRT_glob.o"
+      fi
+      export LDFLAGS
+
       if [ ! -f "config.status" ]
       then
 
-        echo
-        echo "Running binutils configure..."
-      
-        bash "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}/configure" --help
+        (
+          echo
+          echo "Running binutils configure..."
+        
+          bash "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}/configure" --help
 
-        export CFLAGS="${XBB_CFLAGS} -Wno-deprecated-declarations -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-shift-negative-value -Wno-format -Wno-implicit-fallthrough"
-        export CXXFLAGS="${XBB_CXXFLAGS} -Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-c++11-narrowing"
-        export CPPFLAGS="${XBB_CPPFLAGS}"
-        LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
-        if [ "${TARGET_PLATFORM}" == "win32" ]
-        then
-          LDFLAGS="${LDFLAGS} -Wl,${XBB_FOLDER}/${CROSS_COMPILE_PREFIX}/lib/CRT_glob.o"
-        fi
-        export LDFLAGS
-
-        # ? --without-python --without-curses, --with-expat
-
-        # Note that GDB is disabled here, will be build later, possibly from 
-        # different sources.
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}/configure" \
-          --prefix="${APP_PREFIX}" \
-          --infodir="${APP_PREFIX_DOC}/info" \
-          --mandir="${APP_PREFIX_DOC}/man" \
-          --htmldir="${APP_PREFIX_DOC}/html" \
-          --pdfdir="${APP_PREFIX_DOC}/pdf" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${GCC_TARGET} \
-          \
-          --with-pkgversion="${BRANDING}" \
-          \
-          --disable-nls \
-          --disable-werror \
-          --disable-sim \
-          --disable-gdb \
-          --enable-interwork \
-          --enable-plugins \
-          --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
-          \
-          --enable-static \
-          --enable-build-warnings=no \
-          --disable-rpath \
-          \
-        | tee "${LOGS_FOLDER_PATH}/configure-binutils-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-binutils-log.txt"
+          # ? --without-python --without-curses, --with-expat
+          # Note that GDB is disabled here, will be build later, possibly from 
+          # different sources.
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}/configure" \
+            --prefix="${APP_PREFIX}" \
+            --infodir="${APP_PREFIX_DOC}/info" \
+            --mandir="${APP_PREFIX_DOC}/man" \
+            --htmldir="${APP_PREFIX_DOC}/html" \
+            --pdfdir="${APP_PREFIX_DOC}/pdf" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${GCC_TARGET} \
+            \
+            --with-pkgversion="${BRANDING}" \
+            \
+            --disable-nls \
+            --disable-werror \
+            --disable-sim \
+            --disable-gdb \
+            --enable-interwork \
+            --enable-plugins \
+            --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
+            \
+            --enable-static \
+            --enable-build-warnings=no \
+            --disable-rpath
+            
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-binutils-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-binutils-output.txt"
 
       fi
 
@@ -247,10 +247,11 @@ function do_gcc_first()
 
     if [ -n "${GCC_MULTILIB}" ]
     then
-      echo
-      echo "Running the multilib generator..."
 
       (
+        echo
+        echo "Running the multilib generator..."
+
         cd "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/gcc/config/riscv"
 
         xbb_activate
@@ -265,6 +266,7 @@ function do_gcc_first()
         ./multilib-generator ${GCC_MULTILIB} > "${GCC_MULTILIB_FILE}"
         cat "${GCC_MULTILIB_FILE}"
       )
+
     fi
 
     (
@@ -274,84 +276,85 @@ function do_gcc_first()
       xbb_activate
       xbb_activate_this
 
+      export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unused-value -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-unused-but-set-variable -Wno-shift-negative-value -Wno-misleading-indentation -Wno-strict-overflow -Wno-sign-compare"
+      export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}" 
+      export GCC_WARN_CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-format-security -Wno-suggest-attribute=format -Wno-format-extra-args -Wno-format -Wno-varargs -Wno-shift-count-overflow -Wno-ignored-attributes -Wno-tautological-compare -Wno-unused-label -Wno-unused-parameter -Wno-literal-suffix -Wno-expansion-to-defined -Wno-maybe-uninitialized -Wno-shift-negative-value -Wno-memset-elt-size -Wno-dangling-else -Wno-sequence-point -Wno-misleading-indentation -Wno-int-in-bool-context"
+      export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
+      export CPPFLAGS="${XBB_CPPFLAGS}" 
+      export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
+
+      export CFLAGS_FOR_TARGET="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}" 
+      export CXXFLAGS_FOR_TARGET="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}" 
+
       if [ ! -f "config.status" ]
       then
 
-        echo
-        echo "Running gcc first stage configure..."
-      
-        bash "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" --help
+        (
+          echo
+          echo "Running gcc first stage configure..."
+        
+          bash "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" --help
 
-        export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unused-value -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-unused-but-set-variable -Wno-shift-negative-value -Wno-misleading-indentation -Wno-strict-overflow -Wno-sign-compare"
-        export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}" 
-        export GCC_WARN_CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-format-security -Wno-suggest-attribute=format -Wno-format-extra-args -Wno-format -Wno-varargs -Wno-shift-count-overflow -Wno-ignored-attributes -Wno-tautological-compare -Wno-unused-label -Wno-unused-parameter -Wno-literal-suffix -Wno-expansion-to-defined -Wno-maybe-uninitialized -Wno-shift-negative-value -Wno-memset-elt-size -Wno-dangling-else -Wno-sequence-point -Wno-misleading-indentation -Wno-int-in-bool-context"
-        export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
-        export CPPFLAGS="${XBB_CPPFLAGS}" 
-        export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
+          # https://gcc.gnu.org/install/configure.html
+          # --enable-shared[=package[,…]] build shared versions of libraries
+          # --enable-tls specify that the target supports TLS (Thread Local Storage). 
+          # --enable-nls enables Native Language Support (NLS)
+          # --enable-checking=list the compiler is built to perform internal consistency checks of the requested complexity. ‘yes’ (most common checks)
+          # --with-headers=dir specify that target headers are available when building a cross compiler
+          # --with-newlib Specifies that ‘newlib’ is being used as the target C library. This causes `__eprintf`` to be omitted from `libgcc.a`` on the assumption that it will be provided by newlib.
+          # --enable-languages=c newlib does not use C++, so C should be enough
 
-        export CFLAGS_FOR_TARGET="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}" 
-        export CXXFLAGS_FOR_TARGET="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}" 
+          # --enable-checking=no ???
 
-        # https://gcc.gnu.org/install/configure.html
-        # --enable-shared[=package[,…]] build shared versions of libraries
-        # --enable-tls specify that the target supports TLS (Thread Local Storage). 
-        # --enable-nls enables Native Language Support (NLS)
-        # --enable-checking=list the compiler is built to perform internal consistency checks of the requested complexity. ‘yes’ (most common checks)
-        # --with-headers=dir specify that target headers are available when building a cross compiler
-        # --with-newlib Specifies that ‘newlib’ is being used as the target C library. This causes `__eprintf`` to be omitted from `libgcc.a`` on the assumption that it will be provided by newlib.
-        # --enable-languages=c newlib does not use C++, so C should be enough
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
+            --prefix="${APP_PREFIX}"  \
+            --infodir="${APP_PREFIX_DOC}/info" \
+            --mandir="${APP_PREFIX_DOC}/man" \
+            --htmldir="${APP_PREFIX_DOC}/html" \
+            --pdfdir="${APP_PREFIX_DOC}/pdf" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${GCC_TARGET} \
+            \
+            --with-pkgversion="${BRANDING}" \
+            \
+            --enable-languages=c \
+            --disable-decimal-float \
+            --disable-libffi \
+            --disable-libgomp \
+            --disable-libmudflap \
+            --disable-libquadmath \
+            --disable-libssp \
+            --disable-libstdcxx-pch \
+            --disable-nls \
+            --disable-threads \
+            --disable-tls \
+            --enable-checking=no \
+            --with-newlib \
+            --without-headers \
+            --with-gnu-as \
+            --with-gnu-ld \
+            --with-python-dir=share/gcc-${GCC_TARGET} \
+            --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
+            \
+            ${MULTILIB_FLAGS} \
+            --with-abi="${GCC_ABI}" \
+            --with-arch="${GCC_ARCH}" \
+            \
+            --disable-rpath \
+            --disable-build-format-warnings
 
-        # --enable-checking=no ???
-
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
-          --prefix="${APP_PREFIX}"  \
-          --infodir="${APP_PREFIX_DOC}/info" \
-          --mandir="${APP_PREFIX_DOC}/man" \
-          --htmldir="${APP_PREFIX_DOC}/html" \
-          --pdfdir="${APP_PREFIX_DOC}/pdf" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${GCC_TARGET} \
-          \
-          --with-pkgversion="${BRANDING}" \
-          \
-          --enable-languages=c \
-          --disable-decimal-float \
-          --disable-libffi \
-          --disable-libgomp \
-          --disable-libmudflap \
-          --disable-libquadmath \
-          --disable-libssp \
-          --disable-libstdcxx-pch \
-          --disable-nls \
-          --disable-threads \
-          --disable-tls \
-          --enable-checking=no \
-          --with-newlib \
-          --without-headers \
-          --with-gnu-as \
-          --with-gnu-ld \
-          --with-python-dir=share/gcc-${GCC_TARGET} \
-          --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
-          \
-          ${MULTILIB_FLAGS} \
-          --with-abi="${GCC_ABI}" \
-          --with-arch="${GCC_ARCH}" \
-          \
-          --disable-rpath \
-          --disable-build-format-warnings \
-          \
-        | tee "${LOGS_FOLDER_PATH}/configure-gcc-first-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc-first-log.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc-first-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gcc-first-output.txt"
 
       fi
 
-      # Partial build, without documentation.
-      echo
-      echo "Running gcc first stage make..."
-
       (
+        # Partial build, without documentation.
+        echo
+        echo "Running gcc first stage make..."
+
         # No need to make 'all', 'all-gcc' is enough to compile the libraries.
         # Parallel build failed once on win32.
         make ${JOBS} all-gcc
@@ -389,113 +392,111 @@ function do_newlib()
       # Add the gcc first stage binaries to the path.
       PATH="${APP_PREFIX}/bin":${PATH}
 
+      local optimize="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}"
+      if [ "$1" == "-nano" ]
+      then
+        # For newlib-nano optimize for size.
+        optimize="$(echo ${optimize} | sed -e 's/-O2/-Os/')"
+      fi
+
+      export CFLAGS="${XBB_CFLAGS}"
+      export CXXFLAGS="${XBB_CXXFLAGS}"
+      export CPPFLAGS="${XBB_CPPFLAGS}" 
+
+      # Note the intentional `-g`.
+      export CFLAGS_FOR_TARGET="${optimize} -g -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-logical-not-parentheses -Wno-implicit-int -Wno-expansion-to-defined" 
+      export CXXFLAGS_FOR_TARGET="${optimize} -g" 
+
       if [ ! -f "config.status" ]
       then
 
-        # --disable-nls do not use Native Language Support
-        # --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf
-        # --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf
-        # --enable-newlib-io-c99-formats   enable C99 support in IO functions like printf/scanf
-        # --enable-newlib-register-fini   enable finalization function registration using atexit
-        # --disable-newlib-supplied-syscalls disable newlib from supplying syscalls (__NO_SYSCALLS__)
+        (
+          # --disable-nls do not use Native Language Support
+          # --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf
+          # --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf
+          # --enable-newlib-io-c99-formats   enable C99 support in IO functions like printf/scanf
+          # --enable-newlib-register-fini   enable finalization function registration using atexit
+          # --disable-newlib-supplied-syscalls disable newlib from supplying syscalls (__NO_SYSCALLS__)
 
-        # --disable-newlib-fvwrite-in-streamio    disable iov in streamio
-        # --disable-newlib-fseek-optimization    disable fseek optimization
-        # --disable-newlib-wide-orient    Turn off wide orientation in streamio
-        # --disable-newlib-unbuf-stream-opt    disable unbuffered stream optimization in streamio
-        # --enable-newlib-nano-malloc    use small-footprint nano-malloc implementation
-        # --enable-lite-exit	enable light weight exit
-        # --enable-newlib-global-atexit	enable atexit data structure as global
-        # --enable-newlib-nano-formatted-io    Use nano version formatted IO
-        # --enable-newlib-reent-small
+          # --disable-newlib-fvwrite-in-streamio    disable iov in streamio
+          # --disable-newlib-fseek-optimization    disable fseek optimization
+          # --disable-newlib-wide-orient    Turn off wide orientation in streamio
+          # --disable-newlib-unbuf-stream-opt    disable unbuffered stream optimization in streamio
+          # --enable-newlib-nano-malloc    use small-footprint nano-malloc implementation
+          # --enable-lite-exit	enable light weight exit
+          # --enable-newlib-global-atexit	enable atexit data structure as global
+          # --enable-newlib-nano-formatted-io    Use nano version formatted IO
+          # --enable-newlib-reent-small
 
-        # --enable-newlib-retargetable-locking ???
+          # --enable-newlib-retargetable-locking ???
 
-        echo
-        echo "Running newlib$1 configure..."
-      
-        bash "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" --help
+          echo
+          echo "Running newlib$1 configure..."
+        
+          bash "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" --help
 
-        local optimize="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}"
-        if [ "$1" == "-nano" ]
-        then
-          # For newlib-nano optimize for size.
-          optimize="$(echo ${optimize} | sed -e 's/-O2/-Os/')"
-        fi
+          # I still did not figure out how to define a variable with
+          # the list of options, such that it can be extended, so the
+          # brute force approach is to duplicate the entire call.
 
-        export CFLAGS="${XBB_CFLAGS}"
-        export CXXFLAGS="${XBB_CXXFLAGS}"
-        export CPPFLAGS="${XBB_CPPFLAGS}" 
+          if [ "$1" == "" ]
+          then
 
-        # Note the intentional `-g`.
-        export CFLAGS_FOR_TARGET="${optimize} -g -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-logical-not-parentheses -Wno-implicit-int -Wno-expansion-to-defined" 
-        export CXXFLAGS_FOR_TARGET="${optimize} -g" 
+            # Extra options to ARM distribution:
+            # --enable-newlib-io-long-long
+            # --enable-newlib-io-c99-formats
+            bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" \
+              --prefix="${APP_PREFIX}"  \
+              --infodir="${APP_PREFIX_DOC}/info" \
+              --mandir="${APP_PREFIX_DOC}/man" \
+              --htmldir="${APP_PREFIX_DOC}/html" \
+              --pdfdir="${APP_PREFIX_DOC}/pdf" \
+              \
+              --build=${BUILD} \
+              --host=${HOST} \
+              --target="${GCC_TARGET}" \
+              \
+              --enable-newlib-io-long-double \
+              --enable-newlib-register-fini \
+              --enable-newlib-retargetable-locking \
+              --disable-newlib-supplied-syscalls \
+              --disable-nls \
+              \
+              --enable-newlib-io-long-long \
+              --enable-newlib-io-c99-formats 
 
-        # I still did not figure out how to define a variable with
-        # the list of options, such that it can be extended, so the
-        # brute force approach is to duplicate the entire call.
+          elif [ "$1" == "-nano" ]
+          then
 
-        if [ "$1" == "" ]
-        then
+            # --enable-newlib-io-long-long and --enable-newlib-io-c99-formats
+            # are currently ignored if --enable-newlib-nano-formatted-io.
+            # --enable-newlib-register-fini is debatable, was removed.
+            bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" \
+              --prefix="${APP_PREFIX_NANO}"  \
+              \
+              --build=${BUILD} \
+              --host=${HOST} \
+              --target="${GCC_TARGET}" \
+              \
+              --disable-newlib-supplied-syscalls \
+              --enable-newlib-reent-small \
+              --disable-newlib-fvwrite-in-streamio \
+              --disable-newlib-fseek-optimization \
+              --disable-newlib-wide-orient \
+              --enable-newlib-nano-malloc \
+              --disable-newlib-unbuf-stream-opt \
+              --enable-lite-exit \
+              --enable-newlib-global-atexit \
+              --enable-newlib-nano-formatted-io \
+              --disable-nls 
 
-          # Extra options to ARM distribution:
-          # --enable-newlib-io-long-long
-          # --enable-newlib-io-c99-formats
-          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" \
-            --prefix="${APP_PREFIX}"  \
-            --infodir="${APP_PREFIX_DOC}/info" \
-            --mandir="${APP_PREFIX_DOC}/man" \
-            --htmldir="${APP_PREFIX_DOC}/html" \
-            --pdfdir="${APP_PREFIX_DOC}/pdf" \
-            \
-            --build=${BUILD} \
-            --host=${HOST} \
-            --target="${GCC_TARGET}" \
-            \
-            --enable-newlib-io-long-double \
-            --enable-newlib-register-fini \
-            --enable-newlib-retargetable-locking \
-            --disable-newlib-supplied-syscalls \
-            --disable-nls \
-            \
-            --enable-newlib-io-long-long \
-            --enable-newlib-io-c99-formats \
-            \
-          | tee "${LOGS_FOLDER_PATH}/configure-newlib$1-output.txt"
+          else
+            echo "Unsupported do_newlib arg $1"
+            exit 1
+          fi
 
-        elif [ "$1" == "-nano" ]
-        then
-
-          # --enable-newlib-io-long-long and --enable-newlib-io-c99-formats
-          # are currently ignored if --enable-newlib-nano-formatted-io.
-          # --enable-newlib-register-fini is debatable, was removed.
-          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" \
-            --prefix="${APP_PREFIX_NANO}"  \
-            \
-            --build=${BUILD} \
-            --host=${HOST} \
-            --target="${GCC_TARGET}" \
-            \
-            --disable-newlib-supplied-syscalls \
-            --enable-newlib-reent-small \
-            --disable-newlib-fvwrite-in-streamio \
-            --disable-newlib-fseek-optimization \
-            --disable-newlib-wide-orient \
-            --enable-newlib-nano-malloc \
-            --disable-newlib-unbuf-stream-opt \
-            --enable-lite-exit \
-            --enable-newlib-global-atexit \
-            --enable-newlib-nano-formatted-io \
-            --disable-nls \
-            \
-          | tee "${LOGS_FOLDER_PATH}/configure-newlib$1-output.txt"
-
-        else
-          echo "Unsupported do_newlib arg $1"
-          exit 1
-        fi
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-newlib$1-log.txt"
-
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-newlib$1-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-newlib$1-output.txt"
       fi
 
       (
@@ -672,146 +673,143 @@ function do_gcc_final()
       xbb_activate
       xbb_activate_this
 
+      export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unused-value -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-unused-but-set-variable -Wno-shift-negative-value -Wno-expansion-to-defined -Wno-strict-overflow -Wno-sign-compare"
+      export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}" 
+      export GCC_WARN_CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-format-security -Wno-suggest-attribute=format -Wno-format-extra-args -Wno-format -Wno-unused-function -Wno-attributes -Wno-maybe-uninitialized -Wno-expansion-to-defined -Wno-misleading-indentation -Wno-literal-suffix -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-shift-negative-value -Wno-dangling-else -Wno-sequence-point -Wno-nonnull -Wno-unused-parameter"
+      export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
+      export CPPFLAGS="${XBB_CPPFLAGS}" 
+      export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
+      # Do not add CRT_glob.o here, it will fail with already defined,
+      # since it is already handled by --enable-mingw-wildcard.
+
+      local optimize="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}"
+      if [ "$1" == "-nano" ]
+      then
+        # For newlib-nano optimize for size.
+        optimize="$(echo ${optimize} | sed -e 's/-O2/-Os/')"
+      fi
+
+      # Note the intentional `-g`.
+      export CFLAGS_FOR_TARGET="${optimize} -g" 
+      export CXXFLAGS_FOR_TARGET="${optimize} -fno-exceptions -g" 
+
+      mingw_wildcard="--disable-mingw-wildcard"
+
+      if [ "${TARGET_PLATFORM}" == "win32" ]
+      then
+        mingw_wildcard="--enable-mingw-wildcard"
+
+        export AR_FOR_TARGET="${GCC_TARGET}-ar"
+        export NM_FOR_TARGET="${GCC_TARGET}-nm"
+        export OBJDUMP_FOR_TARET="${GCC_TARGET}-objdump"
+        export STRIP_FOR_TARGET="${GCC_TARGET}-strip"
+        export CC_FOR_TARGET="${GCC_TARGET}-gcc"
+        export GCC_FOR_TARGET="${GCC_TARGET}-gcc"
+        export CXX_FOR_TARGET="${GCC_TARGET}-g++"
+      fi
+
       if [ ! -f "config.status" ]
       then
 
-        echo
-        echo "Running gcc$1 final stage configure..."
-      
-        bash "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" --help
+        (
+          echo
+          echo "Running gcc$1 final stage configure..."
+        
+          bash "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" --help
 
-        export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unused-value -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-unused-but-set-variable -Wno-shift-negative-value -Wno-expansion-to-defined -Wno-strict-overflow -Wno-sign-compare"
-        export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}" 
-        export GCC_WARN_CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-format-security -Wno-suggest-attribute=format -Wno-format-extra-args -Wno-format -Wno-unused-function -Wno-attributes -Wno-maybe-uninitialized -Wno-expansion-to-defined -Wno-misleading-indentation -Wno-literal-suffix -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-shift-negative-value -Wno-dangling-else -Wno-sequence-point -Wno-nonnull -Wno-unused-parameter"
-        export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
-        export CPPFLAGS="${XBB_CPPFLAGS}" 
-        export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
-        # Do not add CRT_glob.o here, it will fail with already defined,
-        # since it is already handled by --enable-mingw-wildcard.
+          # https://gcc.gnu.org/install/configure.html
+          # --enable-shared[=package[,…]] build shared versions of libraries
+          # --enable-tls specify that the target supports TLS (Thread Local Storage). 
+          # --enable-nls enables Native Language Support (NLS)
+          # --enable-checking=list the compiler is built to perform internal consistency checks of the requested complexity. ‘yes’ (most common checks)
+          # --with-headers=dir specify that target headers are available when building a cross compiler
+          # --with-newlib Specifies that ‘newlib’ is being used as the target C library. This causes `__eprintf`` to be omitted from `libgcc.a`` on the assumption that it will be provided by newlib.
+          # --enable-languages=c,c++ Support only C/C++, ignore all other.
 
-        local optimize="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}"
-        if [ "$1" == "-nano" ]
-        then
-          # For newlib-nano optimize for size.
-          optimize="$(echo ${optimize} | sed -e 's/-O2/-Os/')"
-        fi
+          if [ "$1" == "" ]
+          then
 
-        # Note the intentional `-g`.
-        export CFLAGS_FOR_TARGET="${optimize} -g" 
-        export CXXFLAGS_FOR_TARGET="${optimize} -fno-exceptions -g" 
+            bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
+              --prefix="${APP_PREFIX}"  \
+              --libexecdir="${APP_PREFIX}/lib" \
+              --infodir="${APP_PREFIX_DOC}/info" \
+              --mandir="${APP_PREFIX_DOC}/man" \
+              --htmldir="${APP_PREFIX_DOC}/html" \
+              --pdfdir="${APP_PREFIX_DOC}/pdf" \
+              \
+              --build=${BUILD} \
+              --host=${HOST} \
+              --target=${GCC_TARGET} \
+              \
+              --with-pkgversion="${BRANDING}" \
+              \
+              --enable-languages=c,c++ \
+              ${mingw_wildcard} \
+              --enable-plugins \
+              --disable-decimal-float \
+              --disable-libffi \
+              --disable-libgomp \
+              --disable-libmudflap \
+              --disable-libquadmath \
+              --disable-libssp \
+              --disable-libstdcxx-pch \
+              --disable-nls \
+              --disable-threads \
+              --enable-tls \
+              --enable-checking=yes \
+              --with-gnu-as \
+              --with-gnu-ld \
+              --with-newlib \
+              --with-headers=yes \
+              --with-python-dir="share/gcc-${GCC_TARGET}" \
+              --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
+              \
+              ${MULTILIB_FLAGS} \
+              --with-abi="${GCC_ABI}" \
+              --with-arch="${GCC_ARCH}" \
+              \
+              --disable-rpath \
+              --disable-build-format-warnings 
 
-        mingw_wildcard="--disable-mingw-wildcard"
+          else
 
-        if [ "${TARGET_PLATFORM}" == "win32" ]
-        then
-          mingw_wildcard="--enable-mingw-wildcard"
+            bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
+              --prefix="${APP_PREFIX_NANO}"  \
+              \
+              --build=${BUILD} \
+              --host=${HOST} \
+              --target=${GCC_TARGET} \
+              \
+              --with-pkgversion="${BRANDING}" \
+              \
+              --enable-languages=c,c++ \
+              --disable-decimal-float \
+              --disable-libffi \
+              --disable-libgomp \
+              --disable-libmudflap \
+              --disable-libquadmath \
+              --disable-libssp \
+              --disable-libstdcxx-pch \
+              --disable-libstdcxx-verbose \
+              --disable-nls \
+              --disable-shared \
+              --disable-threads \
+              --disable-tls \
+              --with-gnu-as \
+              --with-gnu-ld \
+              --with-newlib \
+              --with-headers=yes \
+              --with-python-dir="share/gcc-${GCC_TARGET}" \
+              --with-sysroot="${APP_PREFIX_NANO}/${GCC_TARGET}" \
+              ${MULTILIB_FLAGS} \
+              \
+              --disable-rpath \
+              --disable-build-format-warnings 
 
-          export AR_FOR_TARGET="${GCC_TARGET}-ar"
-          export NM_FOR_TARGET="${GCC_TARGET}-nm"
-          export OBJDUMP_FOR_TARET="${GCC_TARGET}-objdump"
-          export STRIP_FOR_TARGET="${GCC_TARGET}-strip"
-          export CC_FOR_TARGET="${GCC_TARGET}-gcc"
-          export GCC_FOR_TARGET="${GCC_TARGET}-gcc"
-          export CXX_FOR_TARGET="${GCC_TARGET}-g++"
-        fi
+          fi
 
-        # https://gcc.gnu.org/install/configure.html
-        # --enable-shared[=package[,…]] build shared versions of libraries
-        # --enable-tls specify that the target supports TLS (Thread Local Storage). 
-        # --enable-nls enables Native Language Support (NLS)
-        # --enable-checking=list the compiler is built to perform internal consistency checks of the requested complexity. ‘yes’ (most common checks)
-        # --with-headers=dir specify that target headers are available when building a cross compiler
-        # --with-newlib Specifies that ‘newlib’ is being used as the target C library. This causes `__eprintf`` to be omitted from `libgcc.a`` on the assumption that it will be provided by newlib.
-        # --enable-languages=c,c++ Support only C/C++, ignore all other.
-
-        if [ "$1" == "" ]
-        then
-
-          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
-            --prefix="${APP_PREFIX}"  \
-            --libexecdir="${APP_PREFIX}/lib" \
-            --infodir="${APP_PREFIX_DOC}/info" \
-            --mandir="${APP_PREFIX_DOC}/man" \
-            --htmldir="${APP_PREFIX_DOC}/html" \
-            --pdfdir="${APP_PREFIX_DOC}/pdf" \
-            \
-            --build=${BUILD} \
-            --host=${HOST} \
-            --target=${GCC_TARGET} \
-            \
-            --with-pkgversion="${BRANDING}" \
-            \
-            --enable-languages=c,c++ \
-            ${mingw_wildcard} \
-            --enable-plugins \
-            --disable-decimal-float \
-            --disable-libffi \
-            --disable-libgomp \
-            --disable-libmudflap \
-            --disable-libquadmath \
-            --disable-libssp \
-            --disable-libstdcxx-pch \
-            --disable-nls \
-            --disable-threads \
-            --enable-tls \
-            --enable-checking=yes \
-            --with-gnu-as \
-            --with-gnu-ld \
-            --with-newlib \
-            --with-headers=yes \
-            --with-python-dir="share/gcc-${GCC_TARGET}" \
-            --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
-            \
-            ${MULTILIB_FLAGS} \
-            --with-abi="${GCC_ABI}" \
-            --with-arch="${GCC_ARCH}" \
-            \
-            --disable-rpath \
-            --disable-build-format-warnings \
-            \
-          | tee "${LOGS_FOLDER_PATH}/configure-gcc$1-last-output.txt"
           cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc$1-last-log.txt"
-
-        else
-
-          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
-            --prefix="${APP_PREFIX_NANO}"  \
-            \
-            --build=${BUILD} \
-            --host=${HOST} \
-            --target=${GCC_TARGET} \
-            \
-            --with-pkgversion="${BRANDING}" \
-            \
-            --enable-languages=c,c++ \
-            --disable-decimal-float \
-            --disable-libffi \
-            --disable-libgomp \
-            --disable-libmudflap \
-            --disable-libquadmath \
-            --disable-libssp \
-            --disable-libstdcxx-pch \
-            --disable-libstdcxx-verbose \
-            --disable-nls \
-            --disable-shared \
-            --disable-threads \
-            --disable-tls \
-            --with-gnu-as \
-            --with-gnu-ld \
-            --with-newlib \
-            --with-headers=yes \
-            --with-python-dir="share/gcc-${GCC_TARGET}" \
-            --with-sysroot="${APP_PREFIX_NANO}/${GCC_TARGET}" \
-            ${MULTILIB_FLAGS} \
-            \
-            --disable-rpath \
-            --disable-build-format-warnings \
-            \
-          | tee "${LOGS_FOLDER_PATH}/configure-gcc$1-last-output.txt"
-          cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc$1-last-log.txt"
-
-        fi
-
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gcc$1-last-output.txt"
       fi
 
       (
@@ -928,77 +926,79 @@ function do_gdb()
         export GNURM_PYTHON_WIN_DIR="${SOURCES_FOLDER_PATH}/${PYTHON_WIN}"
       fi
 
+      export GCC_WARN_CFLAGS="-Wno-implicit-function-declaration -Wno-parentheses -Wno-format -Wno-deprecated-declarations -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-int-in-bool-context -Wno-format-nonliteral -Wno-misleading-indentation"
+      export GCC_WARN_CXXFLAGS="-Wno-deprecated-declarations"
+
+      export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}"
+      export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}"
+      
+      export CPPFLAGS="${XBB_CPPFLAGS}" 
+      export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}"
+
+      local extra_python_opts="--with-python=no"
+      if [ "$1" == "-py" ]
+      then
+        if [ "${TARGET_PLATFORM}" == "win32" ]
+        then
+          extra_python_opts="--with-python=${BUILD_GIT_PATH}/scripts/python-config.sh"
+        else
+          extra_python_opts="--with-python=$(which python2)"
+        fi
+      elif [ "$1" == "-py3" ]
+      then
+        # Not yet functional, configure fails.
+        extra_python_opts="--with-python=$(which python3)"
+      fi
+
       if [ ! -f "config.status" ]
       then
 
-        echo
-        echo "Running gdb$1 configure..."
-      
-        bash "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" --help
-
-        export GCC_WARN_CFLAGS="-Wno-implicit-function-declaration -Wno-parentheses -Wno-format -Wno-deprecated-declarations -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-int-in-bool-context -Wno-format-nonliteral -Wno-misleading-indentation"
-        export GCC_WARN_CXXFLAGS="-Wno-deprecated-declarations"
-
-        export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}"
-        export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}"
+        (
+          echo
+          echo "Running gdb$1 configure..."
         
-        export CPPFLAGS="${XBB_CPPFLAGS}" 
-        export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}"
- 
-        local extra_python_opts="--with-python=no"
-        if [ "$1" == "-py" ]
-        then
-          if [ "${TARGET_PLATFORM}" == "win32" ]
-          then
-            extra_python_opts="--with-python=${BUILD_GIT_PATH}/scripts/python-config.sh"
-          else
-            extra_python_opts="--with-python=$(which python2)"
-          fi
-        elif [ "$1" == "-py3" ]
-        then
-          # Not yet functional, configure fails.
-          extra_python_opts="--with-python=$(which python3)"
-        fi
+          bash "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" --help
 
-        # Note that all components are disabled, except GDB.
-        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" \
-          --prefix="${APP_PREFIX}"  \
-          --infodir="${APP_PREFIX_DOC}/info" \
-          --mandir="${APP_PREFIX_DOC}/man" \
-          --htmldir="${APP_PREFIX_DOC}/html" \
-          --pdfdir="${APP_PREFIX_DOC}/pdf" \
-          \
-          --build=${BUILD} \
-          --host=${HOST} \
-          --target=${GCC_TARGET} \
-          \
-          --with-pkgversion="${BRANDING}" \
-          \
-          --disable-nls \
-          --disable-sim \
-          --disable-gas \
-          --disable-binutils \
-          --disable-ld \
-          --disable-gprof \
-          --with-expat \
-          --with-lzma=yes \
-          --with-system-gdbinit="${APP_PREFIX}/${GCC_TARGET}/lib/gdbinit" \
-          --with-gdb-datadir="${APP_PREFIX}/${GCC_TARGET}/share/gdb" \
-          \
-          ${extra_python_opts} \
-          --program-prefix="${GCC_TARGET}-" \
-          --program-suffix="$1" \
-          \
-          --enable-static \
-          --disable-werror \
-          --enable-build-warnings=no \
-          --disable-rpath \
-          --without-guile \
-          --without-babeltrace \
-          --without-libunwind-ia64 \
-          \
-        | tee "${LOGS_FOLDER_PATH}/configure-gdb$1-output.txt"
-        cp "config.log" "${LOGS_FOLDER_PATH}/config-gdb$1-log.txt"
+          # Note that all components are disabled, except GDB.
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" \
+            --prefix="${APP_PREFIX}"  \
+            --infodir="${APP_PREFIX_DOC}/info" \
+            --mandir="${APP_PREFIX_DOC}/man" \
+            --htmldir="${APP_PREFIX_DOC}/html" \
+            --pdfdir="${APP_PREFIX_DOC}/pdf" \
+            \
+            --build=${BUILD} \
+            --host=${HOST} \
+            --target=${GCC_TARGET} \
+            \
+            --with-pkgversion="${BRANDING}" \
+            \
+            --disable-nls \
+            --disable-sim \
+            --disable-gas \
+            --disable-binutils \
+            --disable-ld \
+            --disable-gprof \
+            --with-expat \
+            --with-lzma=yes \
+            --with-system-gdbinit="${APP_PREFIX}/${GCC_TARGET}/lib/gdbinit" \
+            --with-gdb-datadir="${APP_PREFIX}/${GCC_TARGET}/share/gdb" \
+            \
+            ${extra_python_opts} \
+            --program-prefix="${GCC_TARGET}-" \
+            --program-suffix="$1" \
+            \
+            --enable-static \
+            --disable-werror \
+            --enable-build-warnings=no \
+            --disable-rpath \
+            --without-guile \
+            --without-babeltrace \
+            --without-libunwind-ia64 
+
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-gdb$1-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gdb$1-output.txt"
+
       fi
 
       (
