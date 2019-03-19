@@ -1,4 +1,11 @@
 # -----------------------------------------------------------------------------
+# This file is part of the GNU MCU Eclipse distribution.
+#   (https://gnu-mcu-eclipse.github.io)
+# Copyright (c) 2019 Liviu Ionescu.
+#
+# Permission to use, copy, modify, and/or distribute this software 
+# for any purpose is hereby granted, under the terms of the MIT license.
+# -----------------------------------------------------------------------------
 
 # Helper script used in the second edition of the GNU MCU Eclipse build 
 # scripts. As the name implies, it should contain only functions and 
@@ -8,9 +15,9 @@
 
 function download_binutils() 
 {
-  if [ ! -d "${WORK_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}" ]
+  if [ ! -d "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}" ]
   then
-    cd "${WORK_FOLDER_PATH}"
+    cd "${SOURCES_FOLDER_PATH}"
     if [ -n "${BINUTILS_GIT_URL}" ]
     then
       git_clone "${BINUTILS_GIT_URL}" "${BINUTILS_GIT_BRANCH}" \
@@ -25,9 +32,9 @@ function download_binutils()
 
 function download_gcc() 
 {
-  if [ ! -d "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}" ]
+  if [ ! -d "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}" ]
   then
-    cd "${WORK_FOLDER_PATH}"
+    cd "${SOURCES_FOLDER_PATH}"
     if [ -n "${GCC_GIT_URL}" ]
     then
       git_clone "${GCC_GIT_URL}" "${GCC_GIT_BRANCH}" \
@@ -42,9 +49,9 @@ function download_gcc()
 
 function download_newlib() 
 {
-  if [ ! -d "${WORK_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}" ]
+  if [ ! -d "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}" ]
   then
-    cd "${WORK_FOLDER_PATH}"
+    cd "${SOURCES_FOLDER_PATH}"
     if [ -n "${NEWLIB_GIT_URL}" ]
     then
       git_clone "${NEWLIB_GIT_URL}" "${NEWLIB_GIT_BRANCH}" \
@@ -60,9 +67,9 @@ function download_newlib()
 function download_gdb() 
 {
   # Same package as binutils.
-  if [ ! -d "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}" ]
+  if [ ! -d "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}" ]
   then
-    cd "${WORK_FOLDER_PATH}"
+    cd "${SOURCES_FOLDER_PATH}"
     if [ -n "${GDB_GIT_URL}" ]
     then
       git_clone "${GDB_GIT_URL}" "${GDB_GIT_BRANCH}" \
@@ -77,42 +84,28 @@ function download_gdb()
 
 # -----------------------------------------------------------------------------
 
-function download_python() 
+function download_python_win() 
 {
-  # https://www.python.org/downloads/release/python-2714/
+  # https://www.python.org/downloads/
   # https://www.python.org/ftp/python/2.7.14/python-2.7.14.msi
   # https://www.python.org/ftp/python/2.7.14/python-2.7.14.amd64.msi
 
-  cd "${WORK_FOLDER_PATH}"
+  cd "${SOURCES_FOLDER_PATH}"
 
   download "${PYTHON_WIN_URL}" "${PYTHON_WIN_PACK}"
 
   if [ ! -d "${PYTHON_WIN}" ]
   then
-    # Hack to install a tool able to unpack .MSI setups.
-    # TODO: move to XBB.
-    # https://sourceforge.net/projects/p7zip/files/p7zip/16.02/p7zip_16.02_src_all.tar.bz2/download
-    p7zip_version="16.02"
-    p7zip_folder_name="p7zip_${p7zip_version}"
-    p7zip_archive="${p7zip_folder_name}_src_all.tar.bz2"
-    p7zip_url="https://sourceforge.net/projects/p7zip/files/p7zip/${p7zip_version}/${p7zip_archive}"
 
-    cd "${BUILD_FOLDER_PATH}"
-    download_and_extract "${p7zip_url}" "${p7zip_archive}" "${p7zip_folder_name}"
-
-    cd "${p7zip_folder_name}"
-    # Test only 7za
-    make test
-
-    cd "${WORK_FOLDER_PATH}"
+    cd "${SOURCES_FOLDER_PATH}"
     # Include only the headers and the python library and executable.
     echo '*.h' >/tmp/included
     echo 'python*.dll' >>/tmp/included
     echo 'python*.lib' >>/tmp/included
-    "${BUILD_FOLDER_PATH}/${p7zip_folder_name}"/bin/7za x -o"${PYTHON_WIN}" "${DOWNLOAD_FOLDER_PATH}/${PYTHON_WIN_PACK}" -i@/tmp/included
+    7za x -o"${PYTHON_WIN}" "${DOWNLOAD_FOLDER_PATH}/${PYTHON_WIN_PACK}" -i@/tmp/included
 
     # Patch to disable the macro that renames hypot.
-    local patch_path="${WORK_FOLDER_PATH}/build.git/patches/${PYTHON_WIN}.patch"
+    local patch_path="${BUILD_GIT_PATH}/patches/${PYTHON_WIN}.patch"
     if [ -f "${patch_path}" ]
     then
       patch -p0 <"${patch_path}" 
@@ -142,6 +135,7 @@ function do_binutils()
       cd "${BUILD_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}"
 
       xbb_activate
+      xbb_activate_this
 
       if [ ! -f "config.status" ]
       then
@@ -149,13 +143,13 @@ function do_binutils()
         echo
         echo "Running binutils configure..."
       
-        bash "${WORK_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}/configure" --help
+        bash "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}/configure" --help
 
-        export CFLAGS="${EXTRA_CFLAGS} -Wno-deprecated-declarations -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-shift-negative-value -Wno-format -Wno-implicit-fallthrough"
-        export CXXFLAGS="${EXTRA_CXXFLAGS} -Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-c++11-narrowing"
-        export CPPFLAGS="${EXTRA_CPPFLAGS}"
-        LDFLAGS="${EXTRA_LDFLAGS_APP}" 
-        if [ "${TARGET_OS}" == "win" ]
+        export CFLAGS="${XBB_CFLAGS} -Wno-deprecated-declarations -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-shift-negative-value -Wno-format -Wno-implicit-fallthrough"
+        export CXXFLAGS="${XBB_CXXFLAGS} -Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-c++11-narrowing"
+        export CPPFLAGS="${XBB_CPPFLAGS}"
+        LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
+        if [ "${TARGET_PLATFORM}" == "win32" ]
         then
           LDFLAGS="${LDFLAGS} -Wl,${XBB_FOLDER}/${CROSS_COMPILE_PREFIX}/lib/CRT_glob.o"
         fi
@@ -165,7 +159,7 @@ function do_binutils()
 
         # Note that GDB is disabled here, will be build later, possibly from 
         # different sources.
-        bash "${WORK_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}/configure" \
+        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}/configure" \
           --prefix="${APP_PREFIX}" \
           --infodir="${APP_PREFIX_DOC}/info" \
           --mandir="${APP_PREFIX_DOC}/man" \
@@ -186,23 +180,23 @@ function do_binutils()
           --enable-plugins \
           --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
           \
-          --disable-shared \
           --enable-static \
           --enable-build-warnings=no \
           --disable-rpath \
-          --with-system-zlib \
           \
-        | tee "${INSTALL_FOLDER_PATH}/configure-binutils-output.txt"
-        cp "config.log" "${INSTALL_FOLDER_PATH}"/config-binutils-log.txt
+        | tee "${LOGS_FOLDER_PATH}/configure-binutils-output.txt"
+        cp "config.log" "${LOGS_FOLDER_PATH}/config-binutils-log.txt"
 
       fi
 
-      echo
-      echo "Running binutils make..."
-      
       (
+        echo
+        echo "Running binutils make..."
+      
         make ${JOBS} 
         make install
+
+        prepare_app_folder_libraries "${APP_PREFIX}"
 
         if [ "${WITH_PDF}" == "y" ]
         then
@@ -221,32 +215,19 @@ function do_binutils()
         # object files: cannot compile".
         copy_dir "${APP_PREFIX}" "${APP_PREFIX_NANO}"
 
-      ) | tee "${INSTALL_FOLDER_PATH}/make-newlib-output.txt"
+      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-newlib-output.txt"
     )
 
-    if [ "${TARGET_OS}" != "win" ]
-    then
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-ar" --version
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-as" --version
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-ld" --version
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-nm" --version
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-objcopy" --version
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-objdump" --version
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-ranlib" --version
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-size" --version
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-strings" --version
-      echo
-      "${APP_PREFIX}/bin/${GCC_TARGET}-strip" --version
-    fi
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-ar" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-as" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-ld" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-nm" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-objcopy" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-objdump" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-ranlib" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-size" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-strings" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-strip" --version
 
     touch "${binutils_stamp_file_path}"
   else
@@ -270,9 +251,10 @@ function do_gcc_first()
       echo "Running the multilib generator..."
 
       (
-        cd "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/gcc/config/riscv"
+        cd "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/gcc/config/riscv"
 
         xbb_activate
+        xbb_activate_this
 
         # Be sure the ${GCC_MULTILIB} has no quotes, since it defines 
         # multiple strings.
@@ -290,6 +272,7 @@ function do_gcc_first()
       cd "${BUILD_FOLDER_PATH}/${gcc_first_folder_name}"
 
       xbb_activate
+      xbb_activate_this
 
       if [ ! -f "config.status" ]
       then
@@ -297,14 +280,14 @@ function do_gcc_first()
         echo
         echo "Running gcc first stage configure..."
       
-        bash "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" --help
+        bash "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" --help
 
         export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unused-value -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-unused-but-set-variable -Wno-shift-negative-value -Wno-misleading-indentation -Wno-strict-overflow -Wno-sign-compare"
-        export CFLAGS="${EXTRA_CFLAGS} ${GCC_WARN_CFLAGS}" 
+        export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}" 
         export GCC_WARN_CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-format-security -Wno-suggest-attribute=format -Wno-format-extra-args -Wno-format -Wno-varargs -Wno-shift-count-overflow -Wno-ignored-attributes -Wno-tautological-compare -Wno-unused-label -Wno-unused-parameter -Wno-literal-suffix -Wno-expansion-to-defined -Wno-maybe-uninitialized -Wno-shift-negative-value -Wno-memset-elt-size -Wno-dangling-else -Wno-sequence-point -Wno-misleading-indentation -Wno-int-in-bool-context"
-        export CXXFLAGS="${EXTRA_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
-        export CPPFLAGS="${EXTRA_CPPFLAGS}" 
-        export LDFLAGS="${EXTRA_LDFLAGS_APP}" 
+        export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
+        export CPPFLAGS="${XBB_CPPFLAGS}" 
+        export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
 
         export CFLAGS_FOR_TARGET="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}" 
         export CXXFLAGS_FOR_TARGET="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}" 
@@ -320,9 +303,8 @@ function do_gcc_first()
 
         # --enable-checking=no ???
 
-        bash "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
+        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
           --prefix="${APP_PREFIX}"  \
-          --libexecdir="${APP_PREFIX}/lib" \
           --infodir="${APP_PREFIX_DOC}/info" \
           --mandir="${APP_PREFIX_DOC}/man" \
           --htmldir="${APP_PREFIX_DOC}/html" \
@@ -343,7 +325,6 @@ function do_gcc_first()
           --disable-libssp \
           --disable-libstdcxx-pch \
           --disable-nls \
-          --disable-shared \
           --disable-threads \
           --disable-tls \
           --enable-checking=no \
@@ -360,10 +341,9 @@ function do_gcc_first()
           \
           --disable-rpath \
           --disable-build-format-warnings \
-          --with-system-zlib \
           \
-        | tee "${INSTALL_FOLDER_PATH}/configure-gcc-first-output.txt"
-        cp "config.log" "${INSTALL_FOLDER_PATH}"/config-gcc-first-log.txt
+        | tee "${LOGS_FOLDER_PATH}/configure-gcc-first-output.txt"
+        cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc-first-log.txt"
 
       fi
 
@@ -376,7 +356,9 @@ function do_gcc_first()
         # Parallel build failed once on win32.
         make ${JOBS} all-gcc
         make install-gcc
-      ) | tee "${INSTALL_FOLDER_PATH}/make-gcc-first-output.txt"
+
+        prepare_app_folder_libraries "${APP_PREFIX}"
+      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc-first-output.txt"
     )
 
     touch "${gcc_first_stamp_file_path}"
@@ -402,6 +384,7 @@ function do_newlib()
       cd "${BUILD_FOLDER_PATH}/${newlib_folder_name}"
 
       xbb_activate
+      xbb_activate_this
 
       # Add the gcc first stage binaries to the path.
       PATH="${APP_PREFIX}/bin":${PATH}
@@ -431,7 +414,7 @@ function do_newlib()
         echo
         echo "Running newlib$1 configure..."
       
-        bash "${WORK_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" --help
+        bash "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" --help
 
         local optimize="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}"
         if [ "$1" == "-nano" ]
@@ -440,9 +423,9 @@ function do_newlib()
           optimize="$(echo ${optimize} | sed -e 's/-O2/-Os/')"
         fi
 
-        export CFLAGS="${EXTRA_CFLAGS}"
-        export CXXFLAGS="${EXTRA_CXXFLAGS}"
-        export CPPFLAGS="${EXTRA_CPPFLAGS}" 
+        export CFLAGS="${XBB_CFLAGS}"
+        export CXXFLAGS="${XBB_CXXFLAGS}"
+        export CPPFLAGS="${XBB_CPPFLAGS}" 
 
         # Note the intentional `-g`.
         export CFLAGS_FOR_TARGET="${optimize} -g -Wno-implicit-function-declaration -Wno-incompatible-pointer-types -Wno-int-conversion -Wno-logical-not-parentheses -Wno-implicit-int -Wno-expansion-to-defined" 
@@ -458,7 +441,7 @@ function do_newlib()
           # Extra options to ARM distribution:
           # --enable-newlib-io-long-long
           # --enable-newlib-io-c99-formats
-          bash "${WORK_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" \
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" \
             --prefix="${APP_PREFIX}"  \
             --infodir="${APP_PREFIX_DOC}/info" \
             --mandir="${APP_PREFIX_DOC}/man" \
@@ -478,7 +461,7 @@ function do_newlib()
             --enable-newlib-io-long-long \
             --enable-newlib-io-c99-formats \
             \
-          | tee "${INSTALL_FOLDER_PATH}/configure-newlib$1-output.txt"
+          | tee "${LOGS_FOLDER_PATH}/configure-newlib$1-output.txt"
 
         elif [ "$1" == "-nano" ]
         then
@@ -486,7 +469,7 @@ function do_newlib()
           # --enable-newlib-io-long-long and --enable-newlib-io-c99-formats
           # are currently ignored if --enable-newlib-nano-formatted-io.
           # --enable-newlib-register-fini is debatable, was removed.
-          bash "${WORK_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" \
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}/configure" \
             --prefix="${APP_PREFIX_NANO}"  \
             \
             --build=${BUILD} \
@@ -505,23 +488,23 @@ function do_newlib()
             --enable-newlib-nano-formatted-io \
             --disable-nls \
             \
-          | tee "${INSTALL_FOLDER_PATH}/configure-newlib$1-output.txt"
+          | tee "${LOGS_FOLDER_PATH}/configure-newlib$1-output.txt"
 
         else
           echo "Unsupported do_newlib arg $1"
           exit 1
         fi
-        cp "config.log" "${INSTALL_FOLDER_PATH}"/config-newlib$1-log.txt
+        cp "config.log" "${LOGS_FOLDER_PATH}/config-newlib$1-log.txt"
 
       fi
 
-      # Partial build, without documentation.
-      echo
-      echo "Running newlib$1 make..."
-
       (
+        # Partial build, without documentation.
+        echo
+        echo "Running newlib$1 make..."
+
         # Parallel build failed on CentOS XBB
-        if [ "${TARGET_OS}" == "macos" ]
+        if [ "${TARGET_PLATFORM}" == "darwin" ]
         then
           make ${JOBS}
         else
@@ -546,14 +529,14 @@ function do_newlib()
               make ${JOBS} pdf
             )
 
-            /usr/bin/install -v -d "${APP_PREFIX_DOC}"/pdf
+            /usr/bin/install -v -d "${APP_PREFIX_DOC}/pdf"
 
             /usr/bin/install -v -c -m 644 \
-              "${GCC_TARGET}"/libgloss/doc/porting.pdf "${APP_PREFIX_DOC}"/pdf
+              "${GCC_TARGET}/libgloss/doc/porting.pdf" "${APP_PREFIX_DOC}/pdf"
             /usr/bin/install -v -c -m 644 \
-              "${GCC_TARGET}"/newlib/libc/libc.pdf "${APP_PREFIX_DOC}"/pdf
+              "${GCC_TARGET}/newlib/libc/libc.pdf" "${APP_PREFIX_DOC}/pdf"
             /usr/bin/install -v -c -m 644 \
-              "${GCC_TARGET}"/newlib/libm/libm.pdf "${APP_PREFIX_DOC}"/pdf
+              "${GCC_TARGET}/newlib/libm/libm.pdf" "${APP_PREFIX_DOC}/pdf"
 
           fi
 
@@ -562,16 +545,16 @@ function do_newlib()
 
             make ${JOBS} html
 
-            /usr/bin/install -v -d "${APP_PREFIX_DOC}"/html
+            /usr/bin/install -v -d "${APP_PREFIX_DOC}/html"
 
-            copy_dir "${GCC_TARGET}"/newlib/libc/libc.html "${APP_PREFIX_DOC}"/html/libc
-            copy_dir "${GCC_TARGET}"/newlib/libm/libm.html "${APP_PREFIX_DOC}"/html/libm
+            copy_dir "${GCC_TARGET}/newlib/libc/libc.html" "${APP_PREFIX_DOC}/html/libc"
+            copy_dir "${GCC_TARGET}/newlib/libm/libm.html" "${APP_PREFIX_DOC}/html/libm"
 
           fi
 
         fi
 
-      ) | tee "${INSTALL_FOLDER_PATH}/make-gcc-first-output.txt"
+      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc-first-output.txt"
     )
 
     touch "${newlib_stamp_file_path}"
@@ -587,28 +570,28 @@ function copy_nano_libs()
   local src_folder="$1"
   local dst_folder="$2"
 
-  if [ -f "${src_folder}"/libstdc++.a ]
+  if [ -f "${src_folder}/libstdc++.a" ]
   then
-    cp -v -f "${src_folder}"/libstdc++.a "${dst_folder}"/libstdc++_nano.a
+    cp -v -f "${src_folder}/libstdc++.a" "${dst_folder}/libstdc++_nano.a"
   fi
-  if [ -f "${src_folder}"/libsupc++.a ]
+  if [ -f "${src_folder}/libsupc++.a" ]
   then
-    cp -v -f "${src_folder}"/libsupc++.a "${dst_folder}"/libsupc++_nano.a
+    cp -v -f "${src_folder}/libsupc++.a" "${dst_folder}/libsupc++_nano.a"
   fi
-  cp -v -f "${src_folder}"/libc.a "${dst_folder}"/libc_nano.a
-  cp -v -f "${src_folder}"/libg.a "${dst_folder}"/libg_nano.a
-  if [ -f "${src_folder}"/librdimon.a ]
+  cp -v -f "${src_folder}/libc.a" "${dst_folder}/libc_nano.a"
+  cp -v -f "${src_folder}/libg.a" "${dst_folder}/libg_nano.a"
+  if [ -f "${src_folder}/librdimon.a" ]
   then
-    cp -v -f "${src_folder}"/librdimon.a "${dst_folder}"/librdimon_nano.a
+    cp -v -f "${src_folder}/librdimon.a" "${dst_folder}/librdimon_nano.a"
   fi
 
-  cp -v -f "${src_folder}"/nano.specs "${dst_folder}"/
-  if [ -f "${src_folder}"/rdimon.specs ]
+  cp -v -f "${src_folder}/nano.specs" "${dst_folder}/"
+  if [ -f "${src_folder}/rdimon.specs" ]
   then
-    cp -v -f "${src_folder}"/rdimon.specs "${dst_folder}"/
+    cp -v -f "${src_folder}/rdimon.specs" "${dst_folder}/"
   fi
-  cp -v -f "${src_folder}"/nosys.specs "${dst_folder}"/
-  cp -v -f "${src_folder}"/*crt0.o "${dst_folder}"/
+  cp -v -f "${src_folder}/nosys.specs" "${dst_folder}/"
+  cp -v -f "${src_folder}"/*crt0.o "${dst_folder}/"
 }
 
 # Copy target libraries from each multilib folders.
@@ -649,15 +632,15 @@ function copy_linux_libs()
 
     local linux_path="${LINUX_INSTALL_PATH}"
 
-    copy_dir "${linux_path}/${GCC_TARGET}"/lib "${APP_PREFIX}/${GCC_TARGET}"/lib
-    copy_dir "${linux_path}/${GCC_TARGET}"/include "${APP_PREFIX}/${GCC_TARGET}"/include
-    copy_dir "${linux_path}"/include "${APP_PREFIX}"/include
-    copy_dir "${linux_path}"/lib "${APP_PREFIX}"/lib
-    copy_dir "${linux_path}"/share "${APP_PREFIX}"/share
+    copy_dir "${linux_path}/${GCC_TARGET}/lib" "${APP_PREFIX}/${GCC_TARGET}/lib"
+    copy_dir "${linux_path}/${GCC_TARGET}/include" "${APP_PREFIX}/${GCC_TARGET}/include"
+    copy_dir "${linux_path}/include" "${APP_PREFIX}/include"
+    copy_dir "${linux_path}/lib" "${APP_PREFIX}/lib"
+    copy_dir "${linux_path}/share" "${APP_PREFIX}/share"
 
     (
       cd "${APP_PREFIX}"
-      find "${GCC_TARGET}"/lib "${GCC_TARGET}"/include include lib share \
+      find "${GCC_TARGET}/lib" "${GCC_TARGET}/include" "include" "lib" "share" \
         -perm /111 -and ! -type d \
         -exec rm '{}' ';'
     )
@@ -687,6 +670,7 @@ function do_gcc_final()
       cd "${BUILD_FOLDER_PATH}/${gcc_final_folder_name}"
 
       xbb_activate
+      xbb_activate_this
 
       if [ ! -f "config.status" ]
       then
@@ -694,14 +678,14 @@ function do_gcc_final()
         echo
         echo "Running gcc$1 final stage configure..."
       
-        bash "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" --help
+        bash "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" --help
 
         export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unused-value -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-unused-but-set-variable -Wno-shift-negative-value -Wno-expansion-to-defined -Wno-strict-overflow -Wno-sign-compare"
-        export CFLAGS="${EXTRA_CFLAGS} ${GCC_WARN_CFLAGS}" 
+        export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}" 
         export GCC_WARN_CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-format-security -Wno-suggest-attribute=format -Wno-format-extra-args -Wno-format -Wno-unused-function -Wno-attributes -Wno-maybe-uninitialized -Wno-expansion-to-defined -Wno-misleading-indentation -Wno-literal-suffix -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-shift-negative-value -Wno-dangling-else -Wno-sequence-point -Wno-nonnull -Wno-unused-parameter"
-        export CXXFLAGS="${EXTRA_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
-        export CPPFLAGS="${EXTRA_CPPFLAGS}" 
-        export LDFLAGS="${EXTRA_LDFLAGS_APP}" 
+        export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
+        export CPPFLAGS="${XBB_CPPFLAGS}" 
+        export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
         # Do not add CRT_glob.o here, it will fail with already defined,
         # since it is already handled by --enable-mingw-wildcard.
 
@@ -718,17 +702,17 @@ function do_gcc_final()
 
         mingw_wildcard="--disable-mingw-wildcard"
 
-        if [ "${TARGET_OS}" == "win" ]
+        if [ "${TARGET_PLATFORM}" == "win32" ]
         then
           mingw_wildcard="--enable-mingw-wildcard"
 
-          export AR_FOR_TARGET=${GCC_TARGET}-ar
-          export NM_FOR_TARGET=${GCC_TARGET}-nm
-          export OBJDUMP_FOR_TARET=${GCC_TARGET}-objdump
-          export STRIP_FOR_TARGET=${GCC_TARGET}-strip
-          export CC_FOR_TARGET=${GCC_TARGET}-gcc
-          export GCC_FOR_TARGET=${GCC_TARGET}-gcc
-          export CXX_FOR_TARGET=${GCC_TARGET}-g++
+          export AR_FOR_TARGET="${GCC_TARGET}-ar"
+          export NM_FOR_TARGET="${GCC_TARGET}-nm"
+          export OBJDUMP_FOR_TARET="${GCC_TARGET}-objdump"
+          export STRIP_FOR_TARGET="${GCC_TARGET}-strip"
+          export CC_FOR_TARGET="${GCC_TARGET}-gcc"
+          export GCC_FOR_TARGET="${GCC_TARGET}-gcc"
+          export CXX_FOR_TARGET="${GCC_TARGET}-g++"
         fi
 
         # https://gcc.gnu.org/install/configure.html
@@ -743,7 +727,7 @@ function do_gcc_final()
         if [ "$1" == "" ]
         then
 
-          bash "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
             --prefix="${APP_PREFIX}"  \
             --libexecdir="${APP_PREFIX}/lib" \
             --infodir="${APP_PREFIX_DOC}/info" \
@@ -768,7 +752,6 @@ function do_gcc_final()
             --disable-libssp \
             --disable-libstdcxx-pch \
             --disable-nls \
-            --disable-shared \
             --disable-threads \
             --enable-tls \
             --enable-checking=yes \
@@ -776,7 +759,7 @@ function do_gcc_final()
             --with-gnu-ld \
             --with-newlib \
             --with-headers=yes \
-            --with-python-dir=share/gcc-${GCC_TARGET} \
+            --with-python-dir="share/gcc-${GCC_TARGET}" \
             --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
             \
             ${MULTILIB_FLAGS} \
@@ -785,14 +768,13 @@ function do_gcc_final()
             \
             --disable-rpath \
             --disable-build-format-warnings \
-            --with-system-zlib \
             \
-          | tee "${INSTALL_FOLDER_PATH}/configure-gcc$1-last-output.txt"
-          cp "config.log" "${INSTALL_FOLDER_PATH}"/config-gcc$1-last-log.txt
+          | tee "${LOGS_FOLDER_PATH}/configure-gcc$1-last-output.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc$1-last-log.txt"
 
         else
 
-          bash "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
+          bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
             --prefix="${APP_PREFIX_NANO}"  \
             \
             --build=${BUILD} \
@@ -818,27 +800,26 @@ function do_gcc_final()
             --with-gnu-ld \
             --with-newlib \
             --with-headers=yes \
-            --with-python-dir=share/gcc-${GCC_TARGET} \
+            --with-python-dir="share/gcc-${GCC_TARGET}" \
             --with-sysroot="${APP_PREFIX_NANO}/${GCC_TARGET}" \
             ${MULTILIB_FLAGS} \
             \
             --disable-rpath \
             --disable-build-format-warnings \
-            --with-system-zlib \
             \
-          | tee "${INSTALL_FOLDER_PATH}/configure-gcc$1-last-output.txt"
-          cp "config.log" "${INSTALL_FOLDER_PATH}"/config-gcc$1-last-log.txt
+          | tee "${LOGS_FOLDER_PATH}/configure-gcc$1-last-output.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc$1-last-log.txt"
 
         fi
 
       fi
 
-      # Partial build, without documentation.
-      echo
-      echo "Running gcc$1 final stage make..."
-
       (
-        if [ "${TARGET_OS}" != "win" ]
+        # Partial build, without documentation.
+        echo
+        echo "Running gcc$1 final stage make..."
+
+        if [ "${TARGET_PLATFORM}" != "win32" ]
         then
 
           # Passing USE_TM_CLONE_REGISTRY=0 via INHIBIT_LIBC_CFLAGS to disable
@@ -847,6 +828,8 @@ function do_gcc_final()
           # CRTSTUFF_T_CFLAGS
           make ${JOBS} INHIBIT_LIBC_CFLAGS="-DUSE_TM_CLONE_REGISTRY=0"
           make install-strip
+
+          prepare_app_folder_libraries "${APP_PREFIX}"
 
           if [ "$1" == "" ]
           then
@@ -868,7 +851,7 @@ function do_gcc_final()
           then
 
             local target_gcc=""
-            if [ "${TARGET_OS}" == "win" ]
+            if [ "${TARGET_PLATFORM}" == "win32" ]
             then
               target_gcc="${GCC_TARGET}-gcc"
             else
@@ -897,6 +880,8 @@ function do_gcc_final()
           make ${JOBS} all-gcc
           make install-gcc
 
+          prepare_app_folder_libraries "${APP_PREFIX}"
+
           if [ "${WITH_PDF}" == "y" ]
           then
             make install-pdf-gcc
@@ -909,7 +894,7 @@ function do_gcc_final()
 
         fi
 
-      ) | tee "${INSTALL_FOLDER_PATH}/make-gcc-last-output.txt"
+      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc$1-last-output.txt"
     )
 
     touch "${gcc_final_stamp_file_path}"
@@ -918,8 +903,8 @@ function do_gcc_final()
   fi
 }
 
-# Called twice, with and without python support.
-# $1="" or $1="-py"
+# Called multile times, with and without python support.
+# $1="" or $1="-py" or $1="-py3"
 function do_gdb()
 {
   local gdb_folder_name="${GDB_FOLDER_NAME}$1"
@@ -935,11 +920,12 @@ function do_gdb()
       cd "${BUILD_FOLDER_PATH}/${gdb_folder_name}"
 
       xbb_activate
+      xbb_activate_this
 
-      if [ "${TARGET_OS}" == "win" ]
+      if [ "${TARGET_PLATFORM}" == "win32" ]
       then
         # Definition required by python-config.sh.
-        export GNURM_PYTHON_WIN_DIR="${WORK_FOLDER_PATH}/${PYTHON_WIN}"
+        export GNURM_PYTHON_WIN_DIR="${SOURCES_FOLDER_PATH}/${PYTHON_WIN}"
       fi
 
       if [ ! -f "config.status" ]
@@ -948,30 +934,34 @@ function do_gdb()
         echo
         echo "Running gdb$1 configure..."
       
-        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" --help
+        bash "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" --help
 
         export GCC_WARN_CFLAGS="-Wno-implicit-function-declaration -Wno-parentheses -Wno-format -Wno-deprecated-declarations -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-int-in-bool-context -Wno-format-nonliteral -Wno-misleading-indentation"
         export GCC_WARN_CXXFLAGS="-Wno-deprecated-declarations"
 
-        export CFLAGS="${EXTRA_CFLAGS} ${GCC_WARN_CFLAGS}"
-        export CXXFLAGS="${EXTRA_CXXFLAGS} ${GCC_WARN_CXXFLAGS}"
+        export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}"
+        export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}"
         
-        export CPPFLAGS="${EXTRA_CPPFLAGS}" 
-        export LDFLAGS="${EXTRA_LDFLAGS_APP}"
+        export CPPFLAGS="${XBB_CPPFLAGS}" 
+        export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}"
  
         local extra_python_opts="--with-python=no"
         if [ "$1" == "-py" ]
         then
-          if [ "${TARGET_OS}" == "win" ]
+          if [ "${TARGET_PLATFORM}" == "win32" ]
           then
-            extra_python_opts="--with-python=${WORK_FOLDER_PATH}/build.git/scripts/python-config.sh"
+            extra_python_opts="--with-python=${BUILD_GIT_PATH}/scripts/python-config.sh"
           else
-            extra_python_opts="--with-python=yes"
+            extra_python_opts="--with-python=$(which python2)"
           fi
+        elif [ "$1" == "-py3" ]
+        then
+          # Not yet functional, configure fails.
+          extra_python_opts="--with-python=$(which python3)"
         fi
 
         # Note that all components are disabled, except GDB.
-        bash "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" \
+        bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/configure" \
           --prefix="${APP_PREFIX}"  \
           --infodir="${APP_PREFIX_DOC}/info" \
           --mandir="${APP_PREFIX_DOC}/man" \
@@ -992,33 +982,33 @@ function do_gdb()
           --disable-gprof \
           --with-expat \
           --with-lzma=yes \
-          --with-system-gdbinit="${APP_PREFIX}/${GCC_TARGET}"/lib/gdbinit \
-          --with-gdb-datadir="${APP_PREFIX}/${GCC_TARGET}"/share/gdb \
+          --with-system-gdbinit="${APP_PREFIX}/${GCC_TARGET}/lib/gdbinit" \
+          --with-gdb-datadir="${APP_PREFIX}/${GCC_TARGET}/share/gdb" \
           \
           ${extra_python_opts} \
           --program-prefix="${GCC_TARGET}-" \
           --program-suffix="$1" \
           \
-          --disable-shared \
           --enable-static \
           --disable-werror \
           --enable-build-warnings=no \
           --disable-rpath \
-          --with-system-zlib \
           --without-guile \
           --without-babeltrace \
           --without-libunwind-ia64 \
           \
-        | tee "${INSTALL_FOLDER_PATH}/configure-gdb$1-output.txt"
-        cp "config.log" "${INSTALL_FOLDER_PATH}"/config-gdb$1-log.txt
+        | tee "${LOGS_FOLDER_PATH}/configure-gdb$1-output.txt"
+        cp "config.log" "${LOGS_FOLDER_PATH}/config-gdb$1-log.txt"
       fi
 
-      echo
-      echo "Running gdb$1 make..."
-
       (
+        echo
+        echo "Running gdb$1 make..."
+
         make ${JOBS}
         make install
+          
+        prepare_app_libraries "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1"
 
         if [ "$1" == "" ]
         then
@@ -1034,22 +1024,19 @@ function do_gdb()
             make ${JOBS} html 
             make install-html 
           fi
-          
         fi
 
-      ) | tee "${INSTALL_FOLDER_PATH}/make-gdb$1-output.txt"
+      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gdb$1-output.txt"
     )
 
-    if [ "${TARGET_OS}" != "win" ]
-    then
-      (
-        # Required by gdb-py to access the python shared library.
-        xbb_activate
+    (
+      # Required by gdb-py to access the python shared library.
+      xbb_activate
+      xbb_activate_this
 
-        "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1" --version
-        "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1" --config
-      )
-    fi
+      run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1" --version
+      run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1" --config
+    )
 
     touch "${gdb_stamp_file_path}"
   else
@@ -1061,6 +1048,8 @@ function tidy_up()
 {
   echo
   echo "Tidying up..."
+
+  cd "${WORK_FOLDER_PATH}"
 
   find "${APP_PREFIX}" -name "libiberty.a" -exec rm -v '{}' ';'
   find "${APP_PREFIX}" -name '*.la' -exec rm -v '{}' ';'
@@ -1074,52 +1063,54 @@ function strip_binaries()
     echo
     echo "Stripping binaries..."
 
-    if [ "${TARGET_OS}" != "win" ]
+    cd "${WORK_FOLDER_PATH}"
+
+    if [ "${TARGET_PLATFORM}" != "win32" ]
     then
 
-      local binaries=$(find "${INSTALL_FOLDER_PATH}"/bin -name ${GCC_TARGET}-\*)
+      local binaries=$(find "${INSTALL_FOLDER_PATH}/bin" -name ${GCC_TARGET}-\*)
       for bin in ${binaries} 
       do
-        strip_binary strip ${bin}
+        strip_binary strip "${bin}"
       done
 
-      binaries=$(find ${APP_PREFIX}/bin -maxdepth 1 -mindepth 1 -name \*)
+      binaries=$(find "${APP_PREFIX}/bin" -maxdepth 1 -mindepth 1 -name \*)
       for bin in ${binaries} 
       do
-        strip_binary strip ${bin}
+        strip_binary strip "${bin}"
       done
 
       set +e
-      if [ "${UNAME}" == "Darwin" ]; then
-        binaries=$(find ${APP_PREFIX}/lib/gcc/${GCC_TARGET}/* -maxdepth 1 -name \* -perm +111 -and ! -type d)
+      if [ "${CONTAINER_UNAME}" == "Darwin" ]; then
+        binaries=$(find "${APP_PREFIX}/lib/gcc/${GCC_TARGET}"/* -maxdepth 1 -name \* -perm +111 -and ! -type d)
       else
-        binaries=$(find ${APP_PREFIX}/lib/gcc/${GCC_TARGET}/* -maxdepth 1 -name \* -perm /111 -and ! -type d)
+        binaries=$(find "${APP_PREFIX}/lib/gcc/${GCC_TARGET}"/* -maxdepth 1 -name \* -perm /111 -and ! -type d)
       fi
       set -e
 
       for bin in ${binaries} 
       do
-        strip_binary strip ${bin}
+        strip_binary strip "${bin}"
       done
 
     else
 
-      local binaries=$(find "${INSTALL_FOLDER_PATH}"/bin -name ${GCC_TARGET}-\*.exe)
+      local binaries=$(find "${INSTALL_FOLDER_PATH}/bin" -name ${GCC_TARGET}-\*.exe)
       for bin in ${binaries} 
       do
-        strip_binary "${CROSS_COMPILE_PREFIX}"-strip ${bin}
+        strip_binary "${CROSS_COMPILE_PREFIX}-strip" "${bin}"
       done
 
-      binaries=$(find ${APP_PREFIX}/bin -maxdepth 1 -mindepth 1 -name \*)
+      binaries=$(find "${APP_PREFIX}/bin" -maxdepth 1 -mindepth 1 -name \*)
       for bin in ${binaries} 
       do
-        strip_binary "${CROSS_COMPILE_PREFIX}"-strip ${bin}
+        strip_binary "${CROSS_COMPILE_PREFIX}-strip" "${bin}"
       done
 
-      binaries=$(find ${APP_PREFIX}/lib/gcc/${GCC_TARGET}/* -maxdepth 1 -name \*.exe)
+      binaries=$(find "${APP_PREFIX}/lib/gcc/${GCC_TARGET}"/* -maxdepth 1 -name \*.exe)
       for bin in ${binaries} 
       do
-        strip_binary "${CROSS_COMPILE_PREFIX}"-strip ${bin}
+        strip_binary "${CROSS_COMPILE_PREFIX}-strip" "${bin}"
       done
 
     fi
@@ -1137,6 +1128,8 @@ function strip_libs()
       echo
       echo "Stripping libraries..."
 
+      cd "${WORK_FOLDER_PATH}"
+
       local libs=$(find "${APP_PREFIX}" -name '*.[ao]')
       for lib in ${libs}
       do
@@ -1149,51 +1142,51 @@ function strip_libs()
 
 function copy_gme_files()
 {
-  rm -rf "${APP_PREFIX}"/${DISTRO_LC_NAME}
-  mkdir -p "${APP_PREFIX}"/${DISTRO_LC_NAME}
+  rm -rf "${APP_PREFIX}/${DISTRO_LC_NAME}"
+  mkdir -p "${APP_PREFIX}/${DISTRO_LC_NAME}"
 
   echo
   echo "Copying license files..."
 
   copy_license \
-    "${WORK_FOLDER_PATH}/${ZLIB_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${ZLIB_SRC_FOLDER_NAME}" \
     "${ZLIB_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}" \
     "${GMP_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${MPFR_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${MPFR_SRC_FOLDER_NAME}" \
     "${MPFR_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${MPC_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${MPC_SRC_FOLDER_NAME}" \
     "${MPC_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${ISL_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${ISL_SRC_FOLDER_NAME}" \
     "${ISL_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${LIBELF_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${LIBELF_SRC_FOLDER_NAME}" \
     "${LIBELF_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${EXPAT_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${EXPAT_SRC_FOLDER_NAME}" \
     "${EXPAT_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${LIBICONV_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${LIBICONV_SRC_FOLDER_NAME}" \
     "${LIBICONV_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${XZ_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${XZ_SRC_FOLDER_NAME}" \
     "${XZ_FOLDER_NAME}"
 
   copy_license \
-    "${WORK_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}" \
     "${BINUTILS_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}" \
     "${GCC_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}" \
+    "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}" \
     "${NEWLIB_FOLDER_NAME}"
   copy_license \
-    "${WORK_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}"/gdb \
+    "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/gdb" \
     "${GDB_FOLDER_NAME}"
 
   copy_build_files
@@ -1201,67 +1194,9 @@ function copy_gme_files()
   echo
   echo "Copying GME files..."
 
-  cd "${WORK_FOLDER_PATH}"/build.git
-  /usr/bin/install -v -c -m 644 "README-${RELEASE_VERSION}.md" \
-    "${APP_PREFIX}"/README.md
+  cd "${BUILD_GIT_PATH}"
+  /usr/bin/install -v -c -m 644 "${README_OUT_FILE_NAME}" \
+    "${APP_PREFIX}/README.md"
 }
 
-function check_binaries()
-{
-  if [ "${TARGET_OS}" != "win" ]
-  then
-
-    echo
-    echo "Checking binaries for unwanted shared libraries..."
-
-    local binaries=$(find "${INSTALL_FOLDER_PATH}"/bin -name ${GCC_TARGET}-\*)
-    for bin in ${binaries} 
-    do
-      check_binary ${bin}
-    done
-
-    binaries=$(find ${APP_PREFIX}/bin -maxdepth 1 -mindepth 1 -name \*)
-    for bin in ${binaries} 
-    do
-      check_binary ${bin}
-    done
-
-    set +e
-    if [ "${UNAME}" == "Darwin" ]; then
-      binaries=$(find ${APP_PREFIX}/lib/gcc/${GCC_TARGET}/* -maxdepth 1 -name \* -perm +111 -and ! -type d)
-    else
-      binaries=$(find ${APP_PREFIX}/lib/gcc/${GCC_TARGET}/* -maxdepth 1 -name \* -perm /111 -and ! -type d)
-    fi
-    set -e
-
-    for bin in ${binaries}
-    do
-      check_binary ${bin}
-    done
-
-  else
-
-    echo
-    echo "Checking binaries for unwanted DLLs..."
-
-    local binaries=$(find "${INSTALL_FOLDER_PATH}"/bin -name ${GCC_TARGET}-\*.exe)
-    for bin in ${binaries} 
-    do
-      check_binary ${bin}
-    done
-
-    binaries=$(find ${APP_PREFIX}/bin -maxdepth 1 -mindepth 1 -name \*.exe)
-    for bin in ${binaries} 
-    do
-      check_binary ${bin}
-    done
-
-    binaries=$(find ${APP_PREFIX}/lib/gcc/${GCC_TARGET}/* -maxdepth 1 -name \*.exe)
-    for bin in ${binaries}
-    do
-      check_binary ${bin}
-    done
-
-  fi
-}
 
