@@ -950,7 +950,7 @@ function do_gdb()
       then
         if [ "${TARGET_PLATFORM}" == "win32" ]
         then
-          extra_python_opts="--with-python=${BUILD_GIT_PATH}/scripts/python-config.sh"
+          extra_python_opts="--with-python=${BUILD_GIT_PATH}/scripts/python-win-config.sh"
         else
           extra_python_opts="--with-python=$(which python2)"
         fi
