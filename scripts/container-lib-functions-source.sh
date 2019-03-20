@@ -73,7 +73,7 @@ function do_zlib()
 
             cp "configure.log" "${LOGS_FOLDER_PATH}/configure-zlib-log.txt"
           ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-zlib-output.txt"
-          
+
         fi
 
         (
@@ -161,6 +161,7 @@ function do_gmp()
 
           bash "${SOURCES_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}/configure" --help
 
+          # On Windows mpfr wants it shared.
           bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}/configure" \
             --prefix="${LIBS_INSTALL_FOLDER_PATH}" \
             \
@@ -168,7 +169,9 @@ function do_gmp()
             --host=${HOST} \
             --target=${TARGET} \
             \
-            --enable-cxx
+            --enable-cxx \
+            --enable-shared \
+            --disable-static
 
           cp "config.log" "${LOGS_FOLDER_PATH}/config-gmp-log.txt"
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gmp-output.txt"
