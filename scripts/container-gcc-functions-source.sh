@@ -638,11 +638,15 @@ function copy_linux_libs()
 
     local linux_path="${LINUX_INSTALL_PATH}"
 
-    copy_dir "${linux_path}/${GCC_TARGET}/lib" "${APP_PREFIX}/${GCC_TARGET}/lib"
-    copy_dir "${linux_path}/${GCC_TARGET}/include" "${APP_PREFIX}/${GCC_TARGET}/include"
-    copy_dir "${linux_path}/include" "${APP_PREFIX}/include"
-    copy_dir "${linux_path}/lib" "${APP_PREFIX}/lib"
-    copy_dir "${linux_path}/share" "${APP_PREFIX}/share"
+    (
+      cd "${WORK_FOLDER_PATH}"
+
+      copy_dir "${linux_path}/${GCC_TARGET}/lib" "${APP_PREFIX}/${GCC_TARGET}/lib"
+      copy_dir "${linux_path}/${GCC_TARGET}/include" "${APP_PREFIX}/${GCC_TARGET}/include"
+      copy_dir "${linux_path}/include" "${APP_PREFIX}/include"
+      copy_dir "${linux_path}/lib" "${APP_PREFIX}/lib"
+      copy_dir "${linux_path}/share" "${APP_PREFIX}/share"
+    ) 
 
     (
       cd "${APP_PREFIX}"
