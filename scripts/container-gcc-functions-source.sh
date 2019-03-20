@@ -140,7 +140,7 @@ function do_binutils()
       export CFLAGS="${XBB_CFLAGS} -Wno-deprecated-declarations -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-shift-negative-value -Wno-format -Wno-implicit-fallthrough"
       export CXXFLAGS="${XBB_CXXFLAGS} -Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-c++11-narrowing"
       export CPPFLAGS="${XBB_CPPFLAGS}"
-      LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
+      LDFLAGS="${XBB_LDFLAGS_APP}" 
       if [ "${TARGET_PLATFORM}" == "win32" ]
       then
         LDFLAGS="${LDFLAGS} -Wl,${XBB_FOLDER}/${CROSS_COMPILE_PREFIX}/lib/CRT_glob.o"
@@ -180,6 +180,7 @@ function do_binutils()
             --enable-plugins \
             --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
             \
+            --disable-shared \
             --enable-static \
             --enable-build-warnings=no \
             --disable-rpath
@@ -281,7 +282,7 @@ function do_gcc_first()
       export GCC_WARN_CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-format-security -Wno-suggest-attribute=format -Wno-format-extra-args -Wno-format -Wno-varargs -Wno-shift-count-overflow -Wno-ignored-attributes -Wno-tautological-compare -Wno-unused-label -Wno-unused-parameter -Wno-literal-suffix -Wno-expansion-to-defined -Wno-maybe-uninitialized -Wno-shift-negative-value -Wno-memset-elt-size -Wno-dangling-else -Wno-sequence-point -Wno-misleading-indentation -Wno-int-in-bool-context"
       export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
       export CPPFLAGS="${XBB_CPPFLAGS}" 
-      export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
+      export LDFLAGS="${XBB_LDFLAGS_APP}" 
 
       export CFLAGS_FOR_TARGET="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}" 
       export CXXFLAGS_FOR_TARGET="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}" 
@@ -678,7 +679,7 @@ function do_gcc_final()
       export GCC_WARN_CXXFLAGS="-Wno-format-security -Wno-char-subscripts -Wno-deprecated -Wno-array-bounds -Wno-invalid-offsetof -Wno-implicit-fallthrough -Wno-format-security -Wno-suggest-attribute=format -Wno-format-extra-args -Wno-format -Wno-unused-function -Wno-attributes -Wno-maybe-uninitialized -Wno-expansion-to-defined -Wno-misleading-indentation -Wno-literal-suffix -Wno-int-in-bool-context -Wno-memset-elt-size -Wno-shift-negative-value -Wno-dangling-else -Wno-sequence-point -Wno-nonnull -Wno-unused-parameter"
       export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}" 
       export CPPFLAGS="${XBB_CPPFLAGS}" 
-      export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}" 
+      export LDFLAGS="${XBB_LDFLAGS_APP}" 
       # Do not add CRT_glob.o here, it will fail with already defined,
       # since it is already handled by --enable-mingw-wildcard.
 
@@ -754,6 +755,7 @@ function do_gcc_final()
               --disable-libssp \
               --disable-libstdcxx-pch \
               --disable-nls \
+              --disable-shared \
               --disable-threads \
               --enable-tls \
               --enable-checking=yes \
@@ -933,7 +935,7 @@ function do_gdb()
       export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}"
       
       export CPPFLAGS="${XBB_CPPFLAGS}" 
-      export LDFLAGS="${XBB_LDFLAGS_APP_STATIC}"
+      export LDFLAGS="${XBB_LDFLAGS_APP}"
 
       local extra_python_opts="--with-python=no"
       if [ "$1" == "-py" ]
@@ -988,6 +990,7 @@ function do_gdb()
             --program-prefix="${GCC_TARGET}-" \
             --program-suffix="$1" \
             \
+            --disable-shared \
             --enable-static \
             --disable-werror \
             --enable-build-warnings=no \
