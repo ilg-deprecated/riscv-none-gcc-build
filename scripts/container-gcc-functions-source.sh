@@ -395,7 +395,7 @@ function do_newlib()
       xbb_activate_this
 
       # Add the gcc first stage binaries to the path.
-      PATH="${APP_PREFIX}/bin":${PATH}
+      PATH="${APP_PREFIX}/bin:${PATH}"
 
       local optimize="${CFLAGS_OPTIMIZATIONS_FOR_TARGET}"
       if [ "$1" == "-nano" ]
@@ -1134,7 +1134,7 @@ function strip_libs()
   if [ "${WITH_STRIP}" == "y" ]
   then
     (
-      PATH="${APP_PREFIX}/bin":${PATH}
+      PATH="${APP_PREFIX}/bin:${PATH}"
 
       echo
       echo "Stripping libraries..."

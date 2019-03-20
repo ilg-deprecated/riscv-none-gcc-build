@@ -190,7 +190,7 @@ then
   # Windows builds reuse the GNU/Linux binaries.
   if [ -x "${WORK_FOLDER_PATH}/${LINUX_INSTALL_PATH}/bin/${GCC_TARGET}-gcc" ]
   then
-    PATH="${WORK_FOLDER_PATH}/${LINUX_INSTALL_PATH}/bin":${PATH}
+    PATH="${WORK_FOLDER_PATH}/${LINUX_INSTALL_PATH}/bin:${PATH}"
     echo ${PATH}
   fi
 fi
@@ -199,7 +199,7 @@ fi
 
 README_OUT_FILE_NAME="README-${RELEASE_VERSION}.md"
 
-APP_PREFIX_NANO="${INSTALL_FOLDER_PATH}/${APP_LC_NAME}"-nano
+APP_PREFIX_NANO="${INSTALL_FOLDER_PATH}/${APP_LC_NAME}-nano"
 
 # The \x2C is a comma in hex; without this trick the regular expression
 # that processes this string in the Makefile, silently fails and the 
