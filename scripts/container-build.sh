@@ -185,25 +185,6 @@ prepare_xbb_env
 
 prepare_xbb_extras
 
-if false
-then
-
-if [ -f "/.dockerenv" ]
-then
-  ( 
-    xbb_activate
-
-    # Remove references to libfl.so, to force a static link and
-    # avoid references to unwanted shared libraries in binutils.
-    sed -i -e "s/dlname=.*/dlname=''/" -e "s/library_names=.*/library_names=''/" "${XBB_FOLDER}"/lib/libfl.la
-
-    echo "${XBB_FOLDER}"/lib/libfl.la
-    cat "${XBB_FOLDER}"/lib/libfl.la
-  )
-fi
-
-fi
-
 if [ ! -z "${LINUX_INSTALL_PATH}" ]
 then
   # Windows builds reuse the GNU/Linux binaries.
@@ -215,77 +196,6 @@ then
 fi
 
 # -----------------------------------------------------------------------------
-
-
-if false
-then
-
-    UNAME="$(uname)"
-
-    # Make all tools choose gcc, not the old cc.
-    if [ "${UNAME}" == "Darwin" ]
-    then
-      # For consistency, even on macOS, prefer GCC 7 over clang.
-      # (Also because all GCC pre 7 versions fail with 'bracket nesting level 
-      # exceeded' with clang; not to mention the too many warnings.)
-      # However the oof-the-shelf GCC 7 has a problem, and requires patching,
-      # otherwise the generated GDB fails with SIGABRT; to test use 'set 
-      # language auto').
-      export CC=gcc-7.2.0-patched
-      export CXX=g++-7.2.0-patched
-    elif [ "${TARGET_PLATFORM}" == "linux" ]
-    then
-      export CC=gcc
-      export CXX=g++
-    fi
-
-    EXTRA_CFLAGS="-ffunction-sections -fdata-sections -m${TARGET_BITS} -pipe"
-    EXTRA_CXXFLAGS="-ffunction-sections -fdata-sections -m${TARGET_BITS} -pipe"
-
-    if [ "${IS_DEBUG}" == "y" ]
-    then
-      EXTRA_CFLAGS+=" -g -O0"
-      EXTRA_CXXFLAGS+=" -g -O0"
-    else
-      EXTRA_CFLAGS+=" -O2"
-      EXTRA_CXXFLAGS+=" -O2"
-    fi
-
-    EXTRA_CPPFLAGS="-I${INSTALL_FOLDER_PATH}"/include
-    EXTRA_LDFLAGS_LIB="-L${INSTALL_FOLDER_PATH}"/lib
-    EXTRA_LDFLAGS="${EXTRA_LDFLAGS_LIB}"
-    if [ "${IS_DEBUG}" == "y" ]
-    then
-      EXTRA_LDFLAGS+=" -g"
-    fi
-
-    if [ "${TARGET_PLATFORM}" == "darwin" ]
-    then
-      # Note: macOS linker ignores -static-libstdc++, so 
-      # libstdc++.6.dylib should be handled.
-      EXTRA_LDFLAGS_APP="${EXTRA_LDFLAGS} -Wl,-dead_strip"
-    elif [ "${TARGET_PLATFORM}" == "linux" ]
-    then
-      # Do not add -static here, it fails.
-      # Do not try to link pthread statically, it must match the system glibc.
-      EXTRA_LDFLAGS_APP+="${EXTRA_LDFLAGS} -static-libstdc++ -Wl,--gc-sections"
-    elif [ "${TARGET_PLATFORM}" == "win32" ]
-    then
-      # CRT_glob is from ARM script
-      # -static avoids libwinpthread-1.dll 
-      # -static-libgcc avoids libgcc_s_sjlj-1.dll 
-      EXTRA_LDFLAGS_APP+="${EXTRA_LDFLAGS} -static -static-libgcc -static-libstdc++ -Wl,--gc-sections"
-    fi
-
-    export PKG_CONFIG=pkg-config-verbose
-    export PKG_CONFIG_LIBDIR="${INSTALL_FOLDER_PATH}"/lib/pkgconfig
-
-    APP_PREFIX="${INSTALL_FOLDER_PATH}/${APP_LC_NAME}"
-    APP_PREFIX_DOC="${APP_PREFIX}"/share/doc
-
-    APP_PREFIX_NANO="${INSTALL_FOLDER_PATH}/${APP_LC_NAME}"-nano
-
-fi
 
 README_OUT_FILE_NAME="README-${RELEASE_VERSION}.md"
 
