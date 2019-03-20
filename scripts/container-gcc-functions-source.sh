@@ -97,19 +97,23 @@ function download_python_win()
   if [ ! -d "${PYTHON_WIN}" ]
   then
 
-    cd "${SOURCES_FOLDER_PATH}"
-    # Include only the headers and the python library and executable.
-    echo '*.h' >/tmp/included
-    echo 'python*.dll' >>/tmp/included
-    echo 'python*.lib' >>/tmp/included
-    7za x -o"${PYTHON_WIN}" "${DOWNLOAD_FOLDER_PATH}/${PYTHON_WIN_PACK}" -i@/tmp/included
+    (
+      xbb_activate
 
-    # Patch to disable the macro that renames hypot.
-    local patch_path="${BUILD_GIT_PATH}/patches/${PYTHON_WIN}.patch"
-    if [ -f "${patch_path}" ]
-    then
-      patch -p0 <"${patch_path}" 
-    fi
+      cd "${SOURCES_FOLDER_PATH}"
+      # Include only the headers and the python library and executable.
+      echo '*.h' >/tmp/included
+      echo 'python*.dll' >>/tmp/included
+      echo 'python*.lib' >>/tmp/included
+      7za x -o"${PYTHON_WIN}" "${DOWNLOAD_FOLDER_PATH}/${PYTHON_WIN_PACK}" -i@/tmp/included
+
+      # Patch to disable the macro that renames hypot.
+      local patch_path="${BUILD_GIT_PATH}/patches/${PYTHON_WIN}.patch"
+      if [ -f "${patch_path}" ]
+      then
+        patch -p0 <"${patch_path}" 
+      fi
+    )
   else
     echo "Folder ${PYTHON_WIN} already present."
   fi
