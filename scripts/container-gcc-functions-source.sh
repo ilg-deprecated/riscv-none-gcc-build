@@ -810,8 +810,8 @@ function do_gcc_final()
 
           fi
 
-          cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc$1-last-log.txt"
-        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gcc$1-last-output.txt"
+          cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc$1-final-log.txt"
+        ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gcc$1-final-output.txt"
       fi
 
       (
@@ -894,7 +894,7 @@ function do_gcc_final()
 
         fi
 
-      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc$1-last-output.txt"
+      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc$1-final-output.txt"
     )
 
     touch "${gcc_final_stamp_file_path}"
