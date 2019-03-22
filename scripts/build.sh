@@ -57,6 +57,9 @@ source "${host_functions_script_path}"
 
 host_detect
 
+# docker_linux64_image="ilegeul/centos:6-xbb-v2"
+# docker_linux32_image="ilegeul/centos32:6-xbb-v2"
+
 # -----------------------------------------------------------------------------
 
 # Array where the remaining args will be stored.
@@ -66,9 +69,6 @@ help_message="    bash $0 [--win32] [--win64] [--linux32] [--linux64] [--osx] [-
 host_options "${help_message}" $@
 
 host_common
-
-docker_linux64_image="ilegeul/centos:6-xbb-v2"
-docker_linux32_image="ilegeul/centos32:6-xbb-v2"
 
 # -----------------------------------------------------------------------------
 
