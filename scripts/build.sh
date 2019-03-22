@@ -67,8 +67,8 @@ host_options "${help_message}" $@
 
 host_common
 
-docker_linux64_image="ilegeul/centos:6-xbb-v3"
-docker_linux32_image="ilegeul/centos32:6-xbb-v3"
+docker_linux64_image="ilegeul/centos:6-xbb-v2"
+docker_linux32_image="ilegeul/centos32:6-xbb-v2"
 
 # -----------------------------------------------------------------------------
 
