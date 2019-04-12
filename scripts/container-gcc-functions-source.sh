@@ -197,7 +197,7 @@ function do_binutils()
         echo
         echo "Running binutils make..."
       
-        make ${JOBS} 
+        make -j ${JOBS} 
         make install
 
         prepare_app_folder_libraries "${APP_PREFIX}"
@@ -364,8 +364,9 @@ function do_gcc_first()
         echo "Running gcc first stage make..."
 
         # No need to make 'all', 'all-gcc' is enough to compile the libraries.
-        # Parallel build failed once on win32.
-        make ${JOBS} all-gcc
+        # Parallel builds fail.
+        # make -j ${JOBS} all-gcc
+        make all-gcc
         make install-gcc
 
         prepare_app_folder_libraries "${APP_PREFIX}"
@@ -515,7 +516,7 @@ function do_newlib()
         # Parallel build failed on CentOS XBB
         if [ "${TARGET_PLATFORM}" == "darwin" ]
         then
-          make ${JOBS}
+          make -j ${JOBS}
         else
           make
         fi 
@@ -896,7 +897,8 @@ function do_gcc_final()
 
           # For Windows build only the GCC binaries, the libraries were copied 
           # from the Linux build.
-          make ${JOBS} all-gcc
+          # make -j ${JOBS} all-gcc
+          make all-gcc
           make install-gcc
 
           prepare_app_folder_libraries "${APP_PREFIX}"
@@ -1037,7 +1039,9 @@ function do_gdb()
         echo
         echo "Running gdb$1 make..."
 
-        make ${JOBS}
+        # Parallel builds fail.
+        # make -j ${JOBS}
+        make 
         make install
           
         prepare_app_libraries "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1"
