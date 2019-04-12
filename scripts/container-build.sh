@@ -73,7 +73,6 @@ container_app_functions_script_path="${script_folder_path}/${CONTAINER_APP_FUNCT
 echo "Container app functions source script: \"${container_app_functions_script_path}\"."
 source "${container_app_functions_script_path}"
 
-
 # -----------------------------------------------------------------------------
 
 if [ ! -z "#{DEBUG}" ]
@@ -87,16 +86,11 @@ WITH_PDF="y"
 WITH_HTML="n"
 IS_DEVELOP=""
 IS_DEBUG=""
+
 LINUX_INSTALL_PATH=""
 USE_GITS=""
 
-# Attempts to use 8 occasionally failed, reduce if necessary.
-if [ "$(uname)" == "Darwin" ]
-then
-  JOBS="--jobs=$(sysctl -n hw.ncpu)"
-else
-  JOBS="--jobs=$(grep ^processor /proc/cpuinfo|wc -l)"
-fi
+JOBS=""
 
 while [ $# -gt 0 ]
 do
@@ -129,7 +123,7 @@ do
       ;;
 
     --jobs)
-      JOBS="--jobs=$2"
+      JOBS=$2
       shift 2
       ;;
 
@@ -146,6 +140,11 @@ do
 
     # --- specific
 
+    --linux-install-path)
+      LINUX_INSTALL_PATH="$2"
+      shift 2
+      ;;
+
     --disable-multilib)
       WITHOUT_MULTILIB="y"
       shift
@@ -154,11 +153,6 @@ do
     --use-gits)
       USE_GITS="y"
       shift
-      ;;
-
-    --linux-install-path)
-      LINUX_INSTALL_PATH="$2"
-      shift 2
       ;;
 
     *)
@@ -192,6 +186,7 @@ then
   then
     PATH="${WORK_FOLDER_PATH}/${LINUX_INSTALL_PATH}/bin:${PATH}"
     echo ${PATH}
+    ${GCC_TARGET}-gcc --version
   fi
 fi
 
@@ -756,17 +751,18 @@ then
   strip_libs
 fi
 
+# Task [IV-7] /$HOST_MINGW/installation/
+# Nope, no setup.exe.
+
+# Task [III-11] /$HOST_NATIVE/package_tbz2/
+# Task [IV-8] /Package toolchain in zip format/
+
 check_binaries
 
 # -----------------------------------------------------------------------------
 
 copy_gme_files
 
-# Task [IV-7] /$HOST_MINGW/installation/
-# Nope, no setup.exe.
-
-# Task [III-11] /$HOST_NATIVE/package_tbz2/
-# Task [IV-8] /Package toolchain in zip format/
 create_archive
 
 # Change ownership to non-root Linux user.

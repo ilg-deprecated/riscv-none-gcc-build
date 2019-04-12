@@ -96,7 +96,6 @@ function download_python_win()
 
   if [ ! -d "${PYTHON_WIN}" ]
   then
-
     (
       xbb_activate
 
@@ -127,7 +126,7 @@ function do_binutils()
   # https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=binutils-git
   # https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=gdb-git
 
-  local binutils_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-binutils-installed"
+  local binutils_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-binutils-${BINUTILS_VERSION}-installed"
 
   if [ ! -f "${binutils_stamp_file_path}" ]
   then
@@ -139,7 +138,7 @@ function do_binutils()
       cd "${BUILD_FOLDER_PATH}/${BINUTILS_FOLDER_NAME}"
 
       xbb_activate
-      xbb_activate_this
+      xbb_activate_installed_dev
 
       export CFLAGS="${XBB_CFLAGS} -Wno-deprecated-declarations -Wno-implicit-function-declaration -Wno-parentheses -Wno-format-nonliteral -Wno-shift-count-overflow -Wno-shift-negative-value -Wno-format -Wno-implicit-fallthrough"
       export CXXFLAGS="${XBB_CXXFLAGS} -Wno-format-nonliteral -Wno-format-security -Wno-deprecated -Wno-c++11-narrowing"
@@ -203,17 +202,21 @@ function do_binutils()
 
         prepare_app_folder_libraries "${APP_PREFIX}"
 
-        if [ "${WITH_PDF}" == "y" ]
-        then
-          make ${JOBS} pdf
-          make install-pdf
-        fi
+        (
+          xbb_activate_tex
 
-        if [ "${WITH_HTML}" == "y" ]
-        then
-          make ${JOBS} html
-          make install-html
-        fi
+          if [ "${WITH_PDF}" == "y" ]
+          then
+            make pdf
+            make install-pdf
+          fi
+
+          if [ "${WITH_HTML}" == "y" ]
+          then
+            make html
+            make install-html
+          fi
+        )
 
         # Without this copy, the build for the nano version of the GCC second 
         # step fails with unexpected errors, like "cannot compute suffix of 
@@ -243,7 +246,7 @@ function do_binutils()
 function do_gcc_first()
 {
   local gcc_first_folder_name="${GCC_FOLDER_NAME}-first"
-  local gcc_first_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-gcc-first-installed"
+  local gcc_first_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-gcc-first-${GCC_VERSION}-installed"
 
   if [ ! -f "${gcc_first_stamp_file_path}" ]
   then
@@ -260,7 +263,7 @@ function do_gcc_first()
         cd "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/gcc/config/riscv"
 
         xbb_activate
-        xbb_activate_this
+        xbb_activate_installed_dev
 
         # Be sure the ${GCC_MULTILIB} has no quotes, since it defines 
         # multiple strings.
@@ -279,7 +282,7 @@ function do_gcc_first()
       cd "${BUILD_FOLDER_PATH}/${gcc_first_folder_name}"
 
       xbb_activate
-      xbb_activate_this
+      xbb_activate_installed_dev
 
       export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unused-value -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-unused-but-set-variable -Wno-shift-negative-value -Wno-misleading-indentation -Wno-strict-overflow -Wno-sign-compare"
       export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}" 
@@ -380,7 +383,7 @@ function do_gcc_first()
 function do_newlib()
 {
   local newlib_folder_name="${NEWLIB_FOLDER_NAME}$1"
-  local newlib_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-newlib$1-installed"
+  local newlib_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-newlib$1-${NEWLIB_VERSION}-installed"
 
   if [ ! -f "${newlib_stamp_file_path}" ]
   then
@@ -392,7 +395,7 @@ function do_newlib()
       cd "${BUILD_FOLDER_PATH}/${newlib_folder_name}"
 
       xbb_activate
-      xbb_activate_this
+      xbb_activate_installed_dev
 
       # Add the gcc first stage binaries to the path.
       PATH="${APP_PREFIX}/bin:${PATH}"
@@ -532,7 +535,9 @@ function do_newlib()
                 hack_pdfetex
               fi
 
-              make ${JOBS} pdf
+              xbb_activate_tex
+
+              make pdf
             )
 
             /usr/bin/install -v -d "${APP_PREFIX_DOC}/pdf"
@@ -549,7 +554,7 @@ function do_newlib()
           if [ "${WITH_HTML}" == "y" ]
           then
 
-            make ${JOBS} html
+            make html
 
             /usr/bin/install -v -d "${APP_PREFIX_DOC}/html"
 
@@ -668,7 +673,7 @@ function copy_linux_libs()
 function do_gcc_final()
 {
   local gcc_final_folder_name="${GCC_FOLDER_NAME}-final$1"
-  local gcc_final_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-gcc$1-final-installed"
+  local gcc_final_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-gcc$1-final-${GCC_VERSION}-installed"
 
   if [ ! -f "${gcc_final_stamp_file_path}" ]
   then
@@ -680,7 +685,7 @@ function do_gcc_final()
       cd "${BUILD_FOLDER_PATH}/${gcc_final_folder_name}"
 
       xbb_activate
-      xbb_activate_this
+      xbb_activate_installed_dev
 
       export GCC_WARN_CFLAGS="-Wno-tautological-compare -Wno-deprecated-declarations -Wno-unused-value -Wno-implicit-fallthrough -Wno-implicit-function-declaration -Wno-unused-but-set-variable -Wno-shift-negative-value -Wno-expansion-to-defined -Wno-strict-overflow -Wno-sign-compare"
       export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}" 
@@ -834,7 +839,9 @@ function do_gcc_final()
           # transactional memory related code in crtbegin.o.
           # This is a workaround. Better approach is have a t-* to set this flag via
           # CRTSTUFF_T_CFLAGS
-          make ${JOBS} INHIBIT_LIBC_CFLAGS="-DUSE_TM_CLONE_REGISTRY=0"
+          # Parallel builds fail.
+          # make -j ${JOBS} INHIBIT_LIBC_CFLAGS="-DUSE_TM_CLONE_REGISTRY=0"
+          make INHIBIT_LIBC_CFLAGS="-DUSE_TM_CLONE_REGISTRY=0"
           make install-strip
 
           prepare_app_folder_libraries "${APP_PREFIX}"
@@ -842,18 +849,22 @@ function do_gcc_final()
           if [ "$1" == "" ]
           then
 
-            # Full build, with documentation.
-            if [ "${WITH_PDF}" == "y" ]
-            then
-              make ${JOBS} pdf
-              make install-pdf
-            fi
+            (
+              xbb_activate_tex
 
-            if [ "${WITH_HTML}" == "y" ]
-            then
-              make ${JOBS} html
-              make install-html
-            fi
+              # Full build, with documentation.
+              if [ "${WITH_PDF}" == "y" ]
+              then
+                make pdf
+                make install-pdf
+              fi
+
+              if [ "${WITH_HTML}" == "y" ]
+              then
+                make html
+                make install-html
+              fi
+            )
 
           elif [ "$1" == "-nano" ]
           then
@@ -905,6 +916,18 @@ function do_gcc_final()
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc$1-final-output.txt"
     )
 
+    if [ "$1" == "" ]
+    then
+      (
+        xbb_activate
+  
+        run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" --help
+        run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpversion
+        run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpmachine
+        run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpspecs | wc -l
+      )
+    fi
+
     touch "${gcc_final_stamp_file_path}"
   else
     echo "Component gcc$1 final stage already installed."
@@ -916,7 +939,7 @@ function do_gcc_final()
 function do_gdb()
 {
   local gdb_folder_name="${GDB_FOLDER_NAME}$1"
-  local gdb_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-gdb$1-installed"
+  local gdb_stamp_file_path="${INSTALL_FOLDER_PATH}/stamp-gdb$1-${GDB_VERSION}-installed"
 
   if [ ! -f "${gdb_stamp_file_path}" ]
   then
@@ -928,7 +951,7 @@ function do_gdb()
       cd "${BUILD_FOLDER_PATH}/${gdb_folder_name}"
 
       xbb_activate
-      xbb_activate_this
+      xbb_activate_installed_dev
 
       if [ "${TARGET_PLATFORM}" == "win32" ]
       then
@@ -962,7 +985,6 @@ function do_gdb()
 
       if [ ! -f "config.status" ]
       then
-
         (
           echo
           echo "Running gdb$1 configure..."
@@ -1009,7 +1031,6 @@ function do_gdb()
 
           cp "config.log" "${LOGS_FOLDER_PATH}/config-gdb$1-log.txt"
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gdb$1-output.txt"
-
       fi
 
       (
@@ -1024,17 +1045,21 @@ function do_gdb()
         if [ "$1" == "" ]
         then
 
-          if [ "${WITH_PDF}" == "y" ]
-          then
-            make ${JOBS} pdf
-            make install-pdf
-          fi
+          (
+            xbb_activate_tex
 
-          if [ "${WITH_HTML}" == "y" ]
-          then
-            make ${JOBS} html 
-            make install-html 
-          fi
+            if [ "${WITH_PDF}" == "y" ]
+            then
+              make pdf
+              make install-pdf
+            fi
+
+            if [ "${WITH_HTML}" == "y" ]
+            then
+              make html 
+              make install-html 
+            fi
+          )
         fi
 
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gdb$1-output.txt"
@@ -1042,8 +1067,7 @@ function do_gdb()
 
     (
       # Required by gdb-py to access the python shared library.
-      xbb_activate
-      xbb_activate_this
+      xbb_activate_installed_bin
 
       run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1" --version
       run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1" --config
