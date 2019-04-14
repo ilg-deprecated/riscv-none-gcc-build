@@ -212,7 +212,13 @@ function do_binutils()
         echo "Running binutils make..."
       
         make -j ${JOBS} 
-        make install
+        if [ "${WITH_STRIP}" == "y" ]
+        then
+          # For -strip, readline needs a patch.
+          make install-strip
+        else
+          make install
+        fi
 
         prepare_app_folder_libraries "${APP_PREFIX}"
 
@@ -240,6 +246,19 @@ function do_binutils()
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-newlib-output.txt"
     )
 
+    run_binutils
+    
+    touch "${binutils_stamp_file_path}"
+  else
+    echo "Component binutils already installed."
+  fi
+}
+
+function run_binutils()
+{
+  (
+    xbb_activate_installed_bin
+
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-ar" --version
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-as" --version
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-ld" --version
@@ -251,10 +270,7 @@ function do_binutils()
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-strings" --version
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-strip" --version
 
-    touch "${binutils_stamp_file_path}"
-  else
-    echo "Component binutils already installed."
-  fi
+  )
 }
 
 function do_gcc_first()
@@ -381,6 +397,7 @@ function do_gcc_first()
         # Parallel builds fail.
         # make -j ${JOBS} all-gcc
         make all-gcc
+        # No -strip available here.
         make install-gcc
 
         prepare_app_folder_libraries "${APP_PREFIX}"
@@ -857,7 +874,12 @@ function do_gcc_final()
           # Parallel builds fail.
           # make -j ${JOBS} INHIBIT_LIBC_CFLAGS="-DUSE_TM_CLONE_REGISTRY=0"
           make INHIBIT_LIBC_CFLAGS="-DUSE_TM_CLONE_REGISTRY=0"
-          make install-strip
+          if [ "${WITH_STRIP}" == "y" ]
+          then
+            make install-strip
+          else
+            make install
+          fi
 
           prepare_app_folder_libraries "${APP_PREFIX}"
 
@@ -913,19 +935,24 @@ function do_gcc_final()
           # from the Linux build.
           # make -j ${JOBS} all-gcc
           make all-gcc
+          # No -strip here.
           make install-gcc
 
           prepare_app_folder_libraries "${APP_PREFIX}"
 
-          if [ "${WITH_PDF}" == "y" ]
-          then
-            make install-pdf-gcc
-          fi
+          (
+            xbb_activate_tex
+            
+            if [ "${WITH_PDF}" == "y" ]
+            then
+              make install-pdf-gcc
+            fi
 
-          if [ "${WITH_HTML}" == "y" ]
-          then
-            make install-html-gcc
-          fi
+            if [ "${WITH_HTML}" == "y" ]
+            then
+              make install-html-gcc
+            fi
+          )
 
         fi
 
@@ -934,20 +961,25 @@ function do_gcc_final()
 
     if [ "$1" == "" ]
     then
-      (
-        xbb_activate
-  
-        run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" --help
-        run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpversion
-        run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpmachine
-        run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpspecs | wc -l
-      )
+      run_gcc
     fi
 
     touch "${gcc_final_stamp_file_path}"
   else
     echo "Component gcc$1 final stage already installed."
   fi
+}
+
+function run_gcc()
+{
+  (
+    xbb_activate
+
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" --help
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpversion
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpmachine
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpspecs | wc -l
+  )
 }
 
 # Called multile times, with and without python support.
@@ -1056,13 +1088,19 @@ function do_gdb()
         # Parallel builds fail.
         # make -j ${JOBS}
         make 
-        make install
-          
+
+        # No strip.
+        if [ "${WITH_STRIP}" == "_y" ]
+        then
+          make install-strip
+        else
+          make install
+        fi
+
         prepare_app_libraries "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1"
 
         if [ "$1" == "" ]
         then
-
           (
             xbb_activate_tex
 
@@ -1083,18 +1121,29 @@ function do_gdb()
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gdb$1-output.txt"
     )
 
-    (
-      # Required by gdb-py to access the python shared library.
-      xbb_activate_installed_bin
-
-      run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1" --version
-      run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1" --config
-    )
+    run_gdb "$1"
 
     touch "${gdb_stamp_file_path}"
   else
     echo "Component gdb$1 already installed."
   fi
+}
+
+function run_gdb()
+{
+  local suffix=""
+  if [ $# -ge 1 ]
+  then
+    suffix="$1"
+  fi
+
+  (
+    # Required by gdb-py to access the python shared library.
+    xbb_activate_installed_bin
+
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb${suffix}" --version
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb${suffix}" --config
+  )
 }
 
 function tidy_up() 
@@ -1110,64 +1159,81 @@ function tidy_up()
 
 function strip_binaries()
 {
+  local folder_path
+  if [ $# -ge 1 ]
+  then
+    folder_path="$1"
+  else
+    folder_path="${APP_PREFIX}"
+  fi
+
   if [ "${WITH_STRIP}" == "y" ]
   then
+    (
+      xbb_activate
 
-    echo
-    echo "Stripping binaries..."
+      echo
+      echo "Stripping binaries..."
 
-    cd "${WORK_FOLDER_PATH}"
+      local binaries
+      if [ "${TARGET_PLATFORM}" == "win32" ]
+      then
 
-    if [ "${TARGET_PLATFORM}" != "win32" ]
-    then
+        which "${CROSS_COMPILE_PREFIX}-strip"
 
-      local binaries=$(find "${INSTALL_FOLDER_PATH}/bin" -name ${GCC_TARGET}-\*)
-      for bin in ${binaries} 
-      do
-        strip_binary strip "${bin}"
-      done
+        binaries=$(find "${folder_path}" -name \*.exe)
+        for bin in ${binaries} 
+        do
+          strip_binary "${CROSS_COMPILE_PREFIX}-strip" "${bin}"
+        done
 
-      binaries=$(find "${APP_PREFIX}/bin" -maxdepth 1 -mindepth 1 -name \*)
-      for bin in ${binaries} 
-      do
-        strip_binary strip "${bin}"
-      done
+      elif [ "${TARGET_PLATFORM}" == "darwin" ]
+      then
 
-      set +e
-      if [ "${CONTAINER_UNAME}" == "Darwin" ]; then
-        binaries=$(find "${APP_PREFIX}/lib/gcc/${GCC_TARGET}"/* -maxdepth 1 -name \* -perm +111 -and ! -type d)
-      else
-        binaries=$(find "${APP_PREFIX}/lib/gcc/${GCC_TARGET}"/* -maxdepth 1 -name \* -perm /111 -and ! -type d)
+        which strip
+
+        binaries=$(find "${folder_path}" -name \* -perm +111 -and ! -type d)
+        for bin in ${binaries} 
+        do
+          if is_elf "${bin}"
+          then
+            strip_binary strip "${bin}"
+          fi
+        done
+
+      elif [ "${TARGET_PLATFORM}" == "linux" ]
+      then
+
+        which strip
+
+if true
+then
+        binaries=$(find "${folder_path}" -name \* -perm /111 -and ! -type d)
+        for bin in ${binaries} 
+        do
+          if is_elf "${bin}"
+          then
+            strip_binary strip "${bin}"
+          fi
+        done
+else
+        which strip
+        strip --help
+
+        "${APP_PREFIX}/bin/riscv-none-embed-as" --version
+        readelf -d "${APP_PREFIX}/bin/riscv-none-embed-as"
+
+        cp "${APP_PREFIX}/bin/riscv-none-embed-as" "/tmp/riscv-none-embed-as"
+        strip -S "/tmp/riscv-none-embed-as"
+        "/tmp/riscv-none-embed-as" --version
+
+        cp "${APP_PREFIX}/bin/riscv-none-embed-as" "${APP_PREFIX}/bin/riscv-none-embed-as2"
+        strip -S "${APP_PREFIX}/bin/riscv-none-embed-as2"
+        readelf -d "${APP_PREFIX}/bin/riscv-none-embed-as2"
+        "${APP_PREFIX}/bin/riscv-none-embed-as2" --version
+fi
       fi
-      set -e
-
-      for bin in ${binaries} 
-      do
-        strip_binary strip "${bin}"
-      done
-
-    else
-
-      local binaries=$(find "${INSTALL_FOLDER_PATH}/bin" -name ${GCC_TARGET}-\*.exe)
-      for bin in ${binaries} 
-      do
-        strip_binary "${CROSS_COMPILE_PREFIX}-strip" "${bin}"
-      done
-
-      binaries=$(find "${APP_PREFIX}/bin" -maxdepth 1 -mindepth 1 -name \*)
-      for bin in ${binaries} 
-      do
-        strip_binary "${CROSS_COMPILE_PREFIX}-strip" "${bin}"
-      done
-
-      binaries=$(find "${APP_PREFIX}/lib/gcc/${GCC_TARGET}"/* -maxdepth 1 -name \*.exe)
-      for bin in ${binaries} 
-      do
-        strip_binary "${CROSS_COMPILE_PREFIX}-strip" "${bin}"
-      done
-
-    fi
-
+    )
   fi
 }
 
@@ -1176,6 +1242,8 @@ function strip_libs()
   if [ "${WITH_STRIP}" == "y" ]
   then
     (
+      xbb_activate
+
       PATH="${APP_PREFIX}/bin:${PATH}"
 
       echo
@@ -1183,11 +1251,13 @@ function strip_libs()
 
       cd "${WORK_FOLDER_PATH}"
 
+      # which "${GCC_TARGET}-objcopy"
+
       local libs=$(find "${APP_PREFIX}" -name '*.[ao]')
       for lib in ${libs}
       do
-        echo ${GCC_TARGET}-objcopy -R ... ${lib}
-        ${GCC_TARGET}-objcopy -R .comment -R .note -R .debug_info -R .debug_aranges -R .debug_pubnames -R .debug_pubtypes -R .debug_abbrev -R .debug_line -R .debug_str -R .debug_ranges -R .debug_loc ${lib} || true
+        echo "${GCC_TARGET}-objcopy -R ... ${lib}"
+        "${APP_PREFIX}/bin/${GCC_TARGET}-objcopy" -R .comment -R .note -R .debug_info -R .debug_aranges -R .debug_pubnames -R .debug_pubtypes -R .debug_abbrev -R .debug_line -R .debug_str -R .debug_ranges -R .debug_loc "${lib}" || true
       done
     )
   fi
@@ -1195,61 +1265,65 @@ function strip_libs()
 
 function copy_gme_files()
 {
-  rm -rf "${APP_PREFIX}/${DISTRO_LC_NAME}"
-  mkdir -p "${APP_PREFIX}/${DISTRO_LC_NAME}"
+  (
+    xbb_activate
 
-  echo
-  echo "Copying license files..."
+    rm -rf "${APP_PREFIX}/${DISTRO_LC_NAME}"
+    mkdir -p "${APP_PREFIX}/${DISTRO_LC_NAME}"
 
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${ZLIB_SRC_FOLDER_NAME}" \
-    "${ZLIB_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}" \
-    "${GMP_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${MPFR_SRC_FOLDER_NAME}" \
-    "${MPFR_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${MPC_SRC_FOLDER_NAME}" \
-    "${MPC_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${ISL_SRC_FOLDER_NAME}" \
-    "${ISL_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${LIBELF_SRC_FOLDER_NAME}" \
-    "${LIBELF_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${EXPAT_SRC_FOLDER_NAME}" \
-    "${EXPAT_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${LIBICONV_SRC_FOLDER_NAME}" \
-    "${LIBICONV_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${XZ_SRC_FOLDER_NAME}" \
-    "${XZ_FOLDER_NAME}"
+    echo
+    echo "Copying license files..."
 
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}" \
-    "${BINUTILS_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}" \
-    "${GCC_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}" \
-    "${NEWLIB_FOLDER_NAME}"
-  copy_license \
-    "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/gdb" \
-    "${GDB_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${ZLIB_SRC_FOLDER_NAME}" \
+      "${ZLIB_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${GMP_SRC_FOLDER_NAME}" \
+      "${GMP_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${MPFR_SRC_FOLDER_NAME}" \
+      "${MPFR_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${MPC_SRC_FOLDER_NAME}" \
+      "${MPC_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${ISL_SRC_FOLDER_NAME}" \
+      "${ISL_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${LIBELF_SRC_FOLDER_NAME}" \
+      "${LIBELF_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${EXPAT_SRC_FOLDER_NAME}" \
+      "${EXPAT_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${LIBICONV_SRC_FOLDER_NAME}" \
+      "${LIBICONV_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${XZ_SRC_FOLDER_NAME}" \
+      "${XZ_FOLDER_NAME}"
 
-  copy_build_files
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${BINUTILS_SRC_FOLDER_NAME}" \
+      "${BINUTILS_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}" \
+      "${GCC_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${NEWLIB_SRC_FOLDER_NAME}" \
+      "${NEWLIB_FOLDER_NAME}"
+    copy_license \
+      "${SOURCES_FOLDER_PATH}/${GDB_SRC_FOLDER_NAME}/gdb" \
+      "${GDB_FOLDER_NAME}"
 
-  echo
-  echo "Copying GME files..."
+    copy_build_files
+
+    echo
+    echo "Copying GME files..."
 
   cd "${BUILD_GIT_PATH}"
   /usr/bin/install -v -c -m 644 "${README_OUT_FILE_NAME}" \
     "${APP_PREFIX}/README.md"
+  )
 }
 
 

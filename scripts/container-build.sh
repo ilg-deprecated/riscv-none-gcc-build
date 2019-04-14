@@ -184,9 +184,11 @@ then
   # Windows builds reuse the GNU/Linux binaries.
   if [ -x "${WORK_FOLDER_PATH}/${LINUX_INSTALL_PATH}/bin/${GCC_TARGET}-gcc" ]
   then
-    PATH="${WORK_FOLDER_PATH}/${LINUX_INSTALL_PATH}/bin:${PATH}"
+    export PATH="${WORK_FOLDER_PATH}/${LINUX_INSTALL_PATH}/bin:${PATH}"
     echo ${PATH}
-    ${GCC_TARGET}-gcc --version
+
+    export LD_LIBRARY_PATH="${WORK_FOLDER_PATH}/${LINUX_INSTALL_PATH}/bin:${LD_LIBRARY_PATH}"
+    echo ${LD_LIBRARY_PATH}
   fi
 fi
 
@@ -210,6 +212,9 @@ NEWLIB_PROJECT_NAME="riscv-newlib"
 GDB_PROJECT_NAME="riscv-binutils-gdb"
 
 MULTILIB_FLAGS=""
+
+BINUTILS_PATCH=""
+GDB_PATCH=""
 
 # Keep them in sync with combo archive content.
 if [[ "${RELEASE_VERSION}" =~ 7\.2\.0-3-* ]]
@@ -549,6 +554,9 @@ then
 
   PYTHON_WIN_VERSION="2.7.13"
 
+  BINUTILS_PATCH="binutils-gdb-${BINUTILS_VERSION}.patch"
+  GDB_PATCH="binutils-gdb-${BINUTILS_VERSION}.patch"
+
   # ---------------------------------------------------------------------------
 else
   echo "Unsupported version ${RELEASE_VERSION}."
@@ -743,9 +751,26 @@ tidy_up
 
 # Task [III-9] /$HOST_NATIVE/strip_host_objects/
 # Task [IV-6] /$HOST_MINGW/strip_host_objects/
-strip_binaries
 
-if [ "${TARGET_PLATFORM}" != "win32" ]
+if [ "${WITH_STRIP}" == "y" ]
+then
+  if [ "${TARGET_PLATFORM}" == "linux" -a "${TARGET_ARCH}" == "x64" ]
+  then
+    # Disabled on linux64, since the xbb strip damages the binaries:
+    # relocation error: /Host/Users/ilg/Work/riscv-none-gcc-8.2.0-2/linux-x64/install/riscv-none-gcc/bin/riscv-none-embed-as: symbol , version GLIBC_2.2.5 not defined in file libc.so.6 with link time reference
+    # The problem seems caused by patchelf, which reorders something
+    # and confused strip.
+    :
+  else
+    strip_binaries
+
+    run_binutils
+    run_gcc
+    run_gdb
+  fi
+fi
+
+if [ "${WITH_STRIP}" == "y" -a "${TARGET_PLATFORM}" != "win32" ]
 then
   # Task [III-10] /$HOST_NATIVE/strip_target_objects/
   strip_libs
@@ -767,6 +792,11 @@ create_archive
 
 # Change ownership to non-root Linux user.
 fix_ownership
+
+# Final checks.
+run_binutils
+run_gcc
+run_gdb
 
 # -----------------------------------------------------------------------------
 
