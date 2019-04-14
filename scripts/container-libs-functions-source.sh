@@ -59,13 +59,15 @@ function do_zlib()
 
         export CFLAGS="${XBB_CFLAGS} -Wno-shift-negative-value"
 
-        if [ ! -f "config.status" ]
+        # No config.status left, use the library.
+        if [ ! -f "libz.a" ]
         then
 
           (
             echo
             echo "Running zlib configure..."
 
+            # In-source build.
             bash "./configure" --help
 
             bash ${DEBUG} "./configure" \
