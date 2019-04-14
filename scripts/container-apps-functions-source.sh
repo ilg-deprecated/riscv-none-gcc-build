@@ -572,13 +572,13 @@ function do_newlib()
               make pdf
             )
 
-            /usr/bin/install -v -d "${APP_PREFIX_DOC}/pdf"
+            install -v -d "${APP_PREFIX_DOC}/pdf"
 
-            /usr/bin/install -v -c -m 644 \
+            install -v -c -m 644 \
               "${GCC_TARGET}/libgloss/doc/porting.pdf" "${APP_PREFIX_DOC}/pdf"
-            /usr/bin/install -v -c -m 644 \
+            install -v -c -m 644 \
               "${GCC_TARGET}/newlib/libc/libc.pdf" "${APP_PREFIX_DOC}/pdf"
-            /usr/bin/install -v -c -m 644 \
+            install -v -c -m 644 \
               "${GCC_TARGET}/newlib/libm/libm.pdf" "${APP_PREFIX_DOC}/pdf"
 
           fi
@@ -588,7 +588,7 @@ function do_newlib()
 
             make html
 
-            /usr/bin/install -v -d "${APP_PREFIX_DOC}/html"
+            install -v -d "${APP_PREFIX_DOC}/html"
 
             copy_dir "${GCC_TARGET}/newlib/libc/libc.html" "${APP_PREFIX_DOC}/html/libc"
             copy_dir "${GCC_TARGET}/newlib/libm/libm.html" "${APP_PREFIX_DOC}/html/libm"
@@ -1320,9 +1320,9 @@ function copy_gme_files()
     echo
     echo "Copying GME files..."
 
-  cd "${BUILD_GIT_PATH}"
-  /usr/bin/install -v -c -m 644 "${README_OUT_FILE_NAME}" \
-    "${APP_PREFIX}/README.md"
+    cd "${BUILD_GIT_PATH}"
+    install -v -c -m 644 "${README_OUT_FILE_NAME}" \
+      "${APP_PREFIX}/README.md"
   )
 }
 
