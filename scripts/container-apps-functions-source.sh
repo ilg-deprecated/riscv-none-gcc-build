@@ -125,10 +125,18 @@ function download_python_win()
       local patch_path="${BUILD_GIT_PATH}/patches/${PYTHON_WIN}.patch"
       if [ -f "${patch_path}" ]
       then
-        patch -p0 <"${patch_path}" 
+        (
+          cd "${PYTHON_WIN}"
+          patch -p0 <"${patch_path}" 
+        )
       fi
 
       ls -lL "${SOURCES_FOLDER_PATH}/${PYTHON_WIN}"
+
+      # From here it'll be copied as dependency.
+      mkdir -p "${LIBS_INSTALL_FOLDER_PATH}/bin/"
+      install -v -c -m 644 "${PYTHON_WIN}"/python*.dll \
+        "${LIBS_INSTALL_FOLDER_PATH}/bin/"
     )
   else
     echo "Folder ${PYTHON_WIN} already present."
