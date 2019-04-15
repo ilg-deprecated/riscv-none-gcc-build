@@ -752,23 +752,23 @@ tidy_up
 # Task [III-9] /$HOST_NATIVE/strip_host_objects/
 # Task [IV-6] /$HOST_MINGW/strip_host_objects/
 
-if [ "${WITH_STRIP}" == "y" ]
+if [ "${WITH_STRIP}" == "_y" ]
 then
   if [ "${TARGET_PLATFORM}" == "linux" -a "${TARGET_ARCH}" == "x64" ]
   then
-    # Disabled on linux64, since the xbb strip damages the binaries:
+    # Disabled, since on linux64 the xbb strip damages the binaries:
     # relocation error: /Host/Users/ilg/Work/riscv-none-gcc-8.2.0-2/linux-x64/install/riscv-none-gcc/bin/riscv-none-embed-as: symbol , version GLIBC_2.2.5 not defined in file libc.so.6 with link time reference
-    # The problem seems caused by patchelf, which reorders something
-    # and confused strip.
+    # The problem seems to be caused by patchelf, which reorders something
+    # and confuses strip.
     :
   else
     strip_binaries
-
-    run_binutils
-    run_gcc
-    run_gdb
   fi
 fi
+
+run_binutils
+run_gcc
+run_gdb
 
 if [ "${WITH_STRIP}" == "y" -a "${TARGET_PLATFORM}" != "win32" ]
 then
@@ -793,10 +793,17 @@ create_archive
 # Change ownership to non-root Linux user.
 fix_ownership
 
+# -----------------------------------------------------------------------------
+
 # Final checks.
 run_binutils
 run_gcc
 run_gdb
+
+if [  "${TARGET_PLATFORM}" != "win32" ]
+then
+  run_gdb "-py"
+fi
 
 # -----------------------------------------------------------------------------
 

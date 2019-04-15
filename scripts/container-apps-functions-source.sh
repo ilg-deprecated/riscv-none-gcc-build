@@ -411,6 +411,8 @@ function do_gcc_first()
         # No -strip available here.
         make install-gcc
 
+        # Strip?
+
         prepare_app_folder_libraries "${APP_PREFIX}"
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc-first-output.txt"
     )
@@ -949,6 +951,8 @@ function do_gcc_final()
           # No -strip here.
           make install-gcc
 
+          # Strip?
+
           prepare_app_folder_libraries "${APP_PREFIX}"
 
           (
@@ -1100,13 +1104,10 @@ function do_gdb()
         # make -j ${JOBS}
         make 
 
-        # No strip.
-        if [ "${WITH_STRIP}" == "_y" ]
-        then
-          make install-strip
-        else
-          make install
-        fi
+        # install-strip fails, not only because of readline has no install-strip
+        # but even after patch it tries to strip a non elf file
+        # strip:.../install/riscv-none-gcc/bin/_inst.672_: file format not recognized
+        make install
 
         prepare_app_libraries "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1"
 
@@ -1132,7 +1133,10 @@ function do_gdb()
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gdb$1-output.txt"
     )
 
-    run_gdb "$1"
+    if [ "$1" == "" -o "${TARGET_PLATFORM}" != "win32" ]
+    then
+      run_gdb "$1"
+    fi
 
     touch "${gdb_stamp_file_path}"
   else
@@ -1195,7 +1199,7 @@ function strip_binaries()
         binaries=$(find "${folder_path}" -name \*.exe)
         for bin in ${binaries} 
         do
-          strip_binary "${CROSS_COMPILE_PREFIX}-strip" "${bin}"
+          strip_binary2 "${CROSS_COMPILE_PREFIX}-strip" "${bin}"
         done
 
       elif [ "${TARGET_PLATFORM}" == "darwin" ]
@@ -1208,7 +1212,7 @@ function strip_binaries()
         do
           if is_elf "${bin}"
           then
-            strip_binary strip "${bin}"
+            strip_binary2 strip "${bin}"
           fi
         done
 
@@ -1224,7 +1228,7 @@ then
         do
           if is_elf "${bin}"
           then
-            strip_binary strip "${bin}"
+            strip_binary2 strip "${bin}"
           fi
         done
 else
