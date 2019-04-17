@@ -63,21 +63,40 @@ hello-world         latest              f2a91732366c        2 months ago        
 
 ### Update git repos
 
-The GNU MCU Eclipse RISC-V GCC is generally following the official 
-[RISC-V releases](https://github.com/riscv/riscv-gnu-toolchain/releases), 
-with as little differences as possible.
+Starting with 8.2.0-2, the GNU MCU Eclipse RISC-V GCC follows
+the official 
+[SiFive releases](https://github.com/sifive/freedom-tools/releases), 
+with as little differences as possible. Previously it followed the generic
+[RISC-V releases](https://github.com/riscv/riscv-gnu-toolchain/releases).
 
-The procedure is to first merge the remote branches to the local branches.
+#### Checkout remote branches
+
+The first step is to checkout the remote branches into local branches.
 
 Currently, the following branches are used
 
-* `riscv-gcc-8.1.0`
-* `riscv-newlib-3.0.0`
-* `riscv-binutils-2.30`
+- `sifive-binutils-2.32`
+- `sifive-gcc-8.2.0`
+- `sifive-newlib-3.0.0`
 
-The GNU MCU Eclipse branches have similar names, but suffixed with `-gme`.
+For GDB, use the original [FSF repo](https://sourceware.org/git/?p=binutils-gdb.git).
 
-After merging the remote branches, merge the result into the `-gme` branch.
+#### Create local `-gme` branches
+
+The second step is to create GNU MCU Eclipse branches;
+they have similar names, but suffixed with `-gme`.
+
+For the FSF GDB; identify the commit ID and first create a `sifive-gdb-*` 
+branch, then create the `-gme` branch.
+
+#### Update the configure files
+
+In order to support the `riscv-none-embed` names, cherry pick or edit
+the `config` files.
+
+#### Push all branches
+
+In all repos, push the new branches.
 
 ### Prepare the release
 
@@ -88,9 +107,13 @@ fourth digit is the GNU MCU Eclipse release number of this version.
 Add a new set of definitions in the `scripts/container-build.sh`, with the 
 versions of various components.
 
-By default, the build script uses tagged commits and downloads the corresponding archives.
+### Pre-build using GITs
 
-While preparing the release it is important to be able to use live Git versions. For this, 
+By default, the build script uses tagged commits and downloads the 
+corresponding archives.
+
+While preparing the release it is important to be able to use live Git 
+versions. For this, 
 
 * update the commit ids to the desired ones 
 * commit and push
@@ -100,11 +123,15 @@ While preparing the release it is important to be able to use live Git versions.
 $ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --use-gits
 ```
 
-When the result is acceptable, commit all repos and tag all with the same tag (like `v7.2.0-1-20171109`):
+### Tag the repos
+
+When the result is acceptable, commit all repos and tag all with the same tag (like `v7.2.0-1`):
 
 * the [gnu-mcu-eclipse/riscv-gcc](https://github.com/gnu-mcu-eclipse/riscv-gcc) project
 * the [gnu-mcu-eclipse/riscv-binutils-gdb](https://github.com/gnu-mcu-eclipse/riscv-binutils-gdb) project
 * the [gnu-mcu-eclipse/riscv-newlib](https://github.com/gnu-mcu-eclipse/riscv-newlib) project
+
+In the binutils-gdb repo, add a separate tag for the GDB branch (`v7.2.0-1-gdb`).
 
 ### Update CHANGELOG.txt
 
@@ -389,3 +416,8 @@ once for each target, in one of the two docker containers. Both scripts
 include several other helper scripts. The entire process is quite complex, 
 and an attempt to explain its functionality in a few words would not be 
 realistic. Thus, the authoritative source of details remains the source code.
+
+## Publish
+
+See the [PUBLISH.md](https://github.com/gnu-mcu-eclipse/riscv-none-gcc/blob/riscv-next/PUBLISH.md) 
+in the gnu-mcu-eclipse/riscv-next branch.

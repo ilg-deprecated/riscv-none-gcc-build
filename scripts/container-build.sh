@@ -488,6 +488,21 @@ elif [[ "${RELEASE_VERSION}" =~ 8\.2\.0-2-* ]]
 then
   # This is similar to SiFive 2019.02.0 release. (8.2.0-1, from 2018-12, was skipped)
   # https://github.com/sifive/freedom-tools/releases
+
+  # Binutils 2.32 with SiFive CLIC patches
+  # https://github.com/sifive/riscv-binutils-gdb/tree/164267155c96f91472a539ca78ac919993bc5b4e
+
+  # GCC 8.2.0 with SiFive CLIC patches
+  # https://github.com/sifive/riscv-gcc/tree/242abcaff697d0a1ea12dccc975465e1bfeb8331
+
+  # GDB 8.2.90 from FSF 8.3.0 branch
+  # riscv-gdb @ c8aa0bb (28 Feb 2019)
+  # https://sourceware.org/git/?p=binutils-gdb.git
+  # git://sourceware.org/git/binutils-gdb.git
+
+  # Newlib 3.0.0 from SiFive branch
+  # https://github.com/sifive/riscv-newlib/tree/42c2e3fb9f557d59b76d1a64bb6fb32707ff4530
+
   # ---------------------------------------------------------------------------
 
   # Inspired from SiFive
@@ -502,9 +517,9 @@ then
 
   # ---------------------------------------------------------------------------
 
-  BINUTILS_VERSION="2.30"
+  BINUTILS_VERSION="2.32"
   # From gcc/BASE_VER
-  GCC_VERSION="8.1.0"
+  GCC_VERSION="8.2.0"
   # From newlib/configure, VERSION=
   NEWLIB_VERSION="3.0.0"
   # From gdb/VERSION.in
@@ -515,27 +530,29 @@ then
   if [ "${USE_GITS}" != "y" ]
   then
 
-    GH_RELEASE="8.1.0-2-20181019"
+    # Be sure there is no `v`, it is added in the URL.
+    GH_RELEASE="8.2.0-2"
     BINUTILS_GH_RELEASE=${BINUTILS_GH_RELEASE:-"${GH_RELEASE}"}
     GCC_GH_RELEASE=${GCC_GH_RELEASE:-"${GH_RELEASE}"}
     NEWLIB_GH_RELEASE=${NEWLIB_GH_RELEASE:-"${GH_RELEASE}"}
+    # Same, with a `-gdb` suffix added.
     GDB_GH_RELEASE=${GDB_GH_RELEASE:-"${GH_RELEASE}-gdb"}
 
   else
 
-    BINUTILS_GIT_BRANCH=${BINUTILS_GIT_BRANCH:-"riscv-binutils-2.30-gme"}
-    # Oct 17, 2018
-    BINUTILS_GIT_COMMIT=${BINUTILS_GIT_COMMIT:-"983075b97fb5e80ae26ac57410245e642f222bda"}
+    BINUTILS_GIT_BRANCH=${BINUTILS_GIT_BRANCH:-"sifive-binutils-2.32-gme"}
+    # 16 April 2019
+    BINUTILS_GIT_COMMIT=${BINUTILS_GIT_COMMIT:-"82b51c7b5087ddb77988287cd7a2dd8921331bfd"}
 
-    GCC_GIT_BRANCH=${GCC_GIT_BRANCH:-"riscv-gcc-8.1.0-gme"}
-    GCC_GIT_COMMIT=${GCC_GIT_COMMIT:-"151e02a6d1627f2aabb41e046295ecff387f64f3"}
+    GCC_GIT_BRANCH=${GCC_GIT_BRANCH:-"sifive-gcc-8.2.0-gme"}
+    GCC_GIT_COMMIT=${GCC_GIT_COMMIT:-"0c7a874f0b6f452eeafde57731646e5f460187e4"}
 
-    NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"riscv-newlib-3.0.0-gme"}
-    NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"a6facff93404099561e7d7d5cd6bb37e4a1b698c"}
+    NEWLIB_GIT_BRANCH=${NEWLIB_GIT_BRANCH:-"sifive-newlib-3.0.0-gme"}
+    NEWLIB_GIT_COMMIT=${NEWLIB_GIT_COMMIT:-"1975c561730cbd4b93c491eaadeb6c3b01a89447"}
 
     GDB_SRC_FOLDER_NAME=${GDB_SRC_FOLDER_NAME:-"binutils-gdb.git"}
-    GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"gnu-gdb-gme"}
-    GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"ed0b2b7e2a7ef074b6e08a7035abab539a3bab3d"}
+    GDB_GIT_BRANCH=${GDB_GIT_BRANCH:-"sifive-gdb-8.2.90-gme"}
+    GDB_GIT_COMMIT=${GDB_GIT_COMMIT:-"4f0bd4dde3c7b10c4f71e0c87d8707281c648671"}
 
   fi
   

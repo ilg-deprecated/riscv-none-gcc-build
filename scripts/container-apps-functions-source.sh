@@ -1105,7 +1105,7 @@ function do_gdb()
         make 
 
         # install-strip fails, not only because of readline has no install-strip
-        # but even after patch it tries to strip a non elf file
+        # but even after patching it tries to strip a non elf file
         # strip:.../install/riscv-none-gcc/bin/_inst.672_: file format not recognized
         make install
 
