@@ -830,7 +830,8 @@ function do_gcc_final()
               --disable-rpath \
               --disable-build-format-warnings 
 
-          else
+          elif [ "$1" == "-nano" ]
+          then
 
             bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
               --prefix="${APP_PREFIX_NANO}"  \
