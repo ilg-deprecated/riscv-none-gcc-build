@@ -22,8 +22,14 @@ APP_NAME=${APP_NAME:-"RISC-V Embedded GCC"}
 APP_UC_NAME=${APP_UC_NAME:-"RISC-V Embedded GCC"}
 APP_LC_NAME=${APP_LC_NAME:-"riscv-none-gcc"}
 
+# TODO: rename to xPacks/xpacks.
+# Upper case used on Windows.
 DISTRO_UC_NAME=${DISTRO_UC_NAME:-"GNU MCU Eclipse"}
+# Lower case used on macOS and GNU/Linux.
 DISTRO_LC_NAME=${DISTRO_LC_NAME:-"gnu-mcu-eclipse"}
+
+# TODO: remove it.
+DISTRO_INFO_NAME=${DISTRO_INFO_NAME:-"${DISTRO_LC_NAME}"}
 
 BRANDING=${BRANDING:-"${DISTRO_UC_NAME} RISC-V Embedded GCC"}
 
