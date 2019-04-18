@@ -803,7 +803,7 @@ check_binaries
 
 # -----------------------------------------------------------------------------
 
-copy_gme_files
+copy_distro_files
 
 create_archive
 

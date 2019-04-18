@@ -1278,7 +1278,7 @@ function strip_libs()
   fi
 }
 
-function copy_gme_files()
+function copy_distro_files()
 {
   (
     xbb_activate
