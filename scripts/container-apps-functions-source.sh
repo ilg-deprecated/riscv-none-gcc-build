@@ -992,6 +992,7 @@ function run_gcc()
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" --help
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpversion
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpmachine
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -print-multi-lib
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gcc" -dumpspecs | wc -l
   )
 }
