@@ -790,7 +790,6 @@ function do_gcc_final()
 
             bash ${DEBUG} "${SOURCES_FOLDER_PATH}/${GCC_SRC_FOLDER_NAME}/configure" \
               --prefix="${APP_PREFIX}"  \
-              --libexecdir="${APP_PREFIX}/lib" \
               --infodir="${APP_PREFIX_DOC}/info" \
               --mandir="${APP_PREFIX_DOC}/man" \
               --htmldir="${APP_PREFIX_DOC}/html" \
