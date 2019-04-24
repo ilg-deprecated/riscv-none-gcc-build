@@ -1,6 +1,10 @@
 
 The changes applied to the original projects, in reverse chronological order:
 
+[2019-04-25]
+
+- v8.2.0-2.1 released
+
 [2019-04-17]
 
 - prepare v8.2.0-2 (8.2.0-1 was skipped)
