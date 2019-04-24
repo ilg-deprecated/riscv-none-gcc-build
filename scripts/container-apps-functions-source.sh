@@ -208,8 +208,6 @@ function do_binutils()
             --enable-plugins \
             --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
             \
-            --disable-shared \
-            --enable-static \
             --enable-build-warnings=no \
             --disable-rpath
             
@@ -564,6 +562,8 @@ function do_newlib()
         else
           make
         fi 
+
+        # Top make fails with install-strip due to libgloss make.
         make install
 
         if [ "$1" == "" ]
@@ -752,7 +752,7 @@ function do_gcc_final()
       export CFLAGS_FOR_TARGET="${optimize} -g" 
       export CXXFLAGS_FOR_TARGET="${optimize} -fno-exceptions -g" 
 
-      mingw_wildcard="--disable-mingw-wildcard"
+      local mingw_wildcard="--disable-mingw-wildcard"
 
       if [ "${TARGET_PLATFORM}" == "win32" ]
       then
@@ -769,7 +769,6 @@ function do_gcc_final()
 
       if [ ! -f "config.status" ]
       then
-
         (
           echo
           echo "Running gcc$1 final stage configure..."
@@ -804,6 +803,7 @@ function do_gcc_final()
               --enable-languages=c,c++ \
               ${mingw_wildcard} \
               --enable-plugins \
+              --enable-lto \
               --disable-decimal-float \
               --disable-libffi \
               --disable-libgomp \
@@ -812,9 +812,8 @@ function do_gcc_final()
               --disable-libssp \
               --disable-libstdcxx-pch \
               --disable-nls \
-              --disable-shared \
               --disable-threads \
-              --enable-tls \
+              --disable-tls \
               --enable-checking=yes \
               --with-gnu-as \
               --with-gnu-ld \
@@ -828,7 +827,8 @@ function do_gcc_final()
               --with-arch="${GCC_ARCH}" \
               \
               --disable-rpath \
-              --disable-build-format-warnings 
+              --disable-build-format-warnings \
+              --with-system-zlib
 
           elif [ "$1" == "-nano" ]
           then
@@ -852,7 +852,6 @@ function do_gcc_final()
               --disable-libstdcxx-pch \
               --disable-libstdcxx-verbose \
               --disable-nls \
-              --disable-shared \
               --disable-threads \
               --disable-tls \
               --with-gnu-as \
@@ -864,7 +863,8 @@ function do_gcc_final()
               ${MULTILIB_FLAGS} \
               \
               --disable-rpath \
-              --disable-build-format-warnings 
+              --disable-build-format-warnings \
+              --with-system-zlib
 
           fi
 
@@ -884,9 +884,11 @@ function do_gcc_final()
           # transactional memory related code in crtbegin.o.
           # This is a workaround. Better approach is have a t-* to set this flag via
           # CRTSTUFF_T_CFLAGS
+
           # Parallel builds fail.
           # make -j ${JOBS} INHIBIT_LIBC_CFLAGS="-DUSE_TM_CLONE_REGISTRY=0"
           make INHIBIT_LIBC_CFLAGS="-DUSE_TM_CLONE_REGISTRY=0"
+
           if [ "${WITH_STRIP}" == "y" ]
           then
             make install-strip
@@ -898,7 +900,6 @@ function do_gcc_final()
 
           if [ "$1" == "" ]
           then
-
             (
               xbb_activate_tex
 
@@ -915,7 +916,6 @@ function do_gcc_final()
                 make install-html
               fi
             )
-
           elif [ "$1" == "-nano" ]
           then
 
@@ -1084,11 +1084,10 @@ function do_gdb()
             --program-prefix="${GCC_TARGET}-" \
             --program-suffix="$1" \
             \
-            --disable-shared \
-            --enable-static \
             --disable-werror \
             --enable-build-warnings=no \
             --disable-rpath \
+            --with-system-zlib \
             --without-guile \
             --without-babeltrace \
             --without-libunwind-ia64 
@@ -1164,15 +1163,26 @@ function run_gdb()
 
 function tidy_up() 
 {
-  echo
-  echo "Tidying up..."
+  (
+    xbb_activate
 
-  cd "${WORK_FOLDER_PATH}"
+    echo
+    echo "Tidying up..."
 
-  find "${APP_PREFIX}" -name "libiberty.a" -exec rm -v '{}' ';'
-  find "${APP_PREFIX}" -name '*.la' -exec rm -v '{}' ';'
+    cd "${WORK_FOLDER_PATH}"
+
+    find "${APP_PREFIX}" -name "libiberty.a" -exec rm -v '{}' ';'
+    find "${APP_PREFIX}" -name '*.la' -exec rm -v '{}' ';'
+
+    if [ "${TARGET_PLATFORM}" == "win32" ]
+    then
+      find "${APP_PREFIX}" -name "liblto_plugin.a" -exec rm -v '{}' ';'
+      find "${APP_PREFIX}" -name "liblto_plugin.dll.a" -exec rm -v '{}' ';'
+    fi
+  )
 }
 
+# Unused.
 function strip_binaries()
 {
   local folder_path
@@ -1336,7 +1346,7 @@ function copy_distro_files()
     copy_build_files
 
     echo
-    echo "Copying GME files..."
+    echo "Copying distro files..."
 
     cd "${BUILD_GIT_PATH}"
     install -v -c -m 644 "${README_OUT_FILE_NAME}" \
@@ -1344,4 +1354,52 @@ function copy_distro_files()
   )
 }
 
+function final_tunings()
+{
+  # Create the missing LTO plugin links.
+  # For `ar` to work with LTO objects, it needs the plugin in lib/bfd-plugins,
+  # but the build leaves it where `ld` needs it. On POSIX, make a soft link.
+  if [ "${FIX_LTO_PLUGIN}" == "y" ]
+  then
+    (
+      cd "${APP_PREFIX}"
 
+      echo
+      if [ "${TARGET_PLATFORM}" == "win32" ]
+      then
+        echo
+        echo "Copying ${LTO_PLUGIN_ORIGINAL_NAME}..."
+
+        mkdir -p "$(dirname ${LTO_PLUGIN_BFD_PATH})"
+
+        if [ ! -f "${LTO_PLUGIN_BFD_PATH}" ]
+        then
+          local plugin_path="$(find * -type f -name ${LTO_PLUGIN_ORIGINAL_NAME})"
+          if [ ! -z "${plugin_path}" ]
+          then
+            cp -v "${plugin_path}" "${LTO_PLUGIN_BFD_PATH}"
+          else
+            echo "${LTO_PLUGIN_ORIGINAL_NAME} not found."
+            exit 1
+          fi
+        fi
+      else
+        echo
+        echo "Creating ${LTO_PLUGIN_ORIGINAL_NAME} link..."
+
+        mkdir -p "$(dirname ${LTO_PLUGIN_BFD_PATH})"
+        if [ ! -f "${LTO_PLUGIN_BFD_PATH}" ]
+        then
+          local plugin_path="$(find * -type f -name ${LTO_PLUGIN_ORIGINAL_NAME})"
+          if [ ! -z "${plugin_path}" ]
+          then
+            ln -s -v "../../${plugin_path}" "${LTO_PLUGIN_BFD_PATH}"
+          else
+            echo "${LTO_PLUGIN_ORIGINAL_NAME} not found."
+            exit 1
+          fi
+        fi
+      fi
+    )
+  fi
+}

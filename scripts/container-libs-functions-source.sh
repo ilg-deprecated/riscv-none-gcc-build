@@ -62,7 +62,6 @@ function do_zlib()
         # No config.status left, use the library.
         if [ ! -f "libz.a" ]
         then
-
           (
             echo
             echo "Running zlib configure..."
@@ -75,7 +74,6 @@ function do_zlib()
 
             cp "configure.log" "${LOGS_FOLDER_PATH}/configure-zlib-log.txt"
           ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-zlib-output.txt"
-
         fi
 
         (
@@ -85,9 +83,7 @@ function do_zlib()
           make -j ${JOBS}
           make install
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-zlib-output.txt"
-
       else
-
         (
           echo
           echo "Running zlib make..."
@@ -103,7 +99,6 @@ function do_zlib()
             BINARY_PATH="bin"
 
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-zlib-output.txt"
-
       fi
     )
 
@@ -235,7 +230,6 @@ function do_mpfr()
 
       if [ ! -f "config.status" ]
       then 
-
         (
           echo
           echo "Running mpfr configure..."
@@ -253,7 +247,6 @@ function do_mpfr()
 
           cp "config.log" "${LOGS_FOLDER_PATH}/config-mpfr-log.txt"
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-mpfr-output.txt"
-
       fi
 
       (

@@ -216,6 +216,8 @@ MULTILIB_FLAGS=""
 BINUTILS_PATCH=""
 GDB_PATCH=""
 
+FIX_LTO_PLUGIN=""
+
 # Keep them in sync with combo archive content.
 if [[ "${RELEASE_VERSION}" =~ 7\.2\.0-3-* ]]
 then
@@ -530,6 +532,8 @@ then
   # From gdb/VERSION.in
   GDB_VERSION="8.2"
 
+  FIX_LTO_PLUGIN="y"
+
   # ---------------------------------------------------------------------------
 
   if [ "${USE_GITS}" != "y" ]
@@ -798,15 +802,17 @@ then
   strip_libs
 fi
 
+final_tunings
+
 # Task [IV-7] /$HOST_MINGW/installation/
 # Nope, no setup.exe.
 
 # Task [III-11] /$HOST_NATIVE/package_tbz2/
 # Task [IV-8] /Package toolchain in zip format/
 
-check_binaries
-
 # -----------------------------------------------------------------------------
+
+check_binaries
 
 copy_distro_files
 
