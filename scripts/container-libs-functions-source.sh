@@ -180,7 +180,8 @@ function do_gmp()
         echo "Running gmp make..."
 
         # Build.
-        make -j ${JOBS}
+        # make -j ${JOBS}
+        make
         make install-strip
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gmp-output.txt"
     )
