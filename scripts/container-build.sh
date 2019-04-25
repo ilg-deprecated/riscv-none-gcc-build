@@ -216,7 +216,21 @@ MULTILIB_FLAGS=""
 BINUTILS_PATCH=""
 GDB_PATCH=""
 
+# Redefine to "y" to create the LTO plugin links.
 FIX_LTO_PLUGIN=""
+if [ "${TARGET_PLATFORM}" == "darwin" ]
+then
+  LTO_PLUGIN_ORIGINAL_NAME="liblto_plugin.0.so"
+  LTO_PLUGIN_BFD_PATH="lib/bfd-plugins/liblto_plugin.so"
+elif [ "${TARGET_PLATFORM}" == "linux" ]
+then
+  LTO_PLUGIN_ORIGINAL_NAME="liblto_plugin.so.0.0.0"
+  LTO_PLUGIN_BFD_PATH="lib/bfd-plugins/liblto_plugin.so"
+elif [ "${TARGET_PLATFORM}" == "win32" ]
+then
+  LTO_PLUGIN_ORIGINAL_NAME="liblto_plugin-0.dll"
+  LTO_PLUGIN_BFD_PATH="lib/bfd-plugins/liblto_plugin-0.dll"
+fi
 
 # Keep them in sync with combo archive content.
 if [[ "${RELEASE_VERSION}" =~ 7\.2\.0-3-* ]]
