@@ -791,6 +791,14 @@ tidy_up
 
 # Task [III-9] /$HOST_NATIVE/strip_host_objects/
 # Task [IV-6] /$HOST_MINGW/strip_host_objects/
+if [ "${WITH_STRIP}" == "y" ]
+then
+  # For unknown reasons, strip after patchelf damages the binaries.
+  if [ "${TARGET_PLATFORM}" != "linux" ]
+  then
+    strip_binaries
+  fi
+fi
 
 run_binutils
 run_gcc
