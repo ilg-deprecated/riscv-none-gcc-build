@@ -209,7 +209,8 @@ function do_binutils()
             --with-sysroot="${APP_PREFIX}/${GCC_TARGET}" \
             \
             --enable-build-warnings=no \
-            --disable-rpath
+            --disable-rpath \
+            --with-system-zlib \
             
           cp "config.log" "${LOGS_FOLDER_PATH}/config-binutils-log.txt"
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-binutils-output.txt"
@@ -390,7 +391,8 @@ function do_gcc_first()
             --with-arch="${GCC_ARCH}" \
             \
             --disable-rpath \
-            --disable-build-format-warnings
+            --disable-build-format-warnings \
+            --with-system-zlib 
 
           cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc-first-log.txt"
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gcc-first-output.txt"
