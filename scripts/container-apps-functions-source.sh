@@ -1073,14 +1073,31 @@ function do_gdb()
         export GNURM_PYTHON_WIN_DIR="${SOURCES_FOLDER_PATH}/${PYTHON_WIN}"
       fi
 
-      export GCC_WARN_CFLAGS="-Wno-implicit-function-declaration -Wno-parentheses -Wno-format -Wno-deprecated-declarations -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-int-in-bool-context -Wno-format-nonliteral -Wno-misleading-indentation"
-      export GCC_WARN_CXXFLAGS="-Wno-deprecated-declarations"
+      GCC_WARN_CFLAGS="-Wno-implicit-function-declaration -Wno-parentheses -Wno-format -Wno-deprecated-declarations -Wno-implicit-fallthrough -Wno-format-nonliteral"
+      GCC_WARN_CXXFLAGS="-Wno-deprecated-declarations"
+      if [ "${TARGET_PLATFORM}" == "darwin" ]
+      then
+        GCC_WARN_CXXFLAGS+=" -Wno-c++11-narrowing"
+      else
+        GCC_WARN_CFLAGS+=" -Wno-maybe-uninitialized -Wno-int-in-bool-context -Wno-misleading-indentation"
+      fi
+
+      export GCC_WARN_CFLAGS
+      export GCC_WARN_CXXFLAGS
 
       export CFLAGS="${XBB_CFLAGS} ${GCC_WARN_CFLAGS}"
       export CXXFLAGS="${XBB_CXXFLAGS} ${GCC_WARN_CXXFLAGS}"
       
       export CPPFLAGS="${XBB_CPPFLAGS}" 
       export LDFLAGS="${XBB_LDFLAGS_APP}"
+
+      if [ "${TARGET_PLATFORM}" == "darwin" ]
+      then
+        # When compiled with GCC-7 it fails to run, due to
+        # some problems with exceptions unwind.
+        export CC=clang
+        export CXX=clang++
+      fi
 
       local extra_python_opts="--with-python=no"
       if [ "$1" == "-py" ]
