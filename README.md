@@ -27,6 +27,12 @@ To download it, clone the
 Git repo, including submodules. 
 
 ```console
+$ curl -L https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build/raw/master/scripts/git-clone.sh | bash
+```
+
+which issues the following two commands:
+
+```console
 $ rm -rf ~/Downloads/riscv-none-gcc-build.git
 $ git clone --recurse-submodules https://github.com/gnu-mcu-eclipse/riscv-none-gcc-build.git \
   ~/Downloads/riscv-none-gcc-build.git
