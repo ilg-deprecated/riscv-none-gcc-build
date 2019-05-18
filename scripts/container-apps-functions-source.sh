@@ -1160,6 +1160,14 @@ function run_gdb()
 
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb${suffix}" --version
     run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb${suffix}" --config
+
+    # This command is known to fail with 'Abort trap: 6' (SIGABRT)
+    run_app "${APP_PREFIX}/bin/${GCC_TARGET}-gdb${suffix}" \
+      --nh \
+      --nx \
+      -ex='show language' \
+      -ex='set language auto' \
+      -ex='quit'
   )
 }
 
