@@ -756,6 +756,8 @@ function do_gcc_final()
 
       if [ "${TARGET_PLATFORM}" == "win32" ]
       then
+        add_linux_install_path
+
         mingw_wildcard="--enable-mingw-wildcard"
 
         export AR_FOR_TARGET="${GCC_TARGET}-ar"
