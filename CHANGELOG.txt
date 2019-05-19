@@ -1,6 +1,13 @@
 
 The changes applied to the original projects, in reverse chronological order:
 
+[2019-05-19]
+
+- v8.2.0-2.2 released
+- fix GDB build on macOS (use clang)
+- add compiler tests
+- add gdb set language tests
+
 [2019-04-25]
 
 - v8.2.0-2.1 released
