@@ -170,14 +170,8 @@ to build selectively, use `--linux64 --win64` or `--linux32 --win32`
 (GNU/Linux can be built alone; Windows also requires the GNU/Linux build).
 
 ```console
-$ rm -rf ${HOME}/Work/riscv-none-gcc-*
+$ sudo rm -rf "${HOME}/Work"/riscv-none-gcc-*
 $ bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --all
-```
-
-To build one of the previous versions:
-
-```console
-$ RELEASE_VERSION=7.2.0-3 bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --all
 ```
 
 Several hours later, the output of the build script is a set of 4 files 
@@ -200,8 +194,8 @@ To copy the files from the build machine to the current development machine,
 open the `deploy` folder in a terminal and use `scp`:
 
 ```console
-$ cd ${HOME}/Work/riscv-none-gcc-7.2.0-3/deploy
-$ scp * ilg@ilg-mbp.local:Downloads
+$ cd "${HOME}/Work/riscv-none-gcc-7.2.0-3/deploy"
+$ scp * ilg@ilg-mbp.local:Downloads/gme-binaries/riscv
 ```
 
 #### Build the macOS binary
@@ -212,14 +206,8 @@ VirtualBox image running on the same macMini with 16 GB of RAM and a fast SSD.
 To build the latest macOS version, with the same timestamp as the previous build:
 
 ```console
-$ rm -rf ${HOME}/Work/riscv-none-gcc-*
+$ rm -rf "${HOME}/Work"/riscv-none-gcc-*
 $ caffeinate bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --osx --date YYYYMMDD-HHMM
-```
-
-To build one of the previous macOS versions:
-
-```console
-$ RELEASE_VERSION=7.2.0-3 caffeinate bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --osx --date YYYYMMDD-HHMM
 ```
 
 For consistency reasons, the date should be the same as the GNU/Linux 
@@ -239,8 +227,8 @@ To copy the files from the build machine to the current development
 machine, open the `deploy` folder in a terminal and use `scp`:
 
 ```console
-$ cd ${HOME}/Work/riscv-none-gcc-7.2.0-3/deploy
-$ scp * ilg@ilg-mbp.local:Downloads
+$ cd "${HOME}/Work/riscv-none-gcc-7.2.0-3/deploy"
+$ scp * ilg@ilg-mbp.local:Downloads/gme-binaries/riscv
 ```
 
 ### Subsequent runs
@@ -318,12 +306,19 @@ After install, the package should create a structure like this (only
 the first two depth levels are shown):
 
 ```console
-$ tree -L 2 /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1/.content/
-/Users/ilg/Library/xPacks/@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1/.content/
+$ tree -L 2 /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/8.2.0-2.1/.content/
+/Users/ilg/Library/xPacks/@gnu-mcu-eclipse/riscv-none-gcc/8.2.0-2.1/.content/
 ├── README.md
 ├── bin
+│   ├── libexpat.1.6.7.dylib
+│   ├── libexpat.1.dylib -> libexpat.1.6.7.dylib
 │   ├── libgcc_s.1.dylib
-│   ├── libstdc++.6.dylib
+│   ├── libgmp.10.dylib
+│   ├── libiconv.2.dylib
+│   ├── liblzma.5.dylib
+│   ├── libmpfr.4.dylib
+│   ├── libz.1.2.8.dylib
+│   ├── libz.1.dylib -> libz.1.2.8.dylib
 │   ├── riscv-none-embed-addr2line
 │   ├── riscv-none-embed-ar
 │   ├── riscv-none-embed-as
@@ -333,7 +328,7 @@ $ tree -L 2 /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1
 │   ├── riscv-none-embed-elfedit
 │   ├── riscv-none-embed-g++
 │   ├── riscv-none-embed-gcc
-│   ├── riscv-none-embed-gcc-7.2.0
+│   ├── riscv-none-embed-gcc-8.2.0
 │   ├── riscv-none-embed-gcc-ar
 │   ├── riscv-none-embed-gcc-nm
 │   ├── riscv-none-embed-gcc-ranlib
@@ -341,6 +336,9 @@ $ tree -L 2 /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1
 │   ├── riscv-none-embed-gcov-dump
 │   ├── riscv-none-embed-gcov-tool
 │   ├── riscv-none-embed-gdb
+│   ├── riscv-none-embed-gdb-
+│   ├── riscv-none-embed-gdb-add-index
+│   ├── riscv-none-embed-gdb-add-index-py
 │   ├── riscv-none-embed-gdb-py
 │   ├── riscv-none-embed-gprof
 │   ├── riscv-none-embed-ld
@@ -361,9 +359,12 @@ $ tree -L 2 /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1
 ├── include
 │   └── gdb
 ├── lib
+│   ├── bfd-plugins
 │   ├── gcc
 │   ├── libcc1.0.so
 │   └── libcc1.so -> libcc1.0.so
+├── libexec
+│   └── gcc
 ├── riscv-none-embed
 │   ├── bin
 │   ├── include
@@ -373,7 +374,7 @@ $ tree -L 2 /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1
     ├── doc
     └── gcc-riscv-none-embed
 
-17 directories, 35 files
+20 directories, 45 files
 ```
 
 No other files are installed in any system folders or other locations.
@@ -393,8 +394,8 @@ program from the final location. For example on macOS the output should
 look like:
 
 ```console
-$ /Users/ilg/Library/xPacks/\@gnu-mcu-eclipse/riscv-none-gcc/7.2.0-3.1/.content/bin/riscv-none-embed-gcc --version
-riscv-none-embed-gcc (GNU MCU Eclipse RISC-V Embedded GCC, 64-bit) 7.2.0
+$ /Users/ilg/Library/xPacks/@gnu-mcu-eclipse/riscv-none-gcc/8.2.0-2.1.1/.content/bin/riscv-none-embed-gcc --version
+riscv-none-embed-gcc (GNU MCU Eclipse RISC-V Embedded GCC, 64-bit) 8.2.0
 ```
 
 ## Support
