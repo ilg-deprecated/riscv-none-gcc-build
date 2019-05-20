@@ -792,11 +792,7 @@ tidy_up
 # Task [IV-6] /$HOST_MINGW/strip_host_objects/
 if [ "${WITH_STRIP}" == "y" ]
 then
-  # For unknown reasons, strip after patchelf damages the binaries.
-  if [ "${TARGET_PLATFORM}" != "_linux" ]
-  then
-    strip_binaries
-  fi
+  strip_binaries
 fi
 
 # Must be done after gcc 2 make install, otherwise some wrong links
@@ -833,6 +829,8 @@ fix_ownership
 # -----------------------------------------------------------------------------
 
 # Final checks.
+# To keep everything as pristine as possible, run tests
+# only after the archive is packed.
 run_binutils
 run_gcc
 run_gdb
