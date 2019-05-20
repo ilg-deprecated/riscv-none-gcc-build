@@ -177,7 +177,6 @@ function do_binutils()
 
       if [ ! -f "config.status" ]
       then
-
         (
           echo
           echo "Running binutils configure..."
@@ -214,7 +213,6 @@ function do_binutils()
             
           cp "config.log" "${LOGS_FOLDER_PATH}/config-binutils-log.txt"
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-binutils-output.txt"
-
       fi
 
       (
@@ -253,7 +251,7 @@ function do_binutils()
         # object files: cannot compile".
         copy_dir "${APP_PREFIX}" "${APP_PREFIX_NANO}"
 
-      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-newlib-output.txt"
+      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-binutils-output.txt"
     )
 
     run_binutils
@@ -295,7 +293,6 @@ function do_gcc_first()
 
     if [ -n "${GCC_MULTILIB}" ]
     then
-
       (
         echo
         echo "Running the multilib generator..."
@@ -314,7 +311,6 @@ function do_gcc_first()
         ./multilib-generator ${GCC_MULTILIB} > "${GCC_MULTILIB_FILE}"
         cat "${GCC_MULTILIB_FILE}"
       )
-
     fi
 
     (
@@ -336,7 +332,6 @@ function do_gcc_first()
 
       if [ ! -f "config.status" ]
       then
-
         (
           echo
           echo "Running gcc first stage configure..."
@@ -396,7 +391,6 @@ function do_gcc_first()
 
           cp "config.log" "${LOGS_FOLDER_PATH}/config-gcc-first-log.txt"
         ) 2>&1 | tee "${LOGS_FOLDER_PATH}/configure-gcc-first-output.txt"
-
       fi
 
       (
@@ -413,7 +407,9 @@ function do_gcc_first()
 
         # Strip?
 
-        prepare_app_folder_libraries "${APP_PREFIX}"
+        # Do not prepare here, the final stage make install gets confused
+        # by the shared libraries.
+        # prepare_app_folder_libraries "${APP_PREFIX}"
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc-first-output.txt"
     )
 
@@ -462,7 +458,6 @@ function do_newlib()
 
       if [ ! -f "config.status" ]
       then
-
         (
           # --disable-nls do not use Native Language Support
           # --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf
@@ -612,7 +607,7 @@ function do_newlib()
 
         fi
 
-      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc-first-output.txt"
+      ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-newlib$1-output.txt"
     )
 
     touch "${newlib_stamp_file_path}"
@@ -900,27 +895,7 @@ function do_gcc_final()
             make install
           fi
 
-          prepare_app_folder_libraries "${APP_PREFIX}"
-
-          if [ "$1" == "" ]
-          then
-            (
-              xbb_activate_tex
-
-              # Full build, with documentation.
-              if [ "${WITH_PDF}" == "y" ]
-              then
-                make pdf
-                make install-pdf
-              fi
-
-              if [ "${WITH_HTML}" == "y" ]
-              then
-                make html
-                make install-html
-              fi
-            )
-          elif [ "$1" == "-nano" ]
+          if [ "$1" == "-nano" ]
           then
 
             local target_gcc=""
@@ -957,23 +932,31 @@ function do_gcc_final()
 
           # Strip?
 
-          prepare_app_folder_libraries "${APP_PREFIX}"
+        fi
 
+        if [ "$1" == "" ]
+        then
           (
             xbb_activate_tex
-            
+
+            # Full build, with documentation.
             if [ "${WITH_PDF}" == "y" ]
             then
-              make install-pdf-gcc
+              make pdf
+              make install-pdf
             fi
 
             if [ "${WITH_HTML}" == "y" ]
             then
-              make install-html-gcc
+              make html
+              make install-html
             fi
           )
-
         fi
+
+        # Must be done after make install, otherwise some wrong links
+        # are created in libexec.
+        prepare_app_folder_libraries "${APP_PREFIX}"
 
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc$1-final-output.txt"
     )
