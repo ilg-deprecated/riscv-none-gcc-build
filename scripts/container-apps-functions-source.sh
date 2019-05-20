@@ -228,8 +228,6 @@ function do_binutils()
           make install
         fi
 
-        prepare_app_folder_libraries "${APP_PREFIX}"
-
         (
           xbb_activate_tex
 
@@ -254,8 +252,6 @@ function do_binutils()
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-binutils-output.txt"
     )
 
-    run_binutils
-    
     touch "${binutils_stamp_file_path}"
   else
     echo "Component binutils already installed."
@@ -407,9 +403,6 @@ function do_gcc_first()
 
         # Strip?
 
-        # Do not prepare here, the final stage make install gets confused
-        # by the shared libraries.
-        # prepare_app_folder_libraries "${APP_PREFIX}"
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc-first-output.txt"
     )
 
@@ -954,17 +947,8 @@ function do_gcc_final()
           )
         fi
 
-        # Must be done after make install, otherwise some wrong links
-        # are created in libexec.
-        prepare_app_folder_libraries "${APP_PREFIX}"
-
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gcc$1-final-output.txt"
     )
-
-    if [ "$1" == "" ]
-    then
-      run_gcc
-    fi
 
     touch "${gcc_final_stamp_file_path}"
   else
@@ -1159,8 +1143,6 @@ function do_gdb()
         # strip:.../install/riscv-none-gcc/bin/_inst.672_: file format not recognized
         make install
 
-        prepare_app_libraries "${APP_PREFIX}/bin/${GCC_TARGET}-gdb$1"
-
         if [ "$1" == "" ]
         then
           (
@@ -1182,11 +1164,6 @@ function do_gdb()
 
       ) 2>&1 | tee "${LOGS_FOLDER_PATH}/make-gdb$1-output.txt"
     )
-
-    if [ "$1" == "" -o "${TARGET_PLATFORM}" != "win32" ]
-    then
-      run_gdb "$1"
-    fi
 
     touch "${gdb_stamp_file_path}"
   else
@@ -1290,8 +1267,6 @@ function strip_binaries()
 
         which strip
 
-if true
-then
         binaries=$(find "${folder_path}" -name \* -perm /111 -and ! -type d)
         for bin in ${binaries} 
         do
@@ -1300,22 +1275,7 @@ then
             strip_binary2 strip "${bin}"
           fi
         done
-else
-        which strip
-        strip --help
 
-        "${APP_PREFIX}/bin/riscv-none-embed-as" --version
-        readelf -d "${APP_PREFIX}/bin/riscv-none-embed-as"
-
-        cp "${APP_PREFIX}/bin/riscv-none-embed-as" "/tmp/riscv-none-embed-as"
-        strip -S "/tmp/riscv-none-embed-as"
-        "/tmp/riscv-none-embed-as" --version
-
-        cp "${APP_PREFIX}/bin/riscv-none-embed-as" "${APP_PREFIX}/bin/riscv-none-embed-as2"
-        strip -S "${APP_PREFIX}/bin/riscv-none-embed-as2"
-        readelf -d "${APP_PREFIX}/bin/riscv-none-embed-as2"
-        "${APP_PREFIX}/bin/riscv-none-embed-as2" --version
-fi
       fi
     )
   fi
