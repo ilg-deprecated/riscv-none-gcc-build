@@ -206,7 +206,7 @@ VirtualBox image running on the same macMini with 16 GB of RAM and a fast SSD.
 To build the latest macOS version, with the same timestamp as the previous build:
 
 ```console
-$ rm -rf "${HOME}/Work"/riscv-none-gcc-*
+$ sudo rm -rf "${HOME}/Work"/riscv-none-gcc-*
 $ caffeinate bash ~/Downloads/riscv-none-gcc-build.git/scripts/build.sh --osx --date YYYYMMDD-HHMM
 ```
 
