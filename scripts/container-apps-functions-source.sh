@@ -1217,15 +1217,12 @@ function tidy_up()
   )
 }
 
-# Unused.
 function strip_binaries()
 {
-  local folder_path
+  local folder_path="${APP_PREFIX}"
   if [ $# -ge 1 ]
   then
     folder_path="$1"
-  else
-    folder_path="${APP_PREFIX}"
   fi
 
   if [ "${WITH_STRIP}" == "y" ]
